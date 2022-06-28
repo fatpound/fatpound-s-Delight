@@ -9,10 +9,7 @@ int IsSorted(int *d, int n)
 			count[0]++;
 			count[1]++;
 		}
-		else
-		{
-			count[(d[i] < d[i + 1] ? 0 : 1)]++;
-		}
+		else count[(d[i] < d[i + 1] ? 0 : 1)]++;
 	}
 	
 	return (count[0] == n - 1 ? -1 : (count[1] == n - 1 ? 1 : 0));
