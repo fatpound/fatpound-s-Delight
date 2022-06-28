@@ -1,6 +1,6 @@
 #define SWAP_P(x, y) (*x == *y ? *x = *y : (*x ^= *y ^= *x ^= *y))
 
-void SelectionSort(int *d, int n) // O(n * n)
+void SelectionSort(int *d, int n)
 {
 	int index, j, min;
 	
