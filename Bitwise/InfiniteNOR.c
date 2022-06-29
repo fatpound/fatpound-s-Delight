@@ -1,6 +1,9 @@
 #include <stdio.h>
 
-// As seen in Sebastian Lague's Digital Logic Sim.exe file > https://github.com/SebLague/Digital-Logic-Sim
+// As seen in Sebastian Lague's Digital Logic Sim.exe file
+
+// https://github.com/SebLague/Digital-Logic-Sim
+// https://github.com/fatpound/fatpounds-Delight/blob/main/Bitwise/InfiniteNOR.png
 
 int main()
 {
