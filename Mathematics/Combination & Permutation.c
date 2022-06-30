@@ -8,6 +8,7 @@ int Combination1(int x, int y)
 	return (Factorial(x) / (Factorial(y) * Factorial(x - y)));
 }
 
+// shoutout to Weylyn...
 double Combination2(double x, double y)
 {
 	if (x == y || x == 0 || y == 0) return 1;
