@@ -1,2 +1,2 @@
 # FAT£'s Delight...
-Feels like Turkish Delight ;)
+Tastes like Turkish Delight ;)
