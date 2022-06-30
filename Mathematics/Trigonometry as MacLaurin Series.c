@@ -30,8 +30,8 @@ int main()
 	
 	for (i = 0; i < 10; us1 += 2, us2 += 2)
 	{
-		sinx += (i & 1)   ? (-islem(1)) : (islem(1));
-		cosx += (i++ & 1) ? (islem(2))  : (-islem(2));
+		sinx += (i & 1)   ? (-islem(1)) :  (islem(1));
+		cosx += (i++ & 1) ?  (islem(2)) : (-islem(2));
 	}
 	
 	for (i = 0; i < 6; i++)
