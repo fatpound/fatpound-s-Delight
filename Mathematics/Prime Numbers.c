@@ -21,9 +21,9 @@ int IsPrime2(int x)
 	if (x < 2 || (x % 10) & 1 == 0 || x % 10 == 5 || ISPOWOF2(x)) return 0;
 	if (x % 3 == 0) return (x == 3);
 	
-	int i, j = x + 1;
+	int i;
 	
-	for (i = 7; i * i < j; i++)
+	for (i = 7; i * i < x + 1; i++)
 	{
 		if (x % i == 0)
 		{
@@ -68,9 +68,9 @@ int IsPrime5(int n)
 	
 	int i = 5, h = Floor(1 + sqrt(n));
 	
-	for (i = 7; i * i <= n; i++)
+	for (i = 7; i * i <= h; i++)
 	{
-		if (n % i == 0)
+		if (h % i == 0)
 		{
 			return 0;
 		}
@@ -84,9 +84,9 @@ int IsPrime6(int n)
 	if (n < 4) return (n > 1);
 	if (n % 2 == 0 || n % 3 == 0) return 0;
 	
-	int i, j = n + 1;
+	int i;
 	
-	for (i = 5; i * i < j; i += 6)
+	for (i = 5; i * i < n + 1; i += 6)
 	{
 		if (n % i == 0 || n % (i + 2) == 0)
 		{
@@ -131,7 +131,7 @@ int PrevPrime(int x)
 
 int ClosestPrime(int x)
 {
-	int flag, a = x - PrevPrime(x), b = NextPrime(x) - x;
+	int a = x - PrevPrime(x), b = NextPrime(x) - x;
 	
 	return (a > b ? NextPrime(x) : (a < b ? PrevPrime(x) : 0));
 }
@@ -141,7 +141,7 @@ int ClosestPrimeLocation(int x)
 	int a = x - PrevPrime(x), b = NextPrime(x) - x;
 	
 	if (a < b) return -1;
-	if (a == b) return 0; // Esit Uzakliktalar
+	if (a == b) return 0;
 	if (a > b) return 1;
 }
 
