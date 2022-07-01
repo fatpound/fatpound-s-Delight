@@ -9,10 +9,7 @@ int main()
 {
 	unsigned int z = 0;
   
-	while (1)
-	{
-		printf("%u\n", !(0 | (z = !(0 | z))));
-	}
+	while (printf("%u\n", !(0 | (z = !(0 | z)))));
   
 	return 0;
 }
