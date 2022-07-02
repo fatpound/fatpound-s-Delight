@@ -13,7 +13,7 @@ double Power(double x, U64 int n)
 
 U64 int Factorial(U64 int x)
 {
-	return (x > 2 ? (x * Factorial(x - 1)) : 2);
+	return (x > 1 ? (x * Factorial(x - 1)) : 1);
 }
 
 int main()
