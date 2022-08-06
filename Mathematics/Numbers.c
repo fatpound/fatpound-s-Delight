@@ -8,6 +8,11 @@ int DigitSum(int value)
 	return (value > 0 ? (value % 10 + DigitSum(value / 10)) : 0);
 }
 
+int DigitProd(int value)
+{
+	return (value > 0 ? ((value % 10) * DigitProd(value / 10)) : 1);
+}
+
 int DigitSumOfRange(int start, int end)
 {
 	return (start < end ? (DigitSum(start) + DigitSumOfRange(start + 1, end)) : 0);
