@@ -25,7 +25,7 @@ int main()
 	printf("acinizi giriniz > ");
 	scanf("%lf", &aci);
 	
-	aci = ((U64 int) aci % 360) + (aci - (U64 int) aci); // double variable Mod 360
+	aci  = ((U64 int) aci % 360) + (aci - (U64 int) aci); // double variable Mod 360
 	aci *= PI / 180; // to Radian
 	
 	for (i = 0; i < 10; us1 += 2, us2 += 2)
