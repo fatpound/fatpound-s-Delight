@@ -1,8 +1,8 @@
 using System.Diagnostics;
 
-namespace ConsoleAppCS
+namespace Recursion
 {
-    internal class Program
+    internal class Combinations
     {
         public static void partialcombine(String s, String first, int start, int count, int fixcount)
         {
