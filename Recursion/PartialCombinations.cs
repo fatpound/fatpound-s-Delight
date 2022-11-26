@@ -24,7 +24,7 @@ namespace Recursion
         {
             Stopwatch clock = Stopwatch.StartNew();
 
-            partialcombine("ABCD", "", 0, 2, 2);
+            partialcombine("ABCDE", "", 0, 3, 3);
 
             clock.Stop();
             Console.WriteLine("\n{0} ms", clock.ElapsedMilliseconds);
