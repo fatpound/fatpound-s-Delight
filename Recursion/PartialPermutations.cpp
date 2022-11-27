@@ -3,7 +3,7 @@
 
 using namespace std;
 
-void permute(string first, string str, int n)
+void permute(string str, string first, int n)
 {
 	if (n == 0)
 	{
@@ -13,14 +13,14 @@ void permute(string first, string str, int n)
 	{
 		for (int i = 0; i < str.length(); i++)
 		{
-			permute(first + str[i], str.substr(0, i) + str.substr(i + 1, str.length()), n - 1);
+			permute(str.substr(0, i) + str.substr(i + 1, str.length()), first + str[i], n - 1);
 		}
 	}
 }
 
 int main()
 {
-	permute("", "abcde", 2);
+	permute("abcde", "", 2);
 
 	return 0;
 }
