@@ -8,13 +8,12 @@ void permutecombine(string str, string first, int n, int mode) /// mode 0 -> com
 	if (n == 0)
 	{
 		cout << first << endl;
+		return;
 	}
-	else
+
+	for (int i = 0; i < str.length(); i++)
 	{
-		for (int i = 0; i < str.length(); i++)
-		{
-			permutecombine((mode ? str.substr(0, i) : "") + str.substr(i + 1, str.length()), first + str[i], n - 1, mode);
-		}
+		permutecombine((mode ? str.substr(0, i) : "") + str.substr(i + 1, str.length()), first + str[i], n - 1, mode);
 	}
 }
 
