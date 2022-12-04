@@ -303,8 +303,7 @@ matrix matrix::returnMinor(matrix* source, int row, int col)
 			{
 				y = 1;
 			}
-
-			if (j != col)
+			else
 			{
 				src._matrix[x == 1 ? i - 1 : i][y == 1 ? j - 1 : j] = source->_matrix[i][j];
 			}
