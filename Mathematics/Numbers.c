@@ -33,16 +33,6 @@ int IsOppositeSigns(int x, int y)
 	return ((x ^ y) < 0);
 }
 
-int IsSmith(int x)
-{
-	return (DigitSum(x) == SumOfPrimeDigits(x) ? 1 : 0);
-}
-
-int IsMagic(int x)
-{
-	return  (DigitSum(x) * RevNum(DigitSum(x)) == x ? 1 : 0);
-}
-
 int AllDigitsDiffer(int x)
 {
 	int i, j, count = DigitCount(x);
