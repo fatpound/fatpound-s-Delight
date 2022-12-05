@@ -82,6 +82,28 @@ void matrix::printAll()
 	cout << "\n";
 }
 
+void matrix::toUnit()
+{
+	if (_row != _col)
+	{
+		return;
+	}
+
+	for (int i = 0; i < _row; i++)
+	{
+		for (int j = 0; j < _col; j++)
+		{
+			if (i == j && _matrix[i][j] != 1)
+			{
+				_matrix[i][j] = 1;
+			}
+			else if (_matrix[i][j] != 0)
+			{
+				_matrix[i][j] = 0;
+			}
+		}
+	}
+}
 void matrix::setValue(int row, int col, int value)
 {
 	_matrix[row][col] = value;
@@ -113,28 +135,6 @@ void matrix::fillRand(int max)
 	}
 }
 
-void matrix::toUnit()
-{
-	if (_row != _col)
-	{
-		return;
-	}
-
-	for (int i = 0; i < _row; i++)
-	{
-		for (int j = 0; j < _col; j++)
-		{
-			if (i == j && _matrix[i][j] != 1)
-			{
-				_matrix[i][j] = 1;
-			}
-			else if (_matrix[i][j] != 0)
-			{
-				_matrix[i][j] = 0;
-			}
-		}
-	}
-}
 void matrix::transPose()
 {
 	int** temp_matrix = new int* [_col];
@@ -154,7 +154,6 @@ void matrix::transPose()
 
 	_matrix = temp_matrix;
 }
-
 void matrix::addMatrix(matrix* second)
 {
 	if (_row != second->_row || _col != second->_col)
@@ -188,19 +187,6 @@ void matrix::subtractMatrix(matrix* second)
 			{
 				_matrix[i][j] -= second->_matrix[i][j];
 			}
-		}
-	}
-}
-void matrix::multiplyScalar(int k)
-{
-	if (k == 1)
-		return;
-
-	for (int i = 0; i < _row; i++)
-	{
-		for (int j = 0; i < _col; j++)
-		{
-			_matrix[i][j] *= k;
 		}
 	}
 }
@@ -252,6 +238,19 @@ void matrix::multiplyMatrix(matrix* second)
 		for (int j = 0; j < _col; j++)
 		{
 			_matrix[i][j] = temp_matrix[i][j];
+		}
+	}
+}
+void matrix::multiplyScalar(int k)
+{
+	if (k == 1)
+		return;
+
+	for (int i = 0; i < _row; i++)
+	{
+		for (int j = 0; i < _col; j++)
+		{
+			_matrix[i][j] *= k;
 		}
 	}
 }
