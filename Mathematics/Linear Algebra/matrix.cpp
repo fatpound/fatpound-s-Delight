@@ -165,7 +165,7 @@ void matrix::addMatrix(matrix* second)
 	{
 		for (int j = 0; j < _col; j++)
 		{
-			if (_matrix[i][j] != 0 && second->_matrix[i][j] != 0)
+			if (second->_matrix[i][j] != 0)
 			{
 				_matrix[i][j] += second->_matrix[i][j];
 			}
@@ -183,7 +183,7 @@ void matrix::subtractMatrix(matrix* second)
 	{
 		for (int j = 0; j < _col; j++)
 		{
-			if (_matrix[i][j] != 0 && second->_matrix[i][j] != 0)
+			if (second->_matrix[i][j] != 0)
 			{
 				_matrix[i][j] -= second->_matrix[i][j];
 			}
@@ -268,7 +268,7 @@ matrix matrix::AddedMatrix(matrix* second)
 	{
 		for (int j = 0; j < _col; j++)
 		{
-			if (newm._matrix[i][j] != 0 && second->_matrix[i][j] != 0)
+			if (second->_matrix[i][j] != 0)
 			{
 				newm._matrix[i][j] += second->_matrix[i][j];
 			}
@@ -290,7 +290,7 @@ matrix matrix::SubtractedMatrix(matrix* second)
 	{
 		for (int j = 0; j < _col; j++)
 		{
-			if (newm._matrix[i][j] != 0 && second->_matrix[i][j] != 0)
+			if (second->_matrix[i][j] != 0)
 			{
 				newm._matrix[i][j] -= second->_matrix[i][j];
 			}
