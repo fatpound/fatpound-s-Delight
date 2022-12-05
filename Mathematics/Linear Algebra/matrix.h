@@ -28,10 +28,15 @@ public:
 	void addMatrix(matrix* second);
 	void multiplyScalar(int k);
 	void multiplyMatrix(matrix* second);
-	matrix returnMultipledMatrix(matrix* second);
 
-	matrix returnMinor(matrix* source, int row, int col);
-	matrix returnAdj(matrix* source);
+	matrix AddedMatrix(matrix* second);
+	matrix MultipledMatrix(matrix* second);
+	matrix Minor(matrix* source, int row, int col);
+	matrix Adjacent(matrix* source);
+
 	int calculateSarrus();
 	int calculateDeterminant(matrix* source);
+
+	matrix operator + (matrix& source);
+	matrix operator * (matrix& source);
 };
