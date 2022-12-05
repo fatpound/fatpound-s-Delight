@@ -26,10 +26,12 @@ public:
 	void transPose();
 
 	void addMatrix(matrix* second);
+	void subtractMatrix(matrix* second);
 	void multiplyScalar(int k);
 	void multiplyMatrix(matrix* second);
 
 	matrix AddedMatrix(matrix* second);
+	matrix SubtractedMatrix(matrix* second);
 	matrix MultipledMatrix(matrix* second);
 	matrix Minor(matrix* source, int row, int col);
 	matrix Adjacent(matrix* source);
@@ -38,5 +40,6 @@ public:
 	int calculateDeterminant(matrix* source);
 
 	matrix operator + (matrix& source);
+	matrix operator - (matrix& source);
 	matrix operator * (matrix& source);
 };
