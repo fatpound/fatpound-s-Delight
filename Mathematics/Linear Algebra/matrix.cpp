@@ -173,6 +173,24 @@ void matrix::addMatrix(matrix* second)
 		}
 	}
 }
+void matrix::subtractMatrix(matrix* second)
+{
+	if (_row != second->_row || _col != second->_col)
+	{
+		return;
+	}
+
+	for (int i = 0; i < _row; i++)
+	{
+		for (int j = 0; j < _col; j++)
+		{
+			if (_matrix[i][j] != 0 && second->_matrix[i][j] != 0)
+			{
+				_matrix[i][j] -= second->_matrix[i][j];
+			}
+		}
+	}
+}
 void matrix::multiplyScalar(int k)
 {
 	if (k == 1)
@@ -254,6 +272,28 @@ matrix matrix::AddedMatrix(matrix* second)
 			if (newm._matrix[i][j] != 0 && second->_matrix[i][j] != 0)
 			{
 				newm._matrix[i][j] += second->_matrix[i][j];
+			}
+		}
+	}
+
+	return newm;
+}
+matrix matrix::SubtractedMatrix(matrix* second)
+{
+	if (_row != second->_row || _col != second->_col)
+	{
+		return NULL;
+	}
+
+	matrix newm = new matrix(this);
+
+	for (int i = 0; i < _row; i++)
+	{
+		for (int j = 0; j < _col; j++)
+		{
+			if (newm._matrix[i][j] != 0 && second->_matrix[i][j] != 0)
+			{
+				newm._matrix[i][j] -= second->_matrix[i][j];
 			}
 		}
 	}
@@ -394,6 +434,10 @@ int matrix::calculateDeterminant(matrix* source)
 matrix matrix::operator + (matrix& source)
 {
 	return AddedMatrix(&source);
+}
+matrix matrix::operator - (matrix& source)
+{
+	return SubtractedMatrix(&source);
 }
 matrix matrix::operator * (matrix& source)
 {
