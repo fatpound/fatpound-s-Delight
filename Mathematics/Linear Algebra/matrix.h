@@ -17,18 +17,17 @@ public:
 	void printCol(int col);
 	void printAll();
 
+	void toUnit();
 	void setValue(int row, int col, int value);
 	void setRand(int row, int col, int max);
 	void fillValue(int value);
 	void fillRand(int max);
 
-	void toUnit();
 	void transPose();
-
 	void addMatrix(matrix* second);
 	void subtractMatrix(matrix* second);
-	void multiplyScalar(int k);
 	void multiplyMatrix(matrix* second);
+	void multiplyScalar(int k);
 
 	matrix AddedMatrix(matrix* second);
 	matrix SubtractedMatrix(matrix* second);
