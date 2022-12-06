@@ -145,8 +145,7 @@ int main()
 	s1.str = (char**) malloc(sizeof(char*) * len);
 	for (i = 0; i < len; (s1.str[i++] = YERAYIR)[0] = '\0');
 	
-	printf("%s", Infix2Prefix(inf));
-	printf("%s", Infix2Postfix(inf));
+	printf("%s\n%s", Infix2Prefix(inf), Infix2Postfix(inf));
 	
 	return (!getch());
 }
