@@ -6,11 +6,12 @@ class matrix
 {
 private:
 	int** _matrix = NULL;
-	int _row, _col;
+	int _row = 0, _col = 0;
 
 public:
 	matrix(int row, int col);
 	matrix(matrix* source);
+	matrix(int* arr, int length, int row, int col);
 	~matrix();
 
 	void printRow(int row);
