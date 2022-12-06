@@ -282,6 +282,20 @@ void matrix::multiplyScalar(int k)
 	}
 }
 
+matrix matrix::TransPosedMatrix()
+{
+	matrix newm = new matrix(_col, _row);
+
+	for (int j = 0; j < _col; j++)
+	{
+		for (int i = 0; i < _row; i++)
+		{
+			newm._matrix[j][i] = _matrix[i][j];
+		}
+	}
+
+	return newm;
+}
 matrix matrix::AddedMatrix(matrix* second)
 {
 	if (_row != second->_row || _col != second->_col)
