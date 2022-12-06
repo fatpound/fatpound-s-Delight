@@ -31,6 +31,7 @@ public:
 	void multiplyMatrix(matrix* second);
 	void multiplyScalar(int k);
 
+	matrix TransPosedMatrix();
 	matrix AddedMatrix(matrix* second);
 	matrix SubtractedMatrix(matrix* second);
 	matrix MultipledMatrix(matrix* second);
