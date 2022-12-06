@@ -7,6 +7,7 @@ class matrix
 private:
 	int** _matrix = NULL;
 	int _row = 0, _col = 0;
+	int determinant = INT32_MIN;
 
 public:
 	matrix(int row, int col);
@@ -33,11 +34,12 @@ public:
 	matrix AddedMatrix(matrix* second);
 	matrix SubtractedMatrix(matrix* second);
 	matrix MultipledMatrix(matrix* second);
-	matrix Minor(matrix* source, int row, int col);
-	matrix Adjacent(matrix* source);
+	matrix Minor(int row, int col);
+	matrix Adjacent();
 
 	int calculateSarrus();
-	int calculateDeterminant(matrix* source);
+	int calculateDeterminant();
+	int getDeterminant();
 
 	matrix operator + (matrix& source);
 	matrix operator - (matrix& source);
