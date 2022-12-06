@@ -352,13 +352,13 @@ matrix matrix::MultipledMatrix(matrix* second)
 
 	return new_matrix;
 }
-matrix matrix::Minor(matrix* source, int row, int col)
+matrix matrix::Minor(int row, int col)
 {
-	matrix src = new matrix(source->_row - 1, source->_col - 1);
+	matrix src = new matrix(_row - 1, _col - 1);
 
 	int x = 0, y;
 
-	for (int i = 0; i < source->_row; i++)
+	for (int i = 0; i < _row; i++)
 	{
 		if (i == row)
 		{
@@ -368,7 +368,7 @@ matrix matrix::Minor(matrix* source, int row, int col)
 
 		y = 0;
 
-		for (int j = 0; j < source->_col; j++)
+		for (int j = 0; j < _col; j++)
 		{
 			if (j == col)
 			{
@@ -376,24 +376,24 @@ matrix matrix::Minor(matrix* source, int row, int col)
 			}
 			else
 			{
-				src._matrix[x == 1 ? i - 1 : i][y == 1 ? j - 1 : j] = source->_matrix[i][j];
+				src._matrix[x == 1 ? i - 1 : i][y == 1 ? j - 1 : j] = _matrix[i][j];
 			}
 		}
 	}
 
 	return src;
 }
-matrix matrix::Adjacent(matrix* source)
+matrix matrix::Adjacent()
 {
-	matrix newm = new matrix(source->_row, source->_col);
+	matrix newm = new matrix(_row, _col);
 
-	for (int i = 0; i < source->_row; i++)
+	for (int i = 0; i < _row; i++)
 	{
-		for (int j = 0; j < source->_col; j++)
+		for (int j = 0; j < _col; j++)
 		{
-			matrix temp = source->Minor(source, i, j);
+			matrix temp = Minor(i, j);
 
-			newm.setValue(i, j, temp.calculateDeterminant(&temp) * ((i + j) % 2 == 0 ? 1 : -1));
+			newm.setValue(i, j, temp.calculateDeterminant() * ((i + j) % 2 == 0 ? 1 : -1));
 		}
 	}
 
@@ -411,7 +411,7 @@ int matrix::calculateSarrus()
 
 	if (_row < 3)
 	{
-		return _row == 1 ? _matrix[0][0] : (_matrix[0][0] * _matrix[1][1] - _matrix[0][1] * _matrix[1][0]);
+		return determinant = (_row == 1 ? _matrix[0][0] : (_matrix[0][0] * _matrix[1][1] - _matrix[0][1] * _matrix[1][0]));
 	}
 
 	int det = 0, prod;
@@ -431,30 +431,39 @@ int matrix::calculateSarrus()
 		}
 	}
 
-	return det;
+	return determinant = det;
 }
-int matrix::calculateDeterminant(matrix* source)
+int matrix::calculateDeterminant()
 {
-	if (source->_row != source->_col)
+	if (_row != _col)
 	{
 		return INT32_MIN;
 	}
 
-	if (source->_row < 4 && source->_col < 4)
+	if (determinant != INT32_MIN)
 	{
-		return source->calculateSarrus();
+		return getDeterminant();
+	}
+
+	if (_row < 4 && _col < 4)
+	{
+		return calculateSarrus();
 	}
 
 	int det = 0;
 
-	for (int i = 0; i < source->_row; i++)
+	for (int i = 0; i < _row; i++)
 	{
-		matrix newm = Minor(source, i, 0);
+		matrix newm = Minor(i, 0);
 
-		det += source->_matrix[i][0] * calculateDeterminant(&newm) * (i % 2 == 0 ? 1 : -1);
+		det += _matrix[i][0] * newm.calculateDeterminant() * (i % 2 == 0 ? 1 : -1);
 	}
 
-	return det;
+	return determinant = det;
+}
+int matrix::getDeterminant()
+{
+	return determinant;
 }
 
 matrix matrix::operator + (matrix& source)
