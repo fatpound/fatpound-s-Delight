@@ -116,6 +116,7 @@ namespace Stack
             values[5, 0] =  4; values[5, 1] =  0; // (  4  0
 
             Console.WriteLine(Infix2Prefix(inf));
+            Console.WriteLine(Infix2Postfix(inf));
 
             return 0;
         }
