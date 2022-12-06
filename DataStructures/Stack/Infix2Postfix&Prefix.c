@@ -146,6 +146,7 @@ int main()
 	for (i = 0; i < len; (s1.str[i++] = YERAYIR)[0] = '\0');
 	
 	printf("%s", Infix2Prefix(inf));
+	printf("%s", Infix2Postfix(inf));
 	
 	return (!getch());
 }
