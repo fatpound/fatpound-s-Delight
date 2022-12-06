@@ -48,6 +48,33 @@ matrix::matrix(matrix* source)
 		}
 	}
 }
+matrix::matrix(int* arr, int length, int row, int col)
+{
+	if (row * col != length)
+	{
+		return;
+	}
+
+	_row = row;
+	_col = col;
+
+	_matrix = new int* [_row];
+
+	for (int i = 0; i < _row; i++)
+	{
+		_matrix[i] = new int[_col];
+	}
+
+	int n = 0;
+
+	for (int i = 0; i < _row; i++)
+	{
+		for (int j = 0; j < _col; j++)
+		{
+			_matrix[i][j] = arr[n++];
+		}
+	}
+}
 matrix::~matrix()
 {
 
