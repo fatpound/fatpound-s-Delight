@@ -6,10 +6,15 @@
 
 void PrintPermutations(char* str, int left, int rite)
 {
-	if (left == rite) printf("%s\n", str);
+	if (left == rite)
+	{
+		printf("%s\n", str);
+	}
 	else
 	{
-		for (int i = left; i <= rite; i++)
+		int i;
+		
+		for (i = left; i <= rite; i++)
 		{
 			SWAP_P(&str[left], &str[i]);
 			PrintPermutations(str, left + 1, rite);
