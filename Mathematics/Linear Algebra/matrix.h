@@ -15,9 +15,9 @@ public:
 	matrix(int* arr, int length, int row, int col);
 	~matrix();
 
+	void printAll();
 	void printRow(int row);
 	void printCol(int col);
-	void printAll();
 
 	void toUnit();
 	void setValue(int row, int col, int value);
@@ -41,6 +41,8 @@ public:
 	int calculateSarrus();
 	int calculateDeterminant();
 	int getDeterminant();
+	int getRowCount();
+	int getColCount();
 
 	matrix operator + (matrix& source);
 	matrix operator - (matrix& source);
