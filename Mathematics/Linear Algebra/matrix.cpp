@@ -1,5 +1,4 @@
 #include <iostream>
-
 #include <cstdlib>
 #include <ctime>
 
@@ -80,6 +79,18 @@ matrix::~matrix()
 
 }
 
+void matrix::printAll()
+{
+	for (int i = 0; i < _row; i++, cout << "\n")
+	{
+		for (int j = 0; j < _col; j++)
+		{
+			cout << _matrix[i][j] << " ";
+		}
+	}
+
+	cout << "\n";
+}
 void matrix::printRow(int row)
 {
 	for (int i = 0; i < _col; i++)
@@ -95,18 +106,6 @@ void matrix::printCol(int col)
 	{
 		cout << _matrix[i][col] << "\n";
 	}
-}
-void matrix::printAll()
-{
-	for (int i = 0; i < _row; i++, cout << "\n")
-	{
-		for (int j = 0; j < _col; j++)
-		{
-			cout << _matrix[i][j] << " ";
-		}
-	}
-
-	cout << "\n";
 }
 
 void matrix::toUnit()
@@ -478,6 +477,14 @@ int matrix::calculateDeterminant()
 int matrix::getDeterminant()
 {
 	return determinant;
+}
+int matrix::getRowCount()
+{
+	return _row;
+}
+int matrix::getColCount()
+{
+	return _col;
 }
 
 matrix matrix::operator + (matrix& source)
