@@ -6,7 +6,7 @@ int Div(int *d, int left, int right)
 	
 	for (i = left; i < right; i++)
 	{
-		if (dizi[i] <= pivot)
+		if (d[i] <= pivot)
 		{
 			index++;
 			SWAP_P(&d[i], &d[index]);
@@ -14,7 +14,7 @@ int Div(int *d, int left, int right)
 	}
 	
 	index++;
-	SWAP_P(&dizi[right], &d[index]);
+	SWAP_P(&d[right], &d[index]);
 	
 	return index;
 }
@@ -26,7 +26,7 @@ void QuickSort(int *d, int left, int right)
 		return;
 	}
 	
-	int v = Div(dizi, left, right);
+	int v = Div(d, left, right);
 	
 	QuickSort(d, left, v - 1);
 	QuickSort(d, v + 1, right);
