@@ -1,10 +1,8 @@
 #define SWAP_P(x, y) (*x == *y ? 0 : (*x ^= *y ^= *x ^= *y))
 
-int i, greater;
-
 void Heapify(int *d, int index, int n)
 {
-	greater = index;
+	int greater = index;
 	
 	if ((2 * index + 1 <= n) && (d[index] < d[2 * index + 1]))
 	{
@@ -25,7 +23,7 @@ void Heapify(int *d, int index, int n)
 
 void BuildHeap(int *d, int n)
 {
-	for (i = (n - 1) / 2; i >= 0; i--)
+	for (int i = (n - 1) / 2; i >= 0; i--)
 	{
 		Heapify(d, i, n);
 	}
@@ -35,8 +33,8 @@ void HeapSort(int *d, int n)
 {
 	while (n >= 2)
 	{
-		BuildHeap(d, n - 1);
-		SWAP_P(&d[n - 1], &d[0]);
 		n--;
+		BuildHeap(d, n);
+		SWAP_P(&d[n], &d[0]);
 	}
 }
