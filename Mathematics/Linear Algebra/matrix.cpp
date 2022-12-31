@@ -274,7 +274,7 @@ void matrix::multiplyScalar(int k)
 
 	for (int i = 0; i < _row; i++)
 	{
-		for (int j = 0; i < _col; j++)
+		for (int j = 0; j < _col; j++)
 		{
 			_matrix[i][j] *= k;
 		}
