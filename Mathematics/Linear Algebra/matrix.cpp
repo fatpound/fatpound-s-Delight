@@ -18,11 +18,11 @@ matrix::matrix(int row, int col)
 	_row = row;
 	_col = col;
 
-	_matrix = new int* [_row];
+	_matrix = new double* [_row];
 
 	for (int i = 0; i < _row; i++)
 	{
-		_matrix[i] = new int[_col];
+		_matrix[i] = new double[_col];
 	}
 }
 matrix::matrix(matrix* source)
@@ -32,11 +32,11 @@ matrix::matrix(matrix* source)
 	_row = source->_row;
 	_col = source->_col;
 
-	_matrix = new int* [_row];
+	_matrix = new double* [_row];
 
 	for (int i = 0; i < _row; i++)
 	{
-		_matrix[i] = new int[_col];
+		_matrix[i] = new double[_col];
 	}
 
 	for (int i = 0; i < _row; i++)
@@ -47,7 +47,7 @@ matrix::matrix(matrix* source)
 		}
 	}
 }
-matrix::matrix(int* arr, int length, int row, int col)
+matrix::matrix(double* arr, double length, int row, int col)
 {
 	if (row * col != length)
 	{
@@ -57,11 +57,11 @@ matrix::matrix(int* arr, int length, int row, int col)
 	_row = row;
 	_col = col;
 
-	_matrix = new int* [_row];
+	_matrix = new double* [_row];
 
 	for (int i = 0; i < _row; i++)
 	{
-		_matrix[i] = new int[_col];
+		_matrix[i] = new double[_col];
 	}
 
 	int n = 0;
@@ -130,7 +130,7 @@ void matrix::toUnit()
 		}
 	}
 }
-void matrix::setValue(int row, int col, int value)
+void matrix::setValue(int row, int col, double value)
 {
 	_matrix[row][col] = value;
 }
@@ -138,7 +138,7 @@ void matrix::setRand(int row, int col, int max)
 {
 	_matrix[row][col] = rand() % ++max;
 }
-void matrix::fillValue(int value)
+void matrix::fillValue(double value)
 {
 	for (int i = 0; i < _row; i++)
 	{
@@ -163,11 +163,11 @@ void matrix::fillRand(int max)
 
 void matrix::transPose()
 {
-	int** temp_matrix = new int* [_col];
+	double** temp_matrix = new double* [_col];
 
 	for (int k = 0; k < _col; k++)
 	{
-		temp_matrix[k] = new int[_row];
+		temp_matrix[k] = new double[_row];
 	}
 
 	for (int j = 0; j < _col; j++)
@@ -223,18 +223,18 @@ void matrix::multiplyMatrix(matrix* second)
 		return;
 	}
 
-	int** temp_matrix = new int* [_row];
+	double** temp_matrix = new double* [_row];
 
 	for (int t = 0; t < _row; t++)
 	{
-		temp_matrix[t] = new int[second->_col];
+		temp_matrix[t] = new double[second->_col];
 	}
 
 	for (int i = 0; i < _row; i++)
 	{
 		for (int k = 0; k < _row; k++)
 		{
-			int sum = 0;
+			double sum = 0;
 
 			for (int j = 0; j < _col; j++)
 			{
@@ -250,13 +250,13 @@ void matrix::multiplyMatrix(matrix* second)
 
 	free((void*)_matrix);
 
-	_matrix = new int* [_row];
+	_matrix = new double* [_row];
 
 	_col = second->_col;
 
 	for (int t = 0; t < _row; t++)
 	{
-		_matrix[t] = new int[_col];
+		_matrix[t] = new double[_col];
 	}
 
 	for (int i = 0; i < _row; i++)
@@ -267,7 +267,7 @@ void matrix::multiplyMatrix(matrix* second)
 		}
 	}
 }
-void matrix::multiplyScalar(int k)
+void matrix::multiplyScalar(double k)
 {
 	if (k == 1)
 		return;
@@ -352,7 +352,7 @@ matrix matrix::MultipledMatrix(matrix* second)
 	{
 		for (int k = 0; k < _row; k++)
 		{
-			int sum = 0;
+			double sum = 0;
 
 			for (int j = 0; j < _col; j++)
 			{
@@ -365,11 +365,11 @@ matrix matrix::MultipledMatrix(matrix* second)
 
 	return new_matrix;
 }
-matrix matrix::Minor(int row, int col)
+matrix matrix::MinorMatrix(int row, int col)
 {
 	matrix src = new matrix(_row - 1, _col - 1);
 
-	int x = 0, y;
+	double x = 0, y;
 
 	for (int i = 0; i < _row; i++)
 	{
@@ -396,7 +396,7 @@ matrix matrix::Minor(int row, int col)
 
 	return src;
 }
-matrix matrix::Adjacent()
+matrix matrix::AdjacentMatrix()
 {
 	matrix newm = new matrix(_row, _col);
 
@@ -404,9 +404,7 @@ matrix matrix::Adjacent()
 	{
 		for (int j = 0; j < _col; j++)
 		{
-			matrix temp = Minor(i, j);
-
-			newm.setValue(i, j, temp.calculateDeterminant() * ((i + j) % 2 == 0 ? 1 : -1));
+			newm.setValue(i, j, MinorMatrix(i, j).calculateDeterminant() * ((i + j) % 2 == 0 ? 1 : -1));
 		}
 	}
 
@@ -414,8 +412,18 @@ matrix matrix::Adjacent()
 
 	return newm;
 }
+matrix matrix::InverseMatrix()
+{
+	calculateDeterminant();
 
-int matrix::calculateSarrus()
+	matrix newm = AdjacentMatrix();
+
+	newm.multiplyScalar(1 / determinant);
+
+	return newm;
+}
+
+double matrix::calculateSarrus()
 {
 	if (_row != _col || _row > 3)
 	{
@@ -427,7 +435,7 @@ int matrix::calculateSarrus()
 		return determinant = (_row == 1 ? _matrix[0][0] : (_matrix[0][0] * _matrix[1][1] - _matrix[0][1] * _matrix[1][0]));
 	}
 
-	int det = 0, prod;
+	double det = 0, prod;
 
 	for (int k = 0; k < 2; k++)
 	{
@@ -446,7 +454,7 @@ int matrix::calculateSarrus()
 
 	return determinant = det;
 }
-int matrix::calculateDeterminant()
+double matrix::calculateDeterminant()
 {
 	if (_row != _col)
 	{
@@ -455,7 +463,7 @@ int matrix::calculateDeterminant()
 
 	if (determinant != INT32_MIN)
 	{
-		return getDeterminant();
+		return determinant;
 	}
 
 	if (_row < 4 && _col < 4)
@@ -463,28 +471,16 @@ int matrix::calculateDeterminant()
 		return calculateSarrus();
 	}
 
-	int det = 0;
+	double det = 0;
 
 	for (int i = 0; i < _row; i++)
 	{
-		matrix newm = Minor(i, 0);
+		matrix newm = MinorMatrix(i, 0);
 
 		det += _matrix[i][0] * newm.calculateDeterminant() * (i % 2 == 0 ? 1 : -1);
 	}
 
 	return determinant = det;
-}
-int matrix::getDeterminant()
-{
-	return determinant;
-}
-int matrix::getRowCount()
-{
-	return _row;
-}
-int matrix::getColCount()
-{
-	return _col;
 }
 
 matrix matrix::operator + (matrix& source)
