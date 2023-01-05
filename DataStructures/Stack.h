@@ -6,35 +6,41 @@
 
 using namespace std;
 
-#define STACK_LIMIT 50
+#define STACK_LIMIT 5
 
 typedef struct Stack
 {
-	int d[STACK_LIMIT];
-	int index = -1;
+    int s[STACK_LIMIT];
+    int index = -1;
 }
 STACK;
 
 void Push(STACK* stack, int n)
 {
-	if (stack->index == STACK_LIMIT - 1)
-	{
-		return;
-	}
+    if (stack->index == STACK_LIMIT - 1)
+        return;
 
-	stack->d[++stack->index] = n;
+    stack->s[++stack->index] = n;
 }
 
 int Pop(STACK* stack, int n)
 {
-	if (stack->index == 0)
+    if (stack->index == 0)
+        return INT32_MIN;
+
+    int num = stack->s[stack->index];
+
+    stack->s[stack->index--] = 0;
+
+    return num;
+}
+
+void ListStack(STACK* stack)
+{
+	for (int i = stack->index; i >= 0; i--)
 	{
-		return INT32_MIN;
+		printf("%d\n", stack->s[i]);
 	}
 
-	int result = stack->d[stack->index];
-
-	stack->d[stack->index--] = 0;
-
-	return result;
+	printf("\n");
 }
