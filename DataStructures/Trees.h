@@ -8,75 +8,72 @@ using namespace std;
 
 typedef struct BinaryTree
 {
-	struct BinaryTree *left;
-	int n;
-	struct BinaryTree *rite;
+    struct BinaryTree *left;
+    int n;
+    struct BinaryTree *rite;
 }
 BINARY_TREE;
 
 BINARY_TREE* AddToBinarySearchTree(BINARY_TREE* root, int num)
 {
-	if (root == NULL)
-	{
-		root = (BINARY_TREE*) malloc(sizeof(BINARY_TREE));
+    if (root == NULL)
+    {
+        root = (BINARY_TREE*) malloc(sizeof(BINARY_TREE));
 
-		root->left = NULL;
-		root->n    = num;
-		root->rite = NULL;
+        root->left = NULL;
+        root->n    = num;
+        root->rite = NULL;
 
-		return root;
-	}
-	
-	if (num <= root->n)
-	{
-		root->left = AddToBinarySearchTree(root->left, num);
-	}
+        return root;
+    }
+    
+    if (num <= root->n)
+    {
+        root->left = AddToBinarySearchTree(root->left, num);
+    }
 
-	if (num >= root->n)
-	{
-		root->rite = AddToBinarySearchTree(root->rite, num);
-	}
+    if (num >= root->n)
+    {
+        root->rite = AddToBinarySearchTree(root->rite, num);
+    }
 
-	return root;
+    return root;
 }
-
 
 void ListPreorder(BINARY_TREE* root)
 {
-	if (root == NULL)
-	{
-		return;
-	}
+    if (root == NULL)
+    {
+        return;
+    }
 
-	printf("%d ", root->n);
+    printf("%d ", root->n);
 
-	ListPreorder(root->left);
-	ListPreorder(root->rite);
+    ListPreorder(root->left);
+    ListPreorder(root->rite);
 }
-
 void ListInorder(BINARY_TREE* root)
 {
-	if (root == NULL)
-	{
-		return;
-	}
+    if (root == NULL)
+    {
+        return;
+    }
 
-	ListInorder(root->left);
+    ListInorder(root->left);
 
-	printf("%d ", root->n);
+    printf("%d ", root->n);
 
-	ListInorder(root->rite);
+    ListInorder(root->rite);
 }
-
 void ListPostorder(BINARY_TREE* root)
 {
-	if (root == NULL)
-	{
-		return;
-	}
+    if (root == NULL)
+    {
+        return;
+    }
 
-	ListPostorder(root->left);
-	ListPostorder(root->rite);
+    ListPostorder(root->left);
+    ListPostorder(root->rite);
 
-	printf("%d ", root->n);
+    printf("%d ", root->n);
 }
