@@ -37,10 +37,10 @@ int Pop(STACK* stack, int n)
 
 void ListStack(STACK* stack)
 {
-	for (int i = stack->index; i >= 0; i--)
-	{
-		printf("%d\n", stack->s[i]);
-	}
+    for (int i = stack->index; i >= 0; i--)
+    {
+        printf("%d\n", stack->s[i]);
+    }
 
-	printf("\n");
+    printf("\n");
 }
