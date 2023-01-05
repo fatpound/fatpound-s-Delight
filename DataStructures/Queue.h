@@ -1,3 +1,11 @@
+#pragma once
+
+#include <iostream>
+#include <cstdio>
+#include <cstdlib>
+
+using namespace std;
+
 #define QUEUE_LIMIT 5
 
 typedef struct Queue
