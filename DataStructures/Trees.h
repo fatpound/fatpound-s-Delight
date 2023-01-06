@@ -77,3 +77,11 @@ void ListPostorder(BINARY_TREE* root)
 
     printf("%d ", root->n);
 }
+
+int TreeSum(BINARY_TREE* root)
+{
+    if (root == NULL)
+        return 0;
+
+    return root->n + TreeSum(root->left) + TreeSum(root->rite);
+}
