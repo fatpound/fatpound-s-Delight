@@ -43,9 +43,7 @@ BINARY_TREE* AddToBinarySearchTree(BINARY_TREE* root, int num)
 void ListPreorder(BINARY_TREE* root)
 {
     if (root == NULL)
-    {
         return;
-    }
 
     printf("%d ", root->n);
 
@@ -55,9 +53,7 @@ void ListPreorder(BINARY_TREE* root)
 void ListInorder(BINARY_TREE* root)
 {
     if (root == NULL)
-    {
         return;
-    }
 
     ListInorder(root->left);
 
@@ -68,9 +64,7 @@ void ListInorder(BINARY_TREE* root)
 void ListPostorder(BINARY_TREE* root)
 {
     if (root == NULL)
-    {
         return;
-    }
 
     ListPostorder(root->left);
     ListPostorder(root->rite);
