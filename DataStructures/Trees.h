@@ -109,6 +109,7 @@ void ListTreePostorder(BINARY_SEARCH_TREE* root)
     }
 }
 
+
 void ListLastLeaves(BINARY_SEARCH_TREE* root)
 {
     if (root != NULL)
@@ -121,6 +122,21 @@ void ListLastLeaves(BINARY_SEARCH_TREE* root)
 
         ListLastLeaves(root->left);
         ListLastLeaves(root->rite);
+    }
+}
+
+void ListLastLeavesReverse(BINARY_SEARCH_TREE* root)
+{
+    if (root != NULL)
+    {
+        if (root->left == NULL && root->rite == NULL)
+        {
+            printf("%d ", root->n);
+            return;
+        }
+
+        ListLastLeavesReverse(root->rite);
+        ListLastLeavesReverse(root->left);
     }
 }
 
