@@ -8,29 +8,32 @@ using namespace std;
 
 typedef struct BinaryTree
 {
-    struct BinaryTree* left;
+    struct BinaryTree *left;
     int n;
-    struct BinaryTree* rite;
+    struct BinaryTree *right;
 }
 BINARY_TREE;
 
 typedef struct BinarySearchTree
 {
-    struct BinarySearchTree*left;
+    struct BinarySearchTree *left;
     int n;
-    struct BinarySearchTree*rite;
+    struct BinarySearchTree *right;
 }
 BINARY_SEARCH_TREE;
+
+#define ALLOCATE_BINARYTREE       (BINARY_TREE*)        malloc(sizeof(BINARY_TREE))
+#define ALLOCATE_BINARYSEARCHTREE (BINARY_SEARCH_TREE*) malloc(sizeof(BINARY_SEARCH_TREE))
 
 BINARY_SEARCH_TREE* AddToBinarySearchTree(BINARY_SEARCH_TREE* root, int num)
 {
     if (root == NULL)
     {
-        root = (BINARY_SEARCH_TREE*) malloc(sizeof(BINARY_SEARCH_TREE));
+        root = ALLOCATE_BINARYSEARCHTREE;
 
         root->left = NULL;
         root->n    = num;
-        root->rite = NULL;
+        root->right = NULL;
 
         return root;
     }
@@ -42,7 +45,7 @@ BINARY_SEARCH_TREE* AddToBinarySearchTree(BINARY_SEARCH_TREE* root, int num)
 
     if (num > root->n)
     {
-        root->rite = AddToBinarySearchTree(root->rite, num);
+        root->right = AddToBinarySearchTree(root->right, num);
     }
 
     return root;
@@ -57,7 +60,7 @@ BINARY_SEARCH_TREE* FindNumberAddress(BINARY_SEARCH_TREE* root, int num)
         return FindNumberAddress(root->left, num);
 
     if (num > root->n)
-        return FindNumberAddress(root->rite, num);
+        return FindNumberAddress(root->right, num);
 
     return root;
 }
@@ -72,10 +75,10 @@ BINARY_SEARCH_TREE* GetSmallest(BINARY_SEARCH_TREE* root)
 
 BINARY_SEARCH_TREE* GetGreatest(BINARY_SEARCH_TREE* root)
 {
-    if (root->rite == NULL)
+    if (root->right == NULL)
         return root;
 
-    return GetGreatest(root->rite);
+    return GetGreatest(root->right);
 }
 
 
@@ -85,7 +88,7 @@ void ListTreePreorder(BINARY_SEARCH_TREE* root)
     {
         printf("%d ", root->n);
         ListTreePreorder(root->left);
-        ListTreePreorder(root->rite);
+        ListTreePreorder(root->right);
     }
 }
 
@@ -95,7 +98,7 @@ void ListTreeInorder(BINARY_SEARCH_TREE* root)
     {
         ListTreeInorder(root->left);
         printf("%d ", root->n);
-        ListTreeInorder(root->rite);
+        ListTreeInorder(root->right);
     }
 }
 
@@ -104,7 +107,7 @@ void ListTreePostorder(BINARY_SEARCH_TREE* root)
     if (root != NULL)
     {
         ListTreePostorder(root->left);
-        ListTreePostorder(root->rite);
+        ListTreePostorder(root->right);
         printf("%d ", root->n);
     }
 }
@@ -114,14 +117,14 @@ void ListLastLeaves(BINARY_SEARCH_TREE* root)
 {
     if (root != NULL)
     {
-        if (root->left == NULL && root->rite == NULL)
+        if (root->left == NULL && root->right == NULL)
         {
             printf("%d ", root->n);
             return;
         }
 
         ListLastLeaves(root->left);
-        ListLastLeaves(root->rite);
+        ListLastLeaves(root->right);
     }
 }
 
@@ -129,13 +132,13 @@ void ListLastLeavesReverse(BINARY_SEARCH_TREE* root)
 {
     if (root != NULL)
     {
-        if (root->left == NULL && root->rite == NULL)
+        if (root->left == NULL && root->right == NULL)
         {
             printf("%d ", root->n);
             return;
         }
 
-        ListLastLeavesReverse(root->rite);
+        ListLastLeavesReverse(root->right);
         ListLastLeavesReverse(root->left);
     }
 }
@@ -146,7 +149,7 @@ int BinaryTreeSum(BINARY_TREE* root)
     if (root == NULL)
         return 0;
 
-    return root->n + BinaryTreeSum(root->left) + BinaryTreeSum(root->rite);
+    return root->n + BinaryTreeSum(root->left) + BinaryTreeSum(root->right);
 }
 
 int BinaryTreeSum(BINARY_SEARCH_TREE* root)
@@ -154,5 +157,5 @@ int BinaryTreeSum(BINARY_SEARCH_TREE* root)
     if (root == NULL)
         return 0;
 
-    return root->n + BinaryTreeSum(root->left) + BinaryTreeSum(root->rite);
+    return root->n + BinaryTreeSum(root->left) + BinaryTreeSum(root->right);
 }
