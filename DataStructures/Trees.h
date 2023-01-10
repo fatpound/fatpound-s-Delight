@@ -51,34 +51,34 @@ BINARY_SEARCH_TREE* AddToBinarySearchTree(BINARY_SEARCH_TREE* root, int num)
     return root;
 }
 
-BINARY_SEARCH_TREE* FindNumberAddress(BINARY_SEARCH_TREE* root, int num)
+BINARY_SEARCH_TREE* FindNode(BINARY_SEARCH_TREE* root, int num)
 {
     if (root == NULL)
         return NULL;
 
     if (num < root->n)
-        return FindNumberAddress(root->left, num);
+        return FindNode(root->left, num);
 
     if (num > root->n)
-        return FindNumberAddress(root->right, num);
+        return FindNode(root->right, num);
 
     return root;
 }
 
-BINARY_SEARCH_TREE* GetSmallest(BINARY_SEARCH_TREE* root)
+BINARY_SEARCH_TREE* GetSmallestNode(BINARY_SEARCH_TREE* root)
 {
     if (root->left == NULL)
         return root;
 
-    return GetSmallest(root->left);
+    return GetSmallestNode(root->left);
 }
 
-BINARY_SEARCH_TREE* GetGreatest(BINARY_SEARCH_TREE* root)
+BINARY_SEARCH_TREE* GetGreatestNode(BINARY_SEARCH_TREE* root)
 {
     if (root->right == NULL)
         return root;
 
-    return GetGreatest(root->right);
+    return GetGreatestNode(root->right);
 }
 
 
