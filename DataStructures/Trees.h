@@ -84,63 +84,63 @@ BINARY_SEARCH_TREE* GetGreatestNode(BINARY_SEARCH_TREE* root)
 
 void ListTreePreorder(BINARY_SEARCH_TREE* root)
 {
-    if (root != NULL)
-    {
-        printf("%d ", root->n);
-        ListTreePreorder(root->left);
-        ListTreePreorder(root->right);
-    }
+    if (root == NULL)
+        return;
+
+    printf("%d ", root->n);
+    ListTreePreorder(root->left);
+    ListTreePreorder(root->right);
 }
 
 void ListTreeInorder(BINARY_SEARCH_TREE* root)
 {
-    if (root != NULL)
-    {
-        ListTreeInorder(root->left);
-        printf("%d ", root->n);
-        ListTreeInorder(root->right);
-    }
+    if (root == NULL)
+        return;
+
+    printf("%d ", root->n);
+    ListTreeInorder(root->left);
+    ListTreeInorder(root->right);
 }
 
 void ListTreePostorder(BINARY_SEARCH_TREE* root)
 {
-    if (root != NULL)
-    {
-        ListTreePostorder(root->left);
-        ListTreePostorder(root->right);
-        printf("%d ", root->n);
-    }
+    if (root == NULL)
+        return;
+
+    printf("%d ", root->n);
+    ListTreePostorder(root->left);
+    ListTreePostorder(root->right);
 }
 
 
 void ListLastLeaves(BINARY_SEARCH_TREE* root)
 {
-    if (root != NULL)
-    {
-        if (root->left == NULL && root->right == NULL)
-        {
-            printf("%d ", root->n);
-            return;
-        }
+    if (root == NULL)
+        return;
 
-        ListLastLeaves(root->left);
-        ListLastLeaves(root->right);
+    if (root->left == NULL && root->right == NULL)
+    {
+        printf("%d ", root->n);
+        return;
     }
+
+    ListLastLeaves(root->left);
+    ListLastLeaves(root->right);
 }
 
 void ListLastLeavesReverse(BINARY_SEARCH_TREE* root)
 {
-    if (root != NULL)
-    {
-        if (root->left == NULL && root->right == NULL)
-        {
-            printf("%d ", root->n);
-            return;
-        }
+    if (root == NULL)
+        return;
 
-        ListLastLeavesReverse(root->right);
-        ListLastLeavesReverse(root->left);
+    if (root->left == NULL && root->right == NULL)
+    {
+        printf("%d ", root->n);
+        return;
     }
+
+    ListLastLeaves(root->right);
+    ListLastLeaves(root->left);
 }
 
 
@@ -158,4 +158,16 @@ int BinaryTreeSum(BINARY_SEARCH_TREE* root)
         return 0;
 
     return root->n + BinaryTreeSum(root->left) + BinaryTreeSum(root->right);
+}
+
+
+void DeleteNode(BINARY_SEARCH_TREE* root)
+{
+    if (root == NULL)
+        return;
+
+    DeleteNode(root->left);
+    DeleteNode(root->right);
+
+    free(root);
 }
