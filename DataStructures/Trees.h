@@ -14,11 +14,11 @@ typedef struct BinaryTree
 }
 BINARY_TREE;
 
-typedef struct BinaryTree
+typedef struct BinarySearchTree
 {
-    struct BinaryTree *left;
+    struct BinarySearchTree*left;
     int n;
-    struct BinaryTree *rite;
+    struct BinarySearchTree*rite;
 }
 BINARY_SEARCH_TREE;
 
