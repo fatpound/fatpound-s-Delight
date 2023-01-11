@@ -144,20 +144,28 @@ void ListLeavesReverse(BINARY_SEARCH_TREE* root)
 }
 
 
-int BinaryTreeSum(BINARY_TREE* root)
+int NodeCount(BST* root)
 {
     if (root == NULL)
         return 0;
 
-    return root->n + BinaryTreeSum(root->left) + BinaryTreeSum(root->right);
+    return 1 + NodeCount(root->left) + NodeCount(root->right);
 }
 
-int BinaryTreeSum(BINARY_SEARCH_TREE* root)
+int TreeSum(BT* root)
 {
     if (root == NULL)
         return 0;
 
-    return root->n + BinaryTreeSum(root->left) + BinaryTreeSum(root->right);
+    return root->n + TreeSum(root->left) + TreeSum(root->right);
+}
+
+int TreeSum(BST* root)
+{
+    if (root == NULL)
+        return 0;
+
+    return root->n + TreeSum(root->left) + TreeSum(root->right);
 }
 
 
