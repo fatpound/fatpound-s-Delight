@@ -113,7 +113,7 @@ void ListTreePostorder(BINARY_SEARCH_TREE* root)
 }
 
 
-void ListLastLeaves(BINARY_SEARCH_TREE* root)
+void ListLeaves(BINARY_SEARCH_TREE* root)
 {
     if (root == NULL)
         return;
@@ -124,11 +124,11 @@ void ListLastLeaves(BINARY_SEARCH_TREE* root)
         return;
     }
 
-    ListLastLeaves(root->left);
-    ListLastLeaves(root->right);
+    ListLeaves(root->left);
+    ListLeaves(root->right);
 }
 
-void ListLastLeavesReverse(BINARY_SEARCH_TREE* root)
+void ListLeavesReverse(BINARY_SEARCH_TREE* root)
 {
     if (root == NULL)
         return;
@@ -139,8 +139,8 @@ void ListLastLeavesReverse(BINARY_SEARCH_TREE* root)
         return;
     }
 
-    ListLastLeaves(root->right);
-    ListLastLeaves(root->left);
+    ListLeavesReverse(root->right);
+    ListLeavesReverse(root->left);
 }
 
 
@@ -161,13 +161,20 @@ int BinaryTreeSum(BINARY_SEARCH_TREE* root)
 }
 
 
-void DeleteNode(BINARY_SEARCH_TREE* root)
+void DeleteTree(BINARY_SEARCH_TREE* root)
 {
     if (root == NULL)
         return;
 
-    DeleteNode(root->left);
-    DeleteNode(root->right);
+    DeleteTree(root->left);
+    DeleteTree(root->right);
 
     free(root);
+}
+
+void DeleteNode(BINARY_SEARCH_TREE* root, BINARY_SEARCH_TREE* leaf)
+{
+    DeleteTree(leaf);
+    
+    root->left == leaf ? root->left = NULL : root->right = NULL;
 }
