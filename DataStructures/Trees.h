@@ -178,3 +178,92 @@ void DeleteNode(BINARY_SEARCH_TREE* root, BINARY_SEARCH_TREE* leaf)
     
     root->left == leaf ? root->left = NULL : root->right = NULL;
 }
+
+void DeleteNode(void* rootptr_address, BST* root, int mode)
+{
+    /// Since we don't use a pointer to root node, that is an optimized solution
+    /// Usage: DeleteNode(&tree, tree, mode)
+
+    // -1 = left
+    //  0 = self with everything connected to it from under
+    //  1 = right
+
+    switch (mode)
+    {
+        case -1:
+        {
+            if (root->left == NULL)
+                return;
+
+            BST* leaf = root->left;
+
+            if (leaf->left == NULL)
+            {
+                root->left = leaf->right;
+            }
+            else
+            {
+                root->left = leaf->left;
+
+                if (leaf->right != NULL)
+                {
+                    if (leaf->left->right != NULL)
+                    {
+                        GetSmallestNode(leaf->right)->left = leaf->left->right;
+                        leaf->left->right = leaf->right;
+                    }
+                }
+            }
+
+            free(leaf);
+            break;
+        }
+
+        case 0:
+        {
+            DeleteTree(root);
+
+            BST* temp_ptr = (BST*)rootptr_address;
+
+            char* p = 0;
+            *temp_ptr = *(BST*)&p;
+
+            break;
+        }
+
+        case 1:
+        {
+            if (root->right == NULL)
+                return;
+
+            BST* leaf = root->right;
+
+            if (leaf->right == NULL)
+            {
+                root->right = leaf->left;
+            }
+            else
+            {
+                root->right = leaf->right;
+
+                if (leaf->left != NULL)
+                {
+                    if (leaf->right->left == NULL)
+                    {
+                        leaf->right->left = leaf->left;
+                    }
+                    else
+                    {
+                        GetSmallestNode(leaf->right)->left = leaf->left;
+                    }
+                }
+            }
+
+            free(leaf);
+            break;
+        }
+
+        default:
+            break;
+    }
+}
