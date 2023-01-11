@@ -82,7 +82,7 @@ BINARY_SEARCH_TREE* GetGreatestNode(BINARY_SEARCH_TREE* root)
 }
 
 
-void ListTreePreorder(BINARY_SEARCH_TREE* root)
+void ListTreePreorder(BST* root)
 {
     if (root == NULL)
         return;
@@ -92,24 +92,24 @@ void ListTreePreorder(BINARY_SEARCH_TREE* root)
     ListTreePreorder(root->right);
 }
 
-void ListTreeInorder(BINARY_SEARCH_TREE* root)
+void ListTreeInorder(BST* root)
 {
     if (root == NULL)
         return;
 
-    printf("%d ", root->n);
     ListTreeInorder(root->left);
+    printf("%d ", root->n);
     ListTreeInorder(root->right);
 }
 
-void ListTreePostorder(BINARY_SEARCH_TREE* root)
+void ListTreePostorder(BST* root)
 {
     if (root == NULL)
         return;
 
-    printf("%d ", root->n);
     ListTreePostorder(root->left);
     ListTreePostorder(root->right);
+    printf("%d ", root->n);
 }
 
 
