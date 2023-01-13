@@ -22,14 +22,17 @@ typedef struct BinarySearchTree
 }
 BINARY_SEARCH_TREE;
 
-#define ALLOCATE_BINARYTREE       (BINARY_TREE*)        malloc(sizeof(BINARY_TREE))
-#define ALLOCATE_BINARYSEARCHTREE (BINARY_SEARCH_TREE*) malloc(sizeof(BINARY_SEARCH_TREE))
+typedef BINARY_TREE BT;
+typedef BINARY_SEARCH_TREE BST;
 
-BINARY_SEARCH_TREE* AddToBinarySearchTree(BINARY_SEARCH_TREE* root, int num)
+#define ALLOCATE_BT  (BT*)  malloc(sizeof(BT))
+#define ALLOCATE_BST (BST*) malloc(sizeof(BST))
+
+BST* AddToBST(BST* root, int num)
 {
     if (root == NULL)
     {
-        root = ALLOCATE_BINARYSEARCHTREE;
+        root = ALLOCATE_BST;
 
         root->left = NULL;
         root->n    = num;
@@ -40,18 +43,18 @@ BINARY_SEARCH_TREE* AddToBinarySearchTree(BINARY_SEARCH_TREE* root, int num)
 
     if (num < root->n)
     {
-        root->left = AddToBinarySearchTree(root->left, num);
+        root->left = AddToBST(root->left, num);
     }
 
     if (num > root->n)
     {
-        root->right = AddToBinarySearchTree(root->right, num);
+        root->right = AddToBST(root->right, num);
     }
 
     return root;
 }
 
-BINARY_SEARCH_TREE* FindNode(BINARY_SEARCH_TREE* root, int num)
+BST* FindNode(BST* root, int num)
 {
     if (root == NULL)
         return NULL;
@@ -65,7 +68,19 @@ BINARY_SEARCH_TREE* FindNode(BINARY_SEARCH_TREE* root, int num)
     return root;
 }
 
-BINARY_SEARCH_TREE* GetSmallestNode(BINARY_SEARCH_TREE* root)
+BST* FindParent(BST* root, BST* node)
+{
+    if (root == NULL || root == node || root->left == node || root->right == node)
+        return root;
+
+    if (FindParent(root->left, node) != NULL)
+        return FindParent(root->left, node);
+
+    if (FindParent(root->right, node) != NULL)
+        return FindParent(root->right, node);
+}
+
+BST* GetSmallestNode(BST* root)
 {
     if (root->left == NULL)
         return root;
@@ -73,7 +88,7 @@ BINARY_SEARCH_TREE* GetSmallestNode(BINARY_SEARCH_TREE* root)
     return GetSmallestNode(root->left);
 }
 
-BINARY_SEARCH_TREE* GetGreatestNode(BINARY_SEARCH_TREE* root)
+BST* GetGreatestNode(BST* root)
 {
     if (root->right == NULL)
         return root;
@@ -113,7 +128,7 @@ void ListTreePostorder(BST* root)
 }
 
 
-void ListLeaves(BINARY_SEARCH_TREE* root)
+void ListLeaves(BST* root)
 {
     if (root == NULL)
         return;
@@ -128,7 +143,7 @@ void ListLeaves(BINARY_SEARCH_TREE* root)
     ListLeaves(root->right);
 }
 
-void ListLeavesReverse(BINARY_SEARCH_TREE* root)
+void ListLeavesReverse(BST* root)
 {
     if (root == NULL)
         return;
@@ -152,24 +167,24 @@ int NodeCount(BST* root)
     return 1 + NodeCount(root->left) + NodeCount(root->right);
 }
 
-int TreeSum(BT* root)
+int BT_Sum(BT* root)
 {
     if (root == NULL)
         return 0;
 
-    return root->n + TreeSum(root->left) + TreeSum(root->right);
+    return root->n + BTSum(root->left) + BTSum(root->right);
 }
 
-int TreeSum(BST* root)
+int BST_Sum(BST* root)
 {
     if (root == NULL)
         return 0;
 
-    return root->n + TreeSum(root->left) + TreeSum(root->right);
+    return root->n + BSTSum(root->left) + BSTSum(root->right);
 }
 
 
-void DeleteTree(BINARY_SEARCH_TREE* root)
+void DeleteTree(BST* root)
 {
     if (root == NULL)
         return;
@@ -179,18 +194,11 @@ void DeleteTree(BINARY_SEARCH_TREE* root)
 
     free(root);
 }
-
-void DeleteNode(BINARY_SEARCH_TREE* root, BINARY_SEARCH_TREE* leaf)
-{
-    DeleteTree(leaf);
-    
-    root->left == leaf ? root->left = NULL : root->right = NULL;
-}
-
 void DeleteNode(void* rootptr_address, BST* root, int mode)
 {
-    /// Since we don't use a pointer to root node, that is an optimized solution
+    /// Since we don't use a pointer to the root node, that is an optimized solution
     /// Usage: DeleteNode(&tree, tree, mode)
+    /// UNBALANCED
 
     // -1 = left
     //  0 = self with everything connected to it from under
