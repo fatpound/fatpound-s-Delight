@@ -53,7 +53,6 @@ BST* AddToBST(BST* root, int num)
 
     return root;
 }
-
 BST* FindNode(BST* root, int num)
 {
     if (root == NULL)
@@ -67,7 +66,6 @@ BST* FindNode(BST* root, int num)
 
     return root;
 }
-
 BST* FindParent(BST* root, BST* node)
 {
     if (root == NULL || root == node || root->left == node || root->right == node)
@@ -79,7 +77,6 @@ BST* FindParent(BST* root, BST* node)
     if (FindParent(root->right, node) != NULL)
         return FindParent(root->right, node);
 }
-
 BST* GetSmallestNode(BST* root)
 {
     if (root->left == NULL)
@@ -87,7 +84,6 @@ BST* GetSmallestNode(BST* root)
 
     return GetSmallestNode(root->left);
 }
-
 BST* GetGreatestNode(BST* root)
 {
     if (root->right == NULL)
@@ -95,7 +91,6 @@ BST* GetGreatestNode(BST* root)
 
     return GetGreatestNode(root->right);
 }
-
 
 void ListTreePreorder(BST* root)
 {
@@ -106,7 +101,6 @@ void ListTreePreorder(BST* root)
     ListTreePreorder(root->left);
     ListTreePreorder(root->right);
 }
-
 void ListTreeInorder(BST* root)
 {
     if (root == NULL)
@@ -116,7 +110,6 @@ void ListTreeInorder(BST* root)
     printf("%d ", root->n);
     ListTreeInorder(root->right);
 }
-
 void ListTreePostorder(BST* root)
 {
     if (root == NULL)
@@ -126,8 +119,6 @@ void ListTreePostorder(BST* root)
     ListTreePostorder(root->right);
     printf("%d ", root->n);
 }
-
-
 void ListLeaves(BST* root)
 {
     if (root == NULL)
@@ -143,7 +134,34 @@ void ListLeaves(BST* root)
     ListLeaves(root->right);
 }
 
-void ListLeavesReverse(BST* root)
+void ListTreePreorder_Reverse(BST* root)
+{
+    if (root == NULL)
+        return;
+
+    printf("%d ", root->n);
+    ListTreePreorder_Reverse(root->right);
+    ListTreePreorder_Reverse(root->left);
+}
+void ListTreeInorder_Reverse(BST* root)
+{
+    if (root == NULL)
+        return;
+
+    ListTreeInorder_Reverse(root->right);
+    printf("%d ", root->n);
+    ListTreeInorder_Reverse(root->left);
+}
+void ListTreePostorder_Reverse(BST* root)
+{
+    if (root == NULL)
+        return;
+
+    ListTreePostorder_Reverse(root->right);
+    ListTreePostorder_Reverse(root->left);
+    printf("%d ", root->n);
+}
+void ListLeaves_Reverse(BST* root)
 {
     if (root == NULL)
         return;
@@ -154,11 +172,17 @@ void ListLeavesReverse(BST* root)
         return;
     }
 
-    ListLeavesReverse(root->right);
-    ListLeavesReverse(root->left);
+    ListLeaves_Reverse(root->right);
+    ListLeaves_Reverse(root->left);
 }
 
+int NodeCount(BT* root)
+{
+    if (root == NULL)
+        return 0;
 
+    return 1 + NodeCount(root->left) + NodeCount(root->right);
+}
 int NodeCount(BST* root)
 {
     if (root == NULL)
@@ -166,23 +190,20 @@ int NodeCount(BST* root)
 
     return 1 + NodeCount(root->left) + NodeCount(root->right);
 }
-
-int BT_Sum(BT* root)
+int TreeSum(BT* root)
 {
     if (root == NULL)
         return 0;
 
-    return root->n + BTSum(root->left) + BTSum(root->right);
+    return root->n + TreeSum(root->left) + TreeSum(root->right);
 }
-
-int BST_Sum(BST* root)
+int TreeSum(BST* root)
 {
     if (root == NULL)
         return 0;
 
-    return root->n + BSTSum(root->left) + BSTSum(root->right);
+    return root->n + TreeSum(root->left) + TreeSum(root->right);
 }
-
 
 void DeleteTree(BST* root)
 {
@@ -194,88 +215,47 @@ void DeleteTree(BST* root)
 
     free(root);
 }
-void DeleteNode(void* rootptr_address, BST* root, int mode)
+void DeleteNode(void* rootptr_address, BST* node, int mode)
 {
-    /// Since we don't use a pointer to the root node, that is an optimized solution
+    /// Since we don't use a pointer to the parent node, that is a good solution
     /// Usage: DeleteNode(&tree, tree, mode)
     /// UNBALANCED
 
-    // -1 = left
-    //  0 = self with everything connected to it from under
-    //  1 = right
+    // 0 = self
+    // 1 = self with everything connected to it from under
 
     switch (mode)
     {
-        case -1:
+        case 0:
         {
-            if (root->left == NULL)
-                return;
-
-            BST* leaf = root->left;
-
-            if (leaf->left == NULL)
+            if (node->left == NULL)
             {
-                root->left = leaf->right;
+                if (node->right == NULL)
+                {
+                    char* p = 0;
+                    *(BST*)rootptr_address = *(BST*)&p;
+                }
+                else
+                {
+                    *(BST*)rootptr_address = *(BST*)&node->right;
+                }
             }
             else
             {
-                root->left = leaf->left;
-
-                if (leaf->right != NULL)
-                {
-                    if (leaf->left->right != NULL)
-                    {
-                        GetSmallestNode(leaf->right)->left = leaf->left->right;
-                        leaf->left->right = leaf->right;
-                    }
-                }
+                *(BST*)rootptr_address = *(BST*)&node->left;
+                node->left->right = node->right;
             }
-
-            free(leaf);
-            break;
-        }
-
-        case 0:
-        {
-            DeleteTree(root);
-
-            BST* temp_ptr = (BST*)rootptr_address;
-
-            char* p = 0;
-            *temp_ptr = *(BST*)&p;
 
             break;
         }
 
         case 1:
         {
-            if (root->right == NULL)
-                return;
+            DeleteTree(node);
 
-            BST* leaf = root->right;
+            char* p = 0;
+            *(BST*)rootptr_address = *(BST*)&p;
 
-            if (leaf->right == NULL)
-            {
-                root->right = leaf->left;
-            }
-            else
-            {
-                root->right = leaf->right;
-
-                if (leaf->left != NULL)
-                {
-                    if (leaf->right->left == NULL)
-                    {
-                        leaf->right->left = leaf->left;
-                    }
-                    else
-                    {
-                        GetSmallestNode(leaf->right)->left = leaf->left;
-                    }
-                }
-            }
-
-            free(leaf);
             break;
         }
 
