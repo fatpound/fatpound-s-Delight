@@ -219,7 +219,6 @@ void DeleteNode(void* rootptr_address, BST* node, int mode)
 {
     /// Since we don't use a pointer to the parent node, that is a good solution
     /// Usage: DeleteNode(&tree, tree, mode)
-    /// UNBALANCED
 
     // 0 = self
     // 1 = self with everything connected to it from under
