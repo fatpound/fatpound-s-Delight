@@ -1,4 +1,4 @@
-#define SWAP_P(x, y) (*x == *y ? *x = *y : (*x ^= *y ^= *x ^= *y))
+#define SWAP_P(x, y) (*x == *y ? 0 : (*x ^= *y ^= *x ^= *y))
 
 void SelectionSort(int *d, int n) // O(n * n)
 {
