@@ -1,67 +1,54 @@
 #include <iostream>
-#include <cstdlib>
-#include <ctime>
 
 #include "matrix.h"
 
-using namespace std;
+using std::cout, std::endl;
 
 matrix::matrix(int row, int col)
 {
     if (row < 1 || col < 1)
-    {
         return;
-    }
-
-    srand(time(NULL));
 
     _row = row;
     _col = col;
 
-    _matrix = new double* [_row];
-
-    for (int i = 0; i < _row; i++)
+    for (int i = 0; i < row; i++)
     {
-        _matrix[i] = new double[_col];
+        _matrix.push_back(vector<double>(col));
     }
 }
-matrix::matrix(matrix* source)
+matrix::matrix(matrix& source)
 {
-    srand(time(NULL));
-
-    _row = source->_row;
-    _col = source->_col;
-
-    _matrix = new double* [_row];
+    _row = source._row;
+    _col = source._col;
 
     for (int i = 0; i < _row; i++)
     {
-        _matrix[i] = new double[_col];
+        _matrix.push_back(vector<double>(_col));
     }
 
     for (int i = 0; i < _row; i++)
     {
         for (int j = 0; j < _col; j++)
         {
-            _matrix[i][j] = source->_matrix[i][j];
+            _matrix.at(i).at(j) = source._matrix.at(i).at(j);
         }
     }
 }
 matrix::matrix(double* arr, double length, int row, int col)
 {
-    if (row * col != length)
-    {
+    if (row < 1 || col < 1)
         return;
-    }
+
+    if (row * col != length)
+        return;
 
     _row = row;
     _col = col;
 
-    _matrix = new double* [_row];
-
     for (int i = 0; i < _row; i++)
     {
-        _matrix[i] = new double[_col];
+        _matrix.push_back(vector<double>(col));
     }
 
     int n = 0;
@@ -70,7 +57,34 @@ matrix::matrix(double* arr, double length, int row, int col)
     {
         for (int j = 0; j < _col; j++)
         {
-            _matrix[i][j] = arr[n++];
+            _matrix.at(i).at(j) = arr[n++];
+        }
+    }
+}
+template<size_t size>
+matrix::matrix(array<double, size> arr, int row, int col)
+{
+    if (row < 1 || col < 1)
+        return;
+
+    if (row * col != size)
+        return;
+
+    _row = row;
+    _col = col;
+
+    for (int i = 0; i < _row; i++)
+    {
+        _matrix.push_back(vector<double>(col));
+    }
+
+    int n = 0;
+
+    for (int i = 0; i < _row; i++)
+    {
+        for (int j = 0; j < _col; j++)
+        {
+            _matrix.at(i).at(j) = arr[n++];
         }
     }
 }
@@ -81,62 +95,63 @@ matrix::~matrix()
 
 void matrix::printAll()
 {
-    for (int i = 0; i < _row; i++, cout << "\n")
+    for (int i = 0; i < _row; i++)
     {
         for (int j = 0; j < _col; j++)
         {
-            cout << _matrix[i][j] << " ";
+            cout << _matrix.at(i).at(j) << " ";
         }
+
+        cout << '\n';
     }
 
-    cout << "\n";
+    cout << '\n';
 }
 void matrix::printRow(int row)
 {
     for (int i = 0; i < _col; i++)
     {
-        cout << _matrix[row][i] << " ";
+        cout << _matrix.at(row).at(i) << " ";
     }
 
-    cout << "\n";
+    cout << '\n';
 }
 void matrix::printCol(int col)
 {
     for (int i = 0; i < _row; i++)
     {
-        cout << _matrix[i][col] << "\n";
+        cout << _matrix.at(i).at(col) << '\n';
     }
 }
 
 void matrix::toUnit()
 {
     if (_row != _col)
-    {
         return;
-    }
 
     for (int i = 0; i < _row; i++)
     {
         for (int j = 0; j < _col; j++)
         {
-            if (i == j && _matrix[i][j] != 1)
+            if (i == j && _matrix.at(i).at(j) != 1)
             {
-                _matrix[i][j] = 1;
+                _matrix.at(i).at(j) = 1;
             }
-            else if (_matrix[i][j] != 0)
+            else if (_matrix.at(i).at(j) != 0)
             {
-                _matrix[i][j] = 0;
+                _matrix.at(i).at(j) = 0;
             }
         }
     }
 }
 void matrix::setValue(int row, int col, double value)
 {
-    _matrix[row][col] = value;
+    _matrix.at(row).at(col) = value;
 }
 void matrix::setRand(int row, int col, int max)
 {
-    _matrix[row][col] = rand() % ++max;
+    max++;
+    _matrix.at(row).at(col) = rand() % max;
 }
 void matrix::fillValue(double value)
 {
@@ -144,7 +159,7 @@ void matrix::fillValue(double value)
     {
         for (int j = 0; j < _col; j++)
         {
-            _matrix[i][j] = value;
+            _matrix.at(i).at(j) = value;
         }
     }
 }
@@ -156,78 +171,72 @@ void matrix::fillRand(int max)
     {
         for (int j = 0; j < _col; j++)
         {
-            _matrix[i][j] = rand() % max;
+            _matrix.at(i).at(j) = rand() % max;
         }
     }
 }
 
 void matrix::transPose()
 {
-    double** temp_matrix = new double* [_col];
+    vector<vector<double>> temp_matrix;
 
     for (int k = 0; k < _col; k++)
     {
-        temp_matrix[k] = new double[_row];
+        temp_matrix.push_back(vector<double>(_row));
     }
 
     for (int j = 0; j < _col; j++)
     {
         for (int i = 0; i < _row; i++)
         {
-            temp_matrix[j][i] = _matrix[i][j];
+            temp_matrix.at(j).at(i) = _matrix.at(i).at(j);
         }
     }
 
     _matrix = temp_matrix;
 }
-void matrix::addMatrix(matrix* second)
+void matrix::addMatrix(matrix& second)
 {
-    if (_row != second->_row || _col != second->_col)
-    {
+    if (_row != second._row || _col != second._col)
         return;
-    }
 
     for (int i = 0; i < _row; i++)
     {
         for (int j = 0; j < _col; j++)
         {
-            if (second->_matrix[i][j] != 0)
+            if (second._matrix.at(i).at(j) != 0)
             {
-                _matrix[i][j] += second->_matrix[i][j];
+                _matrix.at(i).at(j) += second._matrix.at(i).at(j);
             }
         }
     }
 }
-void matrix::subtractMatrix(matrix* second)
+void matrix::subtractMatrix(matrix& second)
 {
-    if (_row != second->_row || _col != second->_col)
-    {
+    if (_row != second._row || _col != second._col)
         return;
-    }
 
     for (int i = 0; i < _row; i++)
     {
         for (int j = 0; j < _col; j++)
         {
-            if (second->_matrix[i][j] != 0)
+            if (second._matrix.at(i).at(j) != 0)
             {
-                _matrix[i][j] -= second->_matrix[i][j];
+                _matrix.at(i).at(j) -= second._matrix.at(i).at(j);
             }
         }
     }
 }
-void matrix::multiplyMatrix(matrix* second)
+void matrix::multiplyMatrix(matrix& second)
 {
-    if (_col != second->_row)
-    {
+    if (_col != second._row)
         return;
-    }
 
-    double** temp_matrix = new double* [_row];
+    vector<vector<double>> temp_matrix;
 
-    for (int t = 0; t < _row; t++)
+    for (int i = 0; i < _row; i++)
     {
-        temp_matrix[t] = new double[second->_col];
+        temp_matrix.push_back(vector<double>(_row));
     }
 
     for (int i = 0; i < _row; i++)
@@ -238,9 +247,9 @@ void matrix::multiplyMatrix(matrix* second)
 
             for (int j = 0; j < _col; j++)
             {
-                if (_matrix[i][j] != 0 && second->_matrix[j][k] != 0)
+                if (_matrix.at(i).at(j) != 0 && second._matrix[j][k] != 0)
                 {
-                    sum += _matrix[i][j] * second->_matrix[j][k];
+                    sum += _matrix.at(i).at(j) * second._matrix[j][k];
                 }
             }
 
@@ -248,22 +257,20 @@ void matrix::multiplyMatrix(matrix* second)
         }
     }
 
-    free((void*)_matrix);
+    _matrix.clear();
 
-    _matrix = new double* [_row];
-
-    _col = second->_col;
+    _col = second._col;
 
     for (int t = 0; t < _row; t++)
     {
-        _matrix[t] = new double[_col];
+        _matrix.push_back(vector<double>(_col));
     }
 
     for (int i = 0; i < _row; i++)
     {
         for (int j = 0; j < _col; j++)
         {
-            _matrix[i][j] = temp_matrix[i][j];
+            _matrix.at(i).at(j) = temp_matrix.at(i).at(j);
         }
     }
 }
@@ -276,98 +283,92 @@ void matrix::multiplyScalar(double k)
     {
         for (int j = 0; j < _col; j++)
         {
-            _matrix[i][j] *= k;
+            _matrix.at(i).at(j) *= k;
         }
     }
 }
 
 matrix matrix::TransPosedMatrix()
 {
-    matrix newm = new matrix(_col, _row);
+    matrix newm = matrix(_col, _row);
 
     for (int j = 0; j < _col; j++)
     {
         for (int i = 0; i < _row; i++)
         {
-            newm._matrix[j][i] = _matrix[i][j];
+            newm._matrix.at(j).at(i) = _matrix.at(i).at(j);
         }
     }
 
     return newm;
 }
-matrix matrix::AddedMatrix(matrix* second)
+matrix matrix::AddedMatrix(matrix& second)
 {
-    if (_row != second->_row || _col != second->_col)
+    if (_row == second._row && _col == second._col)
     {
-        return NULL;
-    }
+        matrix newm = matrix(*this);
 
-    matrix newm = new matrix(this);
-
-    for (int i = 0; i < _row; i++)
-    {
-        for (int j = 0; j < _col; j++)
+        for (int i = 0; i < _row; i++)
         {
-            if (second->_matrix[i][j] != 0)
-            {
-                newm._matrix[i][j] += second->_matrix[i][j];
-            }
-        }
-    }
-
-    return newm;
-}
-matrix matrix::SubtractedMatrix(matrix* second)
-{
-    if (_row != second->_row || _col != second->_col)
-    {
-        return NULL;
-    }
-
-    matrix newm = new matrix(this);
-
-    for (int i = 0; i < _row; i++)
-    {
-        for (int j = 0; j < _col; j++)
-        {
-            if (second->_matrix[i][j] != 0)
-            {
-                newm._matrix[i][j] -= second->_matrix[i][j];
-            }
-        }
-    }
-
-    return newm;
-}
-matrix matrix::MultipledMatrix(matrix* second)
-{
-    if (_col != second->_row)
-    {
-        return NULL;
-    }
-
-    matrix new_matrix = new matrix(_row, second->_col);
-
-    for (int i = 0; i < _row; i++)
-    {
-        for (int k = 0; k < _row; k++)
-        {
-            double sum = 0;
-
             for (int j = 0; j < _col; j++)
             {
-                sum += _matrix[i][j] * second->_matrix[j][k];
+                if (second._matrix.at(i).at(j) != 0)
+                {
+                    newm._matrix.at(i).at(j) += second._matrix.at(i).at(j);
+                }
             }
-
-            new_matrix.setValue(i, k, sum);
         }
-    }
 
-    return new_matrix;
+        return newm;
+    }
+}
+matrix matrix::SubtractedMatrix(matrix& second)
+{
+    if (_row == second._row && _col == second._col)
+    {
+        matrix newm = matrix(*this);
+
+        for (int i = 0; i < _row; i++)
+        {
+            for (int j = 0; j < _col; j++)
+            {
+                if (second._matrix.at(i).at(j) != 0)
+                {
+                    newm._matrix.at(i).at(j) -= second._matrix.at(i).at(j);
+                }
+            }
+        }
+
+        return newm;
+    }
+}
+matrix matrix::MultipledMatrix(matrix& second)
+{
+    if (_col == second._row)
+    {
+        matrix new_matrix = matrix(_row, second._col);
+
+        for (int i = 0; i < _row; i++)
+        {
+            for (int k = 0; k < second._col; k++)
+            {
+                double sum = 0;
+
+                for (int j = 0; j < _col; j++)
+                {
+                    sum += _matrix.at(i).at(j) * second._matrix.at(j).at(k);
+                }
+
+                new_matrix.setValue(i, k, sum);
+            }
+        }
+
+        return new_matrix;
+    }
 }
 matrix matrix::MinorMatrix(int row, int col)
 {
-    matrix src = new matrix(_row - 1, _col - 1);
+    matrix src = matrix(_row - 1, _col - 1);
 
     double x = 0, y;
 
@@ -389,7 +390,7 @@ matrix matrix::MinorMatrix(int row, int col)
             }
             else
             {
-                src._matrix[x == 1 ? i - 1 : i][y == 1 ? j - 1 : j] = _matrix[i][j];
+                src._matrix.at(x == 1 ? i - 1 : i).at(y == 1 ? j - 1 : j) = _matrix.at(i).at(j);
             }
         }
     }
@@ -398,7 +399,7 @@ matrix matrix::MinorMatrix(int row, int col)
 }
 matrix matrix::AdjacentMatrix()
 {
-    matrix newm = new matrix(_row, _col);
+    matrix newm = matrix(_row, _col);
 
     for (int i = 0; i < _row; i++)
     {
@@ -416,28 +417,18 @@ matrix matrix::InverseMatrix()
 {
     calculateDeterminant();
 
-    if (determinant == 0)
-        return NULL;
+    if (determinant != 0)
+    {
+        matrix newm = AdjacentMatrix();
 
-    matrix newm = AdjacentMatrix();
-    
-    newm.multiplyScalar(1 / determinant);
+        newm.multiplyScalar(1 / determinant);
 
-    return newm;
+        return newm;
+    }
 }
 
 double matrix::calculateSarrus()
 {
-    if (_row != _col || _row > 3)
-    {
-        return INT32_MIN;
-    }
-
-    if (_row < 3)
-    {
-        return determinant = (_row == 1 ? _matrix[0][0] : (_matrix[0][0] * _matrix[1][1] - _matrix[0][1] * _matrix[1][0]));
-    }
-
     double det = 0, prod;
 
     for (int k = 0; k < 2; k++)
@@ -448,53 +439,70 @@ double matrix::calculateSarrus()
 
             for (int j = 0; j < 3; j++)
             {
-                prod *= _matrix[(i + (k == 0 ? j : 2 - j)) % 3][j];
+                prod *= _matrix.at((i + (k == 0 ? j : 2 - j)) % 3).at(j);
             }
 
             det += prod * (k == 0 ? 1 : -1);
         }
     }
 
-    return determinant = det;
+    determinant = det;
+
+    return determinant;
 }
 double matrix::calculateDeterminant()
 {
-    if (_row != _col)
-    {
-        return INT32_MIN;
-    }
-
-    if (determinant != INT32_MIN)
-    {
-        return determinant;
-    }
-
-    if (_row < 4 && _col < 4)
-    {
-        return calculateSarrus();
-    }
-
     double det = 0;
 
     for (int i = 0; i < _row; i++)
     {
         matrix newm = MinorMatrix(i, 0);
 
-        det += _matrix[i][0] * newm.calculateDeterminant() * (i % 2 == 0 ? 1 : -1);
+        det += _matrix.at(i).at(0) * newm.calculateDeterminant() * (i % 2 == 0 ? 1 : -1);
     }
 
     return determinant = det;
 }
 
+double matrix::getSarrus()
+{
+    if (_row != _col || _row > 3)
+    {
+        return INT32_MIN;
+    }
+
+    if (_row < 3)
+    {
+        determinant = (_row == 1 ? _matrix.at(0).at(0) : (_matrix.at(0).at(0) * _matrix.at(1).at(1) - _matrix.at(0).at(1) * _matrix.at(1).at(0)));
+
+        return determinant;
+    }
+
+    return calculateSarrus();
+}
+double matrix::getDeterminant()
+{
+    if (_row != _col)
+        return INT32_MIN;
+
+    if (determinant != 999979)
+        return determinant;
+
+    if (_row < 4 && _col < 4)
+        return calculateSarrus();
+
+    return getDeterminant();
+}
+
 matrix matrix::operator + (matrix& source)
 {
-    return AddedMatrix(&source);
+    return AddedMatrix(source);
 }
 matrix matrix::operator - (matrix& source)
 {
-    return SubtractedMatrix(&source);
+    return SubtractedMatrix(source);
 }
 matrix matrix::operator * (matrix& source)
 {
-    return MultipledMatrix(&source);
+    return MultipledMatrix(source);
 }
