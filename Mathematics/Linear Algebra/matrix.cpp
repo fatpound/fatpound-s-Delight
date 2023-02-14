@@ -467,9 +467,7 @@ double matrix::calculateDeterminant()
 double matrix::getSarrus()
 {
     if (_row != _col || _row > 3)
-    {
         return INT32_MIN;
-    }
 
     if (_row < 3)
     {
@@ -482,16 +480,16 @@ double matrix::getSarrus()
 }
 double matrix::getDeterminant()
 {
-    if (_row != _col)
-        return INT32_MIN;
-
     if (determinant != 999979)
         return determinant;
+
+    if (_row != _col)
+        return INT32_MIN;
 
     if (_row < 4 && _col < 4)
         return calculateSarrus();
 
-    return getDeterminant();
+    return calculateDeterminant();
 }
 
 matrix matrix::operator + (matrix& source)
