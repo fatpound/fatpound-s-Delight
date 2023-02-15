@@ -24,7 +24,7 @@ public:
 
     template<size_t size>
     matrix(array<double, size>, int row, int col);
-
+    matrix(vector<double>, int row, int col);
     ~matrix();
 
     void printAll();
