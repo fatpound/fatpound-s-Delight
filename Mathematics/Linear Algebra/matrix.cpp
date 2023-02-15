@@ -84,7 +84,35 @@ matrix::matrix(array<double, size> arr, int row, int col)
     {
         for (int j = 0; j < _col; j++)
         {
-            _matrix.at(i).at(j) = arr[n++];
+            _matrix.at(i).at(j) = arr.at(n);
+            n++;
+        }
+    }
+}
+matrix::matrix(vector<double> arr, int row, int col)
+{
+    if (row < 1 || col < 1)
+        return;
+
+    if (row * col != arr.size())
+        return;
+
+    _row = row;
+    _col = col;
+
+    for (int i = 0; i < _row; i++)
+    {
+        _matrix.push_back(vector<double>(col));
+    }
+
+    int n = 0;
+
+    for (int i = 0; i < _row; i++)
+    {
+        for (int j = 0; j < _col; j++)
+        {
+            _matrix.at(i).at(j) = arr.at(n);
+            n++;
         }
     }
 }
@@ -236,24 +264,24 @@ void matrix::multiplyMatrix(matrix& second)
 
     for (int i = 0; i < _row; i++)
     {
-        temp_matrix.push_back(vector<double>(_row));
+        temp_matrix.push_back(vector<double>(second._col));
     }
 
     for (int i = 0; i < _row; i++)
     {
-        for (int k = 0; k < _row; k++)
+        for (int k = 0; k < second._col; k++)
         {
             double sum = 0;
 
             for (int j = 0; j < _col; j++)
             {
-                if (_matrix.at(i).at(j) != 0 && second._matrix[j][k] != 0)
+                if (_matrix.at(i).at(j) != 0 && second._matrix.at(j).at(k) != 0)
                 {
-                    sum += _matrix.at(i).at(j) * second._matrix[j][k];
+                    sum += _matrix.at(i).at(j) * second._matrix.at(j).at(k);
                 }
             }
 
-            temp_matrix[i][k] = sum;
+            temp_matrix.at(i).at(k) = sum;
         }
     }
 
