@@ -57,7 +57,8 @@ matrix::matrix(double* arr, double length, int row, int col)
     {
         for (int j = 0; j < _col; j++)
         {
-            _matrix.at(i).at(j) = arr[n++];
+            _matrix.at(i).at(j) = arr[n];
+            n++;
         }
     }
 }
