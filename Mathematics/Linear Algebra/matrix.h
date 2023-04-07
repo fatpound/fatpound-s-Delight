@@ -21,9 +21,6 @@ public:
     matrix(int row, int col);
     matrix(matrix& source);
     matrix(double* arr, double length, int row, int col);
-
-    template<size_t size>
-    matrix(array<double, size>, int row, int col);
     matrix(vector<double>, int row, int col);
     ~matrix();
 
