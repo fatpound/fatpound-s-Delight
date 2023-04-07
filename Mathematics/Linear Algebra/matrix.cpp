@@ -62,34 +62,6 @@ matrix::matrix(double* arr, double length, int row, int col)
         }
     }
 }
-template<size_t size>
-matrix::matrix(array<double, size> arr, int row, int col)
-{
-    if (row < 1 || col < 1)
-        return;
-
-    if (row * col != size)
-        return;
-
-    _row = row;
-    _col = col;
-
-    for (int i = 0; i < _row; i++)
-    {
-        _matrix.push_back(vector<double>(col));
-    }
-
-    int n = 0;
-
-    for (int i = 0; i < _row; i++)
-    {
-        for (int j = 0; j < _col; j++)
-        {
-            _matrix.at(i).at(j) = arr.at(n);
-            n++;
-        }
-    }
-}
 matrix::matrix(vector<double> arr, int row, int col)
 {
     if (row < 1 || col < 1)
