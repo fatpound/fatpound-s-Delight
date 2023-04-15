@@ -171,7 +171,7 @@ SINGLY_LINKED_LIST* ReverseSinglyLL(SINGLY_LINKED_LIST* list)
 	SINGLY_LINKED_LIST* a = NULL;
 	SINGLY_LINKED_LIST* x;
 
-	while (list->next != NULL)
+	while (1)
 	{
 		t = list->next;
 		list->next = a;
@@ -183,8 +183,13 @@ SINGLY_LINKED_LIST* ReverseSinglyLL(SINGLY_LINKED_LIST* list)
 
 		if (list == NULL)
 		{
-			t->next = x;
 			return t;
+		}
+		
+		if (list->next == NULL)
+		{
+			list->next = t;
+			return temp;
 		}
 	}
 
@@ -204,7 +209,7 @@ SINGLY_LINKED_LIST* ReverseSinglyCircularLL(SINGLY_LINKED_LIST* list)
 	SINGLY_LINKED_LIST* a = start;
 	SINGLY_LINKED_LIST* x;
 
-	while (list->next != start)
+	while (1)
 	{
 		t = list->next;
 		list->next = a;
@@ -217,8 +222,14 @@ SINGLY_LINKED_LIST* ReverseSinglyCircularLL(SINGLY_LINKED_LIST* list)
 		if (list == start)
 		{
 			start->next = t;
-			t->next = x;
 			return t;
+		}
+		
+		if (list->next == start)
+		{
+			start->next = temp;
+			temp->next = t;
+			return temp;
 		}
 	}
 
