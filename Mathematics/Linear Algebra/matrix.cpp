@@ -1,9 +1,27 @@
 #include <iostream>
+#include <random>
 
 #include "matrix.h"
 
-using std::cout, std::endl;
+using namespace std;
 
+double matrix::get_rand(double first, double last)
+{
+    std::uniform_real_distribution<double> distribution(first, last);
+    std::random_device rd;
+    std::default_random_engine generator(rd());
+
+    return distribution(generator);
+}
+
+matrix::matrix()
+{
+
+}
+matrix::~matrix()
+{
+
+}
 matrix::matrix(int row, int col)
 {
     if (row < 1 || col < 1)
@@ -62,12 +80,12 @@ matrix::matrix(double* arr, double length, int row, int col)
         }
     }
 }
-matrix::matrix(vector<double> arr, int row, int col)
+matrix::matrix(vector<double> vec, int row, int col)
 {
     if (row < 1 || col < 1)
         return;
 
-    if (row * col != arr.size())
+    if (row * col != vec.size())
         return;
 
     _row = row;
@@ -84,14 +102,10 @@ matrix::matrix(vector<double> arr, int row, int col)
     {
         for (int j = 0; j < _col; j++)
         {
-            _matrix.at(i).at(j) = arr.at(n);
+            _matrix.at(i).at(j) = vec.at(n);
             n++;
         }
     }
-}
-matrix::~matrix()
-{
-
 }
 
 void matrix::printAll()
@@ -145,6 +159,10 @@ void matrix::toUnit()
         }
     }
 }
+void matrix::setValue(int row, int col, int value)
+{
+    _matrix.at(row).at(col) = value;
+}
 void matrix::setValue(int row, int col, double value)
 {
     _matrix.at(row).at(col) = value;
@@ -152,7 +170,22 @@ void matrix::setValue(int row, int col, double value)
 void matrix::setRand(int row, int col, int max)
 {
     max++;
-    _matrix.at(row).at(col) = rand() % max;
+    _matrix.at(row).at(col) = (double)(int)get_rand(0, max);
+}
+void matrix::setRand(int row, int col, double max)
+{
+    max++;
+    _matrix.at(row).at(col) = get_rand(0, max);
+}
+void matrix::fillValue(int value)
+{
+    for (int i = 0; i < _row; i++)
+    {
+        for (int j = 0; j < _col; j++)
+        {
+            _matrix.at(i).at(j) = value;
+        }
+    }
 }
 void matrix::fillValue(double value)
 {
@@ -172,7 +205,19 @@ void matrix::fillRand(int max)
     {
         for (int j = 0; j < _col; j++)
         {
-            _matrix.at(i).at(j) = rand() % max;
+            _matrix.at(i).at(j) = (double)(int)get_rand(0, max);
+        }
+    }
+}
+void matrix::fillRand(double max)
+{
+    max++;
+
+    for (int i = 0; i < _row; i++)
+    {
+        for (int j = 0; j < _col; j++)
+        {
+            _matrix.at(i).at(j) = get_rand(0, max);
         }
     }
 }
@@ -272,6 +317,19 @@ void matrix::multiplyMatrix(matrix& second)
         for (int j = 0; j < _col; j++)
         {
             _matrix.at(i).at(j) = temp_matrix.at(i).at(j);
+        }
+    }
+}
+void matrix::multiplyScalar(int k)
+{
+    if (k == 1)
+        return;
+
+    for (int i = 0; i < _row; i++)
+    {
+        for (int j = 0; j < _col; j++)
+        {
+            _matrix.at(i).at(j) *= (double)k;
         }
     }
 }
@@ -418,38 +476,36 @@ matrix matrix::InverseMatrix()
 {
     calculateDeterminant();
 
-    if (determinant != 0)
+    if (this->getDeterminant() != 0)
     {
         matrix newm = AdjacentMatrix();
 
-        newm.multiplyScalar(1 / determinant);
+        newm.multiplyScalar(1 / this->getDeterminant());
 
         return newm;
     }
 }
-
+// kofaktörü yap
 double matrix::calculateSarrus()
 {
-    double det = 0, prod;
+    double det = 0;
 
     for (int k = 0; k < 2; k++)
     {
         for (int i = 0; i < 3; i++)
         {
-            prod = 1;
+            double prod = 1;
 
             for (int j = 0; j < 3; j++)
             {
-                prod *= _matrix.at((i + (k == 0 ? j : 2 - j)) % 3).at(j);
+                prod *= this->_matrix.at((i + (k == 0 ? j : 2 - j)) % 3).at(j);
             }
 
             det += prod * (k == 0 ? 1 : -1);
         }
     }
 
-    determinant = det;
-
-    return determinant;
+    return det;
 }
 double matrix::calculateDeterminant()
 {
@@ -462,7 +518,7 @@ double matrix::calculateDeterminant()
         det += _matrix.at(i).at(0) * newm.calculateDeterminant() * (i % 2 == 0 ? 1 : -1);
     }
 
-    return determinant = det;
+    return det;
 }
 
 double matrix::getSarrus()
@@ -472,23 +528,18 @@ double matrix::getSarrus()
 
     if (_row < 3)
     {
-        determinant = (_row == 1 ? _matrix.at(0).at(0) : (_matrix.at(0).at(0) * _matrix.at(1).at(1) - _matrix.at(0).at(1) * _matrix.at(1).at(0)));
-
-        return determinant;
+        return (_row == 1 ? _matrix.at(0).at(0) : (_matrix.at(0).at(0) * _matrix.at(1).at(1) - _matrix.at(0).at(1) * _matrix.at(1).at(0)));
     }
 
     return calculateSarrus();
 }
 double matrix::getDeterminant()
 {
-    if (determinant != 999979)
-        return determinant;
-
     if (_row != _col)
         return INT32_MIN;
 
     if (_row < 4 && _col < 4)
-        return calculateSarrus();
+        return getSarrus();
 
     return calculateDeterminant();
 }
