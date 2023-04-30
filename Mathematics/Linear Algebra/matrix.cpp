@@ -485,7 +485,7 @@ matrix matrix::InverseMatrix()
         return newm;
     }
 }
-// kofaktörü yap
+
 double matrix::calculateSarrus()
 {
     double det = 0;
