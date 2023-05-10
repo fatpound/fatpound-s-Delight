@@ -2,8 +2,6 @@
 
 #include <iostream>
 
-using namespace std;
-
 template <typename T>
 class DoublyCircularLinkedList
 {
@@ -17,8 +15,8 @@ private:
 
 
     public:
-        DoublyCircularLL_node* prev = NULL;
-        DoublyCircularLL_node* next = NULL;
+        DoublyCircularLL_node* prev = nullptr;
+        DoublyCircularLL_node* next = nullptr;
         T item;
 
         DoublyCircularLL_node();
@@ -26,7 +24,7 @@ private:
         DoublyCircularLL_node(T new_item);
     };
 
-    DoublyCircularLL_node* list = NULL;
+    DoublyCircularLL_node* list = nullptr;
     int item_count = 0;
 
     void connect(DoublyCircularLinkedList<T>& second);
@@ -77,7 +75,7 @@ template <typename T> void DoublyCircularLinkedList<T>::connect(DoublyCircularLi
 }
 template <typename T> void DoublyCircularLinkedList<T>::connect_sorted(DoublyCircularLinkedList<T>::DoublyCircularLL_node* node)
 {
-    if (this->list == NULL)
+    if (this->list == nullptr)
     {
         this->list = node;
         return;
@@ -125,7 +123,7 @@ template <typename T> void DoublyCircularLinkedList<T>::connect_sorted(DoublyCir
 template <typename T> typename DoublyCircularLinkedList<T>::DoublyCircularLL_node* DoublyCircularLinkedList<T>::go_to_index(int index)
 {
     if (index >= this->item_count)
-        return NULL;
+        return nullptr;
 
     DoublyCircularLinkedList<T>::DoublyCircularLL_node* temp = this->list;
 
@@ -151,7 +149,7 @@ template <typename T> void DoublyCircularLinkedList<T>::add(T new_item)
     DoublyCircularLinkedList<T>::DoublyCircularLL_node* new_part = new DoublyCircularLinkedList<T>::DoublyCircularLL_node(new_item);
     this->item_count++;
 
-    if (this->list == NULL)
+    if (this->list == nullptr)
     {
         new_part->prev = new_part;
         new_part->next = new_part;
@@ -175,7 +173,7 @@ template <typename T> void DoublyCircularLinkedList<T>::add_sorted(T new_item)
     DoublyCircularLinkedList<T>::DoublyCircularLL_node* new_part = new DoublyCircularLinkedList<T>::DoublyCircularLL_node(new_item);
     this->item_count++;
 
-    if (this->list == NULL)
+    if (this->list == nullptr)
     {
         new_part->prev = new_part;
         new_part->next = new_part;
@@ -224,7 +222,7 @@ template <typename T> void DoublyCircularLinkedList<T>::add_sorted(T new_item)
 }
 template <typename T> void DoublyCircularLinkedList<T>::combine(DoublyCircularLinkedList<T>& second)
 {
-    if (this->list == NULL || second.list == NULL)
+    if (this->list == nullptr || second.list == nullptr)
         return;
 
     this->connect(second);
@@ -232,7 +230,7 @@ template <typename T> void DoublyCircularLinkedList<T>::combine(DoublyCircularLi
 }
 template <typename T> void DoublyCircularLinkedList<T>::combine_sorted(DoublyCircularLinkedList<T>& second)
 {
-    if (this->list == NULL || second.list == NULL)
+    if (this->list == nullptr || second.list == nullptr)
         return;
 
     DoublyCircularLinkedList<T>::DoublyCircularLL_node* temp = second.list;
@@ -251,7 +249,7 @@ template <typename T> void DoublyCircularLinkedList<T>::combine_sorted(DoublyCir
 }
 template <typename T> void DoublyCircularLinkedList<T>::reverse()
 {
-    if (this->list == NULL)
+    if (this->list == nullptr)
         return;
 
     DoublyCircularLinkedList<T>::DoublyCircularLL_node* temp = this->list;
@@ -273,10 +271,10 @@ template <typename T> void DoublyCircularLinkedList<T>::list_all()
 
     do
     {
-        cout << temp->prev << '\t' << temp << '\t' << temp->item << '\t' << temp->next << '\n';
+        std::cout << temp->prev << '\t' << temp << '\t' << temp->item << '\t' << temp->next << '\n';
         temp = temp->next;
     }
     while (temp != start);
 
-    cout << '\n';
+    std::cout << '\n';
 }

@@ -2,8 +2,6 @@
 
 #include <iostream>
 
-using namespace std;
-
 template <typename T>
 class SinglyCircularLinkedList
 {
@@ -17,7 +15,7 @@ private:
 
 
     public:
-        SinglyCircularLL_node* next = NULL;
+        SinglyCircularLL_node* next = nullptr;
         T item;
 
         SinglyCircularLL_node();
@@ -25,7 +23,7 @@ private:
         SinglyCircularLL_node(T new_item);
     };
 
-    SinglyCircularLL_node* list = NULL;
+    SinglyCircularLL_node* list = nullptr;
     int item_count = 0;
 
     void connect(SinglyCircularLinkedList<T>& second);
@@ -81,7 +79,7 @@ template <typename T> void SinglyCircularLinkedList<T>::connect(SinglyCircularLi
 }
 template <typename T> void SinglyCircularLinkedList<T>::connect_sorted(SinglyCircularLinkedList<T>::SinglyCircularLL_node* node)
 {
-    if (this->list == NULL)
+    if (this->list == nullptr)
     {
         this->list = node;
         return;
@@ -120,7 +118,7 @@ template <typename T> void SinglyCircularLinkedList<T>::connect_sorted(SinglyCir
 template <typename T> typename SinglyCircularLinkedList<T>::SinglyCircularLL_node* SinglyCircularLinkedList<T>::go_to_index(int index)
 {
     if (index >= this->item_count)
-        return NULL;
+        return nullptr;
 
     SinglyCircularLinkedList<T>::SinglyCircularLL_node* temp = this->list;
 
@@ -137,7 +135,7 @@ template <typename T> void SinglyCircularLinkedList<T>::add(T new_item)
     SinglyCircularLinkedList<T>::SinglyCircularLL_node* new_part = new SinglyCircularLinkedList<T>::SinglyCircularLL_node(new_item);
     this->item_count++;
 
-    if (this->list == NULL)
+    if (this->list == nullptr)
     {
         this->list = new_part;
         new_part->next = this->list;
@@ -154,7 +152,7 @@ template <typename T> void SinglyCircularLinkedList<T>::add_sorted(T new_item)
     SinglyCircularLinkedList<T>::SinglyCircularLL_node* new_part = new SinglyCircularLinkedList<T>::SinglyCircularLL_node(new_item);
     this->item_count++;
 
-    if (this->list == NULL)
+    if (this->list == nullptr)
     {
         this->list = new_part;
         new_part->next = this->list;
@@ -194,7 +192,7 @@ template <typename T> void SinglyCircularLinkedList<T>::add_sorted(T new_item)
 }
 template <typename T> void SinglyCircularLinkedList<T>::combine(SinglyCircularLinkedList<T>& second)
 {
-    if (this->list == NULL || second.list == NULL)
+    if (this->list == nullptr || second.list == nullptr)
         return;
 
     this->connect(second);
@@ -202,7 +200,7 @@ template <typename T> void SinglyCircularLinkedList<T>::combine(SinglyCircularLi
 }
 template <typename T> void SinglyCircularLinkedList<T>::combine_sorted(SinglyCircularLinkedList<T>& second)
 {
-    if (this->list == NULL || second.list == NULL)
+    if (this->list == nullptr || second.list == nullptr)
         return;
 
     SinglyCircularLinkedList<T>::SinglyCircularLL_node* temp = second.list;
@@ -221,11 +219,11 @@ template <typename T> void SinglyCircularLinkedList<T>::combine_sorted(SinglyCir
 }
 template <typename T> void SinglyCircularLinkedList<T>::reverse()
 {
-    if (this->list == NULL)
+    if (this->list == nullptr)
         return;
 
     SinglyCircularLinkedList<T>::SinglyCircularLL_node* t;
-    SinglyCircularLinkedList<T>::SinglyCircularLL_node* a = NULL;
+    SinglyCircularLinkedList<T>::SinglyCircularLL_node* a = nullptr;
     SinglyCircularLinkedList<T>::SinglyCircularLL_node* x;
 
     SinglyCircularLinkedList<T>::SinglyCircularLL_node* temp = this->list;
@@ -265,7 +263,7 @@ template <typename T> void SinglyCircularLinkedList<T>::reverse()
 }
 template <typename T> void SinglyCircularLinkedList<T>::list_all()
 {
-    if (this->list == NULL)
+    if (this->list == nullptr)
         return;
 
     SinglyCircularLinkedList<T>::SinglyCircularLL_node* temp = this->list;
@@ -273,10 +271,10 @@ template <typename T> void SinglyCircularLinkedList<T>::list_all()
 
     do
     {
-        cout << temp << '\t' << temp->item << '\t' << temp->next << '\n';
+        std::cout << temp << '\t' << temp->item << '\t' << temp->next << '\n';
         temp = temp->next;
     }
     while (temp != start);
 
-    cout << '\n';
+    std::cout << '\n';
 }

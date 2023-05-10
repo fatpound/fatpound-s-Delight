@@ -2,8 +2,6 @@
 
 #include <iostream>
 
-using namespace std;
-
 template <typename T>
 class BinarySearchTree
 {
@@ -17,8 +15,8 @@ private:
 
 
     public:
-        BST_node* left = NULL;
-        BST_node* right = NULL;
+        BST_node* left = nullptr;
+        BST_node* right = nullptr;
         T item;
 
         BST_node();
@@ -27,7 +25,7 @@ private:
     };
 
 
-    BST_node* root = NULL;
+    BST_node* root = nullptr;
     int item_count = 0;
 
     BST_node* add_private(BST_node* node, T new_item);
@@ -78,7 +76,7 @@ template <typename T> BinarySearchTree<T>::BST_node::BST_node(T new_item)
 
 template <typename T> typename BinarySearchTree<T>::BST_node* BinarySearchTree<T>::add_private(BST_node* node, T new_item)
 {
-    if (node == NULL)
+    if (node == nullptr)
     {
         node = new BST_node(new_item);
         return node;
@@ -106,39 +104,39 @@ template <typename T> BinarySearchTree<T>::~BinarySearchTree()
 
 template <typename T> void BinarySearchTree<T>::list_preorder_private(BST_node* node)
 {
-    if (node == NULL)
+    if (node == nullptr)
         return;
 
-    cout << node->item << ' ';
+    std::cout << node->item << ' ';
     this->list_preorder_private(node->left);
     this->list_preorder_private(node->right);
 }
 template <typename T> void BinarySearchTree<T>::list_inorder_private(BST_node* node)
 {
-    if (node == NULL)
+    if (node == nullptr)
         return;
 
     this->list_preorder_private(node->left);
-    cout << node->item << ' ';
+    std::cout << node->item << ' ';
     this->list_preorder_private(node->right);
 }
 template <typename T> void BinarySearchTree<T>::list_postorder_private(BST_node* node)
 {
-    if (node == NULL)
+    if (node == nullptr)
         return;
 
     this->list_preorder_private(node->left);
     this->list_preorder_private(node->right);
-    cout << node->item << ' ';
+    std::cout << node->item << ' ';
 }
 template <typename T> void BinarySearchTree<T>::list_leaves_private(BST_node* node)
 {
-    if (node == NULL)
+    if (node == nullptr)
         return;
 
-    if (node->left == NULL && node->right == NULL)
+    if (node->left == nullptr && node->right == nullptr)
     {
-        cout << node->item << ' ';
+        std::cout << node->item << ' ';
         return;
     }
 
@@ -148,39 +146,39 @@ template <typename T> void BinarySearchTree<T>::list_leaves_private(BST_node* no
 
 template <typename T> void BinarySearchTree<T>::list_preorder_reverse_private(BST_node* node)
 {
-    if (node == NULL)
+    if (node == nullptr)
         return;
 
-    cout << node->item << ' ';
+    std::cout << node->item << ' ';
     this->list_preorder_private(node->right);
     this->list_preorder_private(node->left);
 }
 template <typename T> void BinarySearchTree<T>::list_inorder_reverse_private(BST_node* node)
 {
-    if (node == NULL)
+    if (node == nullptr)
         return;
 
     this->list_preorder_private(node->right);
-    cout << node->item << ' ';
+    std::cout << node->item << ' ';
     this->list_preorder_private(node->left);
 }
 template <typename T> void BinarySearchTree<T>::list_postorder_reverse_private(BST_node* node)
 {
-    if (node == NULL)
+    if (node == nullptr)
         return;
 
     this->list_preorder_private(node->right);
     this->list_preorder_private(node->left);
-    cout << node->item << ' ';
+    std::cout << node->item << ' ';
 }
 template <typename T> void BinarySearchTree<T>::list_leaves_reverse_private(BST_node* node)
 {
-    if (node == NULL)
+    if (node == nullptr)
         return;
 
-    if (node->left == NULL && node->right == NULL)
+    if (node->left == nullptr && node->right == nullptr)
     {
-        cout << node->item << ' ';
+        std::cout << node->item << ' ';
         return;
     }
 

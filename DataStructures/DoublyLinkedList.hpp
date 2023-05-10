@@ -2,8 +2,6 @@
 
 #include <iostream>
 
-using namespace std;
-
 template <typename T>
 class DoublyLinkedList
 {
@@ -17,8 +15,8 @@ private:
 
 
     public:
-        DoublyLL_node* prev = NULL;
-        DoublyLL_node* next = NULL;
+        DoublyLL_node* prev = nullptr;
+        DoublyLL_node* next = nullptr;
         T item;
 
         DoublyLL_node();
@@ -26,7 +24,7 @@ private:
         DoublyLL_node(T new_item);
     };
 
-    DoublyLL_node* list = NULL;
+    DoublyLL_node* list = nullptr;
     int item_count = 0;
 
     void connect(DoublyLinkedList<T>& second);
@@ -72,7 +70,7 @@ template <typename T> void DoublyLinkedList<T>::connect(DoublyLinkedList<T>& sec
 }
 template <typename T> void DoublyLinkedList<T>::connect_sorted(DoublyLinkedList<T>::DoublyLL_node* node)
 {
-    if (this->list == NULL)
+    if (this->list == nullptr)
     {
         this->list = node;
         return;
@@ -89,7 +87,7 @@ template <typename T> void DoublyLinkedList<T>::connect_sorted(DoublyLinkedList<
 
     DoublyLinkedList<T>::DoublyLL_node* temp = this->list;
 
-    while (temp->next != NULL)
+    while (temp->next != nullptr)
     {
         if (temp->item <= node->item && node->item <= temp->next->item)
         {
@@ -106,12 +104,12 @@ template <typename T> void DoublyLinkedList<T>::connect_sorted(DoublyLinkedList<
 
     temp->next = node;
     node->prev = temp;
-    node->next = NULL;
+    node->next = nullptr;
 }
 template <typename T> typename DoublyLinkedList<T>::DoublyLL_node* DoublyLinkedList<T>::go_to_index(int index)
 {
     if (index >= this->item_count)
-        return NULL;
+        return nullptr;
 
     DoublyLinkedList<T>::DoublyLL_node* temp = this->list;
 
@@ -137,7 +135,7 @@ template <typename T> void DoublyLinkedList<T>::add(T new_item)
     DoublyLinkedList<T>::DoublyLL_node* new_part = new DoublyLinkedList<T>::DoublyLL_node(new_item);
     this->item_count++;
 
-    if (this->list == NULL)
+    if (this->list == nullptr)
     {
         this->list = new_part;
 
@@ -154,7 +152,7 @@ template <typename T> void DoublyLinkedList<T>::add_sorted(T new_item)
     DoublyLinkedList<T>::DoublyLL_node* new_part = new DoublyLinkedList<T>::DoublyLL_node(new_item);
     this->item_count++;
 
-    if (this->list == NULL)
+    if (this->list == nullptr)
     {
         this->list = new_part;
         return;
@@ -171,7 +169,7 @@ template <typename T> void DoublyLinkedList<T>::add_sorted(T new_item)
 
     DoublyLinkedList<T>::DoublyLL_node* temp = this->list;
 
-    while (temp->next != NULL)
+    while (temp->next != nullptr)
     {
         if (temp->item <= new_item && new_item <= temp->next->item)
         {
@@ -191,7 +189,7 @@ template <typename T> void DoublyLinkedList<T>::add_sorted(T new_item)
 }
 template <typename T> void DoublyLinkedList<T>::combine(DoublyLinkedList<T>& second)
 {
-    if (this->list == NULL || second.list == NULL)
+    if (this->list == nullptr || second.list == nullptr)
         return;
 
     this->connect(second);
@@ -199,7 +197,7 @@ template <typename T> void DoublyLinkedList<T>::combine(DoublyLinkedList<T>& sec
 }
 template <typename T> void DoublyLinkedList<T>::combine_sorted(DoublyLinkedList<T>& second)
 {
-    if (this->list == NULL || second.list == NULL)
+    if (this->list == nullptr || second.list == nullptr)
         return;
 
     DoublyLinkedList<T>::DoublyLL_node* temp = second.list;
@@ -211,18 +209,18 @@ template <typename T> void DoublyLinkedList<T>::combine_sorted(DoublyLinkedList<
         this->connect_sorted(temp);
         temp = temp2;
     }
-    while (temp != NULL);
+    while (temp != nullptr);
 
     this->item_count += second.item_count;
 }
 template <typename T> void DoublyLinkedList<T>::reverse()
 {
-    if (this->list == NULL)
+    if (this->list == nullptr)
         return;
 
     DoublyLinkedList<T>::DoublyLL_node* temp = this->list;
 
-    while (temp->next != NULL)
+    while (temp->next != nullptr)
     {
         swap(temp->prev, temp->next);
         temp = temp->prev;
@@ -237,10 +235,10 @@ template <typename T> void DoublyLinkedList<T>::list_all()
 
     do
     {
-        cout << temp->prev << '\t' << temp << '\t' << temp->item << '\t' << temp->next << '\n';
+        std::cout << temp->prev << '\t' << temp << '\t' << temp->item << '\t' << temp->next << '\n';
         temp = temp->next;
     }
-    while (temp != NULL);
+    while (temp != nullptr);
 
-    cout << '\n';
+    std::cout << '\n';
 }
