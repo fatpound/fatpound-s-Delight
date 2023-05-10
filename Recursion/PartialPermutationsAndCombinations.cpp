@@ -1,25 +1,40 @@
 #include <iostream>
 #include <string>
 
-using namespace std;
-
-void permutecombine(string str, string first, int n, int mode) /// mode 0 -> combine <#> mode 1 -> permute
+void combine(std::string str, std::string first, int n)
 {
-	if (n == 0)
-	{
-		cout << first << endl;
-		return;
-	}
+    if (n == 0)
+    {
+        std::cout << first << '\n';
+        return;
+    }
 
-	for (int i = 0; i < str.length(); i++)
-	{
-		permutecombine((mode ? str.substr(0, i) : "") + str.substr(i + 1, str.length()), first + str[i], n - 1, mode);
-	}
+    for (int i = 0; i < str.length(); i++)
+    {
+        combine(str.substr(i + 1, str.length()), first + str[i], n - 1);
+    }
+}
+
+void permute(std::string str, std::string first, int n)
+{
+    if (n == 0)
+    {
+        std::cout << first << '\n';
+        return;
+    }
+
+    for (int i = 0; i < str.length(); i++)
+    {
+        permute(str.substr(0, i) + str.substr(i + 1, str.length()), first + str[i], n - 1);
+    }
 }
 
 int main()
 {
-	permutecombine("abcde", "", 3, 1);
+    combine("abcde", "", 3);
+    std::cout << '\n';
+    permute("abcde", "", 3);
 
-	return 0;
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    return 0;
 }
