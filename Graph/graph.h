@@ -5,6 +5,8 @@
 #include <array>
 #include <queue>
 
+#include "graph_reader.h"
+
 class graph
 {
 private:
@@ -34,11 +36,12 @@ public:
     std::vector<std::vector<int>> adj;
     std::vector<node*> nodes;
 
+    int node_count = 0;
     int edge_count = 0;
 
     graph();
     ~graph();
-    graph(std::vector<std::vector<int>> vec);
+    graph(std::string);
 
     void list_nodes();
 };

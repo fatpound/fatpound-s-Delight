@@ -146,7 +146,7 @@ void Kruskal::set_different_weighs()
             }
         }
     }
-    
+
     sort(this->weighs.begin(), this->weighs.end());
     this->edges.resize(this->weighs.size());
 

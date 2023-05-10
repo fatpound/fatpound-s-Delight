@@ -25,31 +25,24 @@ graph::~graph()
 {
 
 }
-graph::graph(std::vector<std::vector<int>> vec)
+graph::graph(std::string str)
 {
-    for (int i = 0; i < vec.size(); i++)
-    {
-        std::vector<int> x;
+    graph_reader gr(str);
 
-        for (int j = 0; j < vec.size(); j++)
-        {
-            x.push_back(vec.at(i).at(j));
-        }
+    this->adj = std::vector<std::vector<int>>(gr.adj_matrix);
+    this->node_count = this->adj.size();
 
-        this->adj.push_back(x);
-    }
-
-    for (int i = 0; i < vec.size(); i++)
+    for (int i = 0; i < this->adj.size(); i++)
     {
         this->nodes.push_back(new node());
         this->nodes.at(i)->n = i;
     }
 
-    for (int i = 0; i < vec.size(); i++)
+    for (int i = 0; i < this->adj.size(); i++)
     {
-        for (int j = 0; j < vec.size(); j++)
+        for (int j = 0; j < this->adj.size(); j++)
         {
-            if (vec.at(i).at(j) != 0)
+            if (this->adj.at(i).at(j) != 0)
             {
                 this->nodes.at(i)->next_list.push_back(this->nodes.at(j));
                 this->edge_count++;
