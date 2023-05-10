@@ -10,7 +10,7 @@ private:
     std::vector<std::vector<int>> result;
     std::vector<std::vector<std::vector<int>>> edges;
 
-    graph* G = NULL;
+    graph* G = nullptr;
 
     int last = -1;
 

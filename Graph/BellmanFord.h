@@ -9,7 +9,7 @@ private:
     std::vector<int> d;
     std::vector<int> p;
 
-    graph* G = NULL;
+    graph* G = nullptr;
 
     int w(int u, int v);
     void relax(int u, int v);

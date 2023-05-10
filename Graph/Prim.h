@@ -10,7 +10,7 @@ private:
     std::vector<int> key;
     std::vector<int> pi;
 
-    graph* G = NULL;
+    graph* G = nullptr;
 
     int item_count = 0;
 

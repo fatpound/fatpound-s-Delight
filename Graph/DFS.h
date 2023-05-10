@@ -7,7 +7,7 @@ class DFS
 private:
     std::vector<int> colors;
 
-    graph* G = NULL;
+    graph* G = nullptr;
 
     static int color_white;
     static int color_gray;

@@ -10,7 +10,7 @@ private:
     std::vector<int> d;
     std::vector<int> p;
 
-    graph* G = NULL;
+    graph* G = nullptr;
 
     int item_count = 0;
 
