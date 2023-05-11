@@ -147,7 +147,7 @@ void Kruskal::set_different_weighs()
         }
     }
 
-    sort(this->weighs.begin(), this->weighs.end());
+    std::sort(this->weighs.begin(), this->weighs.end());
     this->edges.resize(this->weighs.size());
 
     for (int i = 0; i < this->G->adj.size(); i++)
