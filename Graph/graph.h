@@ -42,6 +42,7 @@ public:
     graph();
     ~graph();
     graph(std::string);
+    graph(std::vector<std::vector<int>> vec);
 
     void list_nodes();
 };

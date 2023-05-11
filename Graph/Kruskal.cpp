@@ -201,7 +201,6 @@ void Kruskal::run()
             }
         }
     }
-
     for (int i = 0; i < this->result.at(this->last).size(); i++)
     {
         std::cout << "abcdefghijk"[this->result.at(this->last).at(i)];

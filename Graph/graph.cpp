@@ -50,6 +50,29 @@ graph::graph(std::string str)
         }
     }
 }
+graph::graph(std::vector<std::vector<int>> vec)
+{
+    this->adj = std::vector<std::vector<int>>(vec);
+    this->node_count = this->adj.size();
+
+    for (int i = 0; i < this->adj.size(); i++)
+    {
+        this->nodes.push_back(new node());
+        this->nodes.at(i)->n = i;
+    }
+
+    for (int i = 0; i < this->adj.size(); i++)
+    {
+        for (int j = 0; j < this->adj.size(); j++)
+        {
+            if (this->adj.at(i).at(j) != 0)
+            {
+                this->nodes.at(i)->next_list.push_back(this->nodes.at(j));
+                this->edge_count++;
+            }
+        }
+    }
+}
 
 void graph::list_nodes()
 {

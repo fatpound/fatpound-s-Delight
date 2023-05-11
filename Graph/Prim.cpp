@@ -20,12 +20,12 @@ Prim::Prim(graph* graf)
         this->deque.push_back(i);
         this->item_count++;
     }
-
-    this->key.at(0) = 0;
 }
 
 void Prim::run()
 {
+    this->key.at(0) = 0;
+
     while (this->item_count > 0)
     {
         int min_index = -1;
@@ -47,7 +47,7 @@ void Prim::run()
         int u = this->deque.at(min_index);
         this->deque.at(min_index) = -1;
         this->item_count--;
-        
+
         for (int i = 0; i < this->G->nodes.at(u)->next_list.size(); i++)
         {
             int v = this->G->nodes.at(u)->next_list.at(i)->n;
@@ -58,7 +58,7 @@ void Prim::run()
             }
         }
     }
-    
+
     for (int i = 0; i < this->key.size(); i++)
     {
         std::cout << this->key.at(i) << ' ';
