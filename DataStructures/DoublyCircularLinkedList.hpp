@@ -6,7 +6,7 @@ template <typename T>
 class DoublyCircularLinkedList
 {
 private:
-    class DoublyCircularLL_node
+    class node
     {
     private:
 
@@ -15,22 +15,22 @@ private:
 
 
     public:
-        DoublyCircularLL_node* prev = nullptr;
-        DoublyCircularLL_node* next = nullptr;
+        DoublyCircularLinkedList<T>::node* prev = nullptr;
+        DoublyCircularLinkedList<T>::node* next = nullptr;
         T item;
 
-        DoublyCircularLL_node();
-        ~DoublyCircularLL_node();
-        DoublyCircularLL_node(T new_item);
+        node();
+        ~node();
+        node(T new_item);
     };
 
-    DoublyCircularLL_node* list = nullptr;
+    DoublyCircularLinkedList<T>::node* list = nullptr;
     int item_count = 0;
 
     void connect(DoublyCircularLinkedList<T>& second);
-    void connect_sorted(DoublyCircularLL_node* node);
+    void connect_sorted(DoublyCircularLinkedList<T>::node* node);
 
-    DoublyCircularLL_node* go_to_index(int index);
+    DoublyCircularLinkedList<T>::node* go_to_index(int index);
 
 
 protected:
@@ -48,32 +48,32 @@ public:
     ~DoublyCircularLinkedList();
 };
 
-template <typename T> DoublyCircularLinkedList<T>::DoublyCircularLL_node::DoublyCircularLL_node()
+template <typename T> DoublyCircularLinkedList<T>::node::node()
 {
 
 }
-template <typename T> DoublyCircularLinkedList<T>::DoublyCircularLL_node::~DoublyCircularLL_node()
+template <typename T> DoublyCircularLinkedList<T>::node::~node()
 {
 
 }
-template <typename T> DoublyCircularLinkedList<T>::DoublyCircularLL_node::DoublyCircularLL_node(T new_item)
+template <typename T> DoublyCircularLinkedList<T>::node::node(T new_item)
 {
     this->item = new_item;
 }
 
 template <typename T> void DoublyCircularLinkedList<T>::connect(DoublyCircularLinkedList<T>& second)
 {
-    DoublyCircularLL_node* end = this->go_to_index(this->item_count - 1);
+    DoublyCircularLinkedList<T>::node* end = this->go_to_index(this->item_count - 1);
 
     second.list->prev = end;
     end->next = second.list;
 
-    DoublyCircularLL_node* second_end = second.go_to_index(second.item_count - 1);
+    DoublyCircularLinkedList<T>::node* second_end = second.go_to_index(second.item_count - 1);
 
     this->list->prev = second_end;
     second_end->next = this->list;
 }
-template <typename T> void DoublyCircularLinkedList<T>::connect_sorted(DoublyCircularLinkedList<T>::DoublyCircularLL_node* node)
+template <typename T> void DoublyCircularLinkedList<T>::connect_sorted(DoublyCircularLinkedList<T>::node* node)
 {
     if (this->list == nullptr)
     {
@@ -86,7 +86,7 @@ template <typename T> void DoublyCircularLinkedList<T>::connect_sorted(DoublyCir
         node->next = this->list;
         this->list->prev = node;
 
-        DoublyCircularLinkedList<T>::DoublyCircularLL_node* end = this->go_to_index(this->item_count - 1);
+        DoublyCircularLinkedList<T>::node* end = this->go_to_index(this->item_count - 1);
 
         node->prev = end;
         end->next = node;
@@ -96,8 +96,8 @@ template <typename T> void DoublyCircularLinkedList<T>::connect_sorted(DoublyCir
         return;
     }
 
-    DoublyCircularLinkedList<T>::DoublyCircularLL_node* temp = this->list;
-    DoublyCircularLinkedList<T>::DoublyCircularLL_node* start = temp;
+    DoublyCircularLinkedList<T>::node* temp = this->list;
+    DoublyCircularLinkedList<T>::node* start = temp;
 
     while (temp->next != start)
     {
@@ -120,12 +120,12 @@ template <typename T> void DoublyCircularLinkedList<T>::connect_sorted(DoublyCir
     node->next = start;
     start->prev = node;
 }
-template <typename T> typename DoublyCircularLinkedList<T>::DoublyCircularLL_node* DoublyCircularLinkedList<T>::go_to_index(int index)
+template <typename T> typename DoublyCircularLinkedList<T>::node* DoublyCircularLinkedList<T>::go_to_index(int index)
 {
     if (index >= this->item_count)
         return nullptr;
 
-    DoublyCircularLinkedList<T>::DoublyCircularLL_node* temp = this->list;
+    DoublyCircularLinkedList<T>::node* temp = this->list;
 
     for (int i = 0; i < index; i++)
     {
@@ -146,7 +146,7 @@ template <typename T> DoublyCircularLinkedList<T>::~DoublyCircularLinkedList()
 
 template <typename T> void DoublyCircularLinkedList<T>::add(T new_item)
 {
-    DoublyCircularLinkedList<T>::DoublyCircularLL_node* new_part = new DoublyCircularLinkedList<T>::DoublyCircularLL_node(new_item);
+    DoublyCircularLinkedList<T>::node* new_part = new DoublyCircularLinkedList<T>::node(new_item);
     this->item_count++;
 
     if (this->list == nullptr)
@@ -159,8 +159,8 @@ template <typename T> void DoublyCircularLinkedList<T>::add(T new_item)
         return;
     }
 
-    DoublyCircularLinkedList<T>::DoublyCircularLL_node* start = this->list;
-    DoublyCircularLinkedList<T>::DoublyCircularLL_node* end = this->go_to_index(this->item_count - 2);
+    DoublyCircularLinkedList<T>::node* start = this->list;
+    DoublyCircularLinkedList<T>::node* end = this->go_to_index(this->item_count - 2);
 
     end->next = new_part;
     new_part->prev = end;
@@ -170,7 +170,7 @@ template <typename T> void DoublyCircularLinkedList<T>::add(T new_item)
 }
 template <typename T> void DoublyCircularLinkedList<T>::add_sorted(T new_item)
 {
-    DoublyCircularLinkedList<T>::DoublyCircularLL_node* new_part = new DoublyCircularLinkedList<T>::DoublyCircularLL_node(new_item);
+    DoublyCircularLinkedList<T>::node* new_part = new DoublyCircularLinkedList<T>::node(new_item);
     this->item_count++;
 
     if (this->list == nullptr)
@@ -188,7 +188,7 @@ template <typename T> void DoublyCircularLinkedList<T>::add_sorted(T new_item)
         this->list->prev = new_part;
         this->list = new_part;
 
-        DoublyCircularLinkedList<T>::DoublyCircularLL_node* end = this->go_to_index(this->item_count - 1);
+        DoublyCircularLinkedList<T>::node* end = this->go_to_index(this->item_count - 1);
 
         end->next = this->list;
         this->list->prev = end;
@@ -196,8 +196,8 @@ template <typename T> void DoublyCircularLinkedList<T>::add_sorted(T new_item)
         return;
     }
 
-    DoublyCircularLinkedList<T>::DoublyCircularLL_node* temp = this->list;
-    DoublyCircularLinkedList<T>::DoublyCircularLL_node* start = temp;
+    DoublyCircularLinkedList<T>::node* temp = this->list;
+    DoublyCircularLinkedList<T>::node* start = temp;
 
     while (temp->next != start)
     {
@@ -233,12 +233,12 @@ template <typename T> void DoublyCircularLinkedList<T>::combine_sorted(DoublyCir
     if (this->list == nullptr || second.list == nullptr)
         return;
 
-    DoublyCircularLinkedList<T>::DoublyCircularLL_node* temp = second.list;
-    DoublyCircularLinkedList<T>::DoublyCircularLL_node* start = temp;
+    DoublyCircularLinkedList<T>::node* temp = second.list;
+    DoublyCircularLinkedList<T>::node* start = temp;
 
     do
     {
-        DoublyCircularLinkedList<T>::DoublyCircularLL_node* temp2 = temp->next;
+        DoublyCircularLinkedList<T>::node* temp2 = temp->next;
 
         this->connect_sorted(temp);
         temp = temp2;
@@ -252,8 +252,8 @@ template <typename T> void DoublyCircularLinkedList<T>::reverse()
     if (this->list == nullptr)
         return;
 
-    DoublyCircularLinkedList<T>::DoublyCircularLL_node* temp = this->list;
-    DoublyCircularLinkedList<T>::DoublyCircularLL_node* start = this->list;
+    DoublyCircularLinkedList<T>::node* temp = this->list;
+    DoublyCircularLinkedList<T>::node* start = this->list;
 
     while (temp->next != start)
     {
@@ -261,13 +261,13 @@ template <typename T> void DoublyCircularLinkedList<T>::reverse()
         temp = temp->prev;
     }
 
-    swap(temp->prev, temp->next);
+    std::swap(temp->prev, temp->next);
     this->list = temp;
 }
 template <typename T> void DoublyCircularLinkedList<T>::list_all()
 {
-    DoublyCircularLinkedList<T>::DoublyCircularLL_node* temp = this->list;
-    DoublyCircularLinkedList<T>::DoublyCircularLL_node* start = temp;
+    DoublyCircularLinkedList<T>::node* temp = this->list;
+    DoublyCircularLinkedList<T>::node* start = temp;
 
     do
     {

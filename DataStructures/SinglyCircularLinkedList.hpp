@@ -6,7 +6,7 @@ template <typename T>
 class SinglyCircularLinkedList
 {
 private:
-    class SinglyCircularLL_node
+    class node
     {
     private:
 
@@ -15,21 +15,21 @@ private:
 
 
     public:
-        SinglyCircularLL_node* next = nullptr;
+        SinglyCircularLinkedList<T>::node* next = nullptr;
         T item;
 
-        SinglyCircularLL_node();
-        ~SinglyCircularLL_node();
-        SinglyCircularLL_node(T new_item);
+        node();
+        ~node();
+        node(T new_item);
     };
 
-    SinglyCircularLL_node* list = nullptr;
+    SinglyCircularLinkedList<T>::node* list = nullptr;
     int item_count = 0;
 
     void connect(SinglyCircularLinkedList<T>& second);
-    void connect_sorted(SinglyCircularLL_node* node);
+    void connect_sorted(SinglyCircularLinkedList<T>::node* node);
 
-    SinglyCircularLL_node* go_to_index(int index);
+    SinglyCircularLinkedList<T>::node* go_to_index(int index);
 
 
 protected:
@@ -47,15 +47,15 @@ public:
     void list_all();
 };
 
-template <typename T> SinglyCircularLinkedList<T>::SinglyCircularLL_node::SinglyCircularLL_node()
+template <typename T> SinglyCircularLinkedList<T>::node::node()
 {
 
 }
-template <typename T> SinglyCircularLinkedList<T>::SinglyCircularLL_node::~SinglyCircularLL_node()
+template <typename T> SinglyCircularLinkedList<T>::node::~node()
 {
 
 }
-template <typename T> SinglyCircularLinkedList<T>::SinglyCircularLL_node::SinglyCircularLL_node(T new_item)
+template <typename T> SinglyCircularLinkedList<T>::node::node(T new_item)
 {
     this->item = new_item;
 }
@@ -71,13 +71,13 @@ template <typename T> SinglyCircularLinkedList<T>::~SinglyCircularLinkedList()
 
 template <typename T> void SinglyCircularLinkedList<T>::connect(SinglyCircularLinkedList<T>& second)
 {
-    SinglyCircularLL_node* end = this->go_to_index(this->item_count - 1);
+    SinglyCircularLinkedList<T>::node* end = this->go_to_index(this->item_count - 1);
     end->next = second.list;
 
-    SinglyCircularLL_node* second_end = second.go_to_index(second.item_count - 1);
+    SinglyCircularLinkedList<T>::node* second_end = second.go_to_index(second.item_count - 1);
     second_end->next = this->list;
 }
-template <typename T> void SinglyCircularLinkedList<T>::connect_sorted(SinglyCircularLinkedList<T>::SinglyCircularLL_node* node)
+template <typename T> void SinglyCircularLinkedList<T>::connect_sorted(SinglyCircularLinkedList<T>::node* node)
 {
     if (this->list == nullptr)
     {
@@ -90,14 +90,14 @@ template <typename T> void SinglyCircularLinkedList<T>::connect_sorted(SinglyCir
         node->next = this->list;
         this->list = node;
 
-        SinglyCircularLinkedList<T>::SinglyCircularLL_node* end = this->go_to_index(this->item_count - 1);
+        SinglyCircularLinkedList<T>::node* end = this->go_to_index(this->item_count - 1);
         end->next = node;
 
         return;
     }
 
-    SinglyCircularLinkedList<T>::SinglyCircularLL_node* temp = this->list;
-    SinglyCircularLinkedList<T>::SinglyCircularLL_node* start = temp;
+    SinglyCircularLinkedList<T>::node* temp = this->list;
+    SinglyCircularLinkedList<T>::node* start = temp;
 
     while (temp->next != start)
     {
@@ -115,12 +115,12 @@ template <typename T> void SinglyCircularLinkedList<T>::connect_sorted(SinglyCir
     temp->next = node;
     node->next = start;
 }
-template <typename T> typename SinglyCircularLinkedList<T>::SinglyCircularLL_node* SinglyCircularLinkedList<T>::go_to_index(int index)
+template <typename T> typename SinglyCircularLinkedList<T>::node* SinglyCircularLinkedList<T>::go_to_index(int index)
 {
     if (index >= this->item_count)
         return nullptr;
 
-    SinglyCircularLinkedList<T>::SinglyCircularLL_node* temp = this->list;
+    SinglyCircularLinkedList<T>::node* temp = this->list;
 
     for (int i = 0; i < index; i++)
     {
@@ -132,7 +132,7 @@ template <typename T> typename SinglyCircularLinkedList<T>::SinglyCircularLL_nod
 
 template <typename T> void SinglyCircularLinkedList<T>::add(T new_item)
 {
-    SinglyCircularLinkedList<T>::SinglyCircularLL_node* new_part = new SinglyCircularLinkedList<T>::SinglyCircularLL_node(new_item);
+    SinglyCircularLinkedList<T>::node* new_part = new SinglyCircularLinkedList<T>::node(new_item);
     this->item_count++;
 
     if (this->list == nullptr)
@@ -143,13 +143,13 @@ template <typename T> void SinglyCircularLinkedList<T>::add(T new_item)
         return;
     }
 
-    SinglyCircularLinkedList<T>::SinglyCircularLL_node* end = this->go_to_index(this->item_count - 2);
+    SinglyCircularLinkedList<T>::node* end = this->go_to_index(this->item_count - 2);
     end->next = new_part;
     new_part->next = this->list;
 }
 template <typename T> void SinglyCircularLinkedList<T>::add_sorted(T new_item)
 {
-    SinglyCircularLinkedList<T>::SinglyCircularLL_node* new_part = new SinglyCircularLinkedList<T>::SinglyCircularLL_node(new_item);
+    SinglyCircularLinkedList<T>::node* new_part = new SinglyCircularLinkedList<T>::node(new_item);
     this->item_count++;
 
     if (this->list == nullptr)
@@ -165,14 +165,14 @@ template <typename T> void SinglyCircularLinkedList<T>::add_sorted(T new_item)
         new_part->next = this->list;
         this->list = new_part;
 
-        SinglyCircularLinkedList<T>::SinglyCircularLL_node* end = this->go_to_index(this->item_count - 1);
+        SinglyCircularLinkedList<T>::node* end = this->go_to_index(this->item_count - 1);
         end->next = new_part;
 
         return;
     }
 
-    SinglyCircularLinkedList<T>::SinglyCircularLL_node* temp = this->list;
-    SinglyCircularLinkedList<T>::SinglyCircularLL_node* start = temp;
+    SinglyCircularLinkedList<T>::node* temp = this->list;
+    SinglyCircularLinkedList<T>::node* start = temp;
 
     while (temp->next != start)
     {
@@ -203,12 +203,12 @@ template <typename T> void SinglyCircularLinkedList<T>::combine_sorted(SinglyCir
     if (this->list == nullptr || second.list == nullptr)
         return;
 
-    SinglyCircularLinkedList<T>::SinglyCircularLL_node* temp = second.list;
-    SinglyCircularLinkedList<T>::SinglyCircularLL_node* start = temp;
+    SinglyCircularLinkedList<T>::node* temp = second.list;
+    SinglyCircularLinkedList<T>::node* start = temp;
 
     do
     {
-        SinglyCircularLinkedList<T>::SinglyCircularLL_node* temp2 = temp->next;
+        SinglyCircularLinkedList<T>::node* temp2 = temp->next;
 
         this->connect_sorted(temp);
         temp = temp2;
@@ -222,12 +222,12 @@ template <typename T> void SinglyCircularLinkedList<T>::reverse()
     if (this->list == nullptr)
         return;
 
-    SinglyCircularLinkedList<T>::SinglyCircularLL_node* t;
-    SinglyCircularLinkedList<T>::SinglyCircularLL_node* a = nullptr;
-    SinglyCircularLinkedList<T>::SinglyCircularLL_node* x;
+    SinglyCircularLinkedList<T>::node* t;
+    SinglyCircularLinkedList<T>::node* a = nullptr;
+    SinglyCircularLinkedList<T>::node* x;
 
-    SinglyCircularLinkedList<T>::SinglyCircularLL_node* temp = this->list;
-    SinglyCircularLinkedList<T>::SinglyCircularLL_node* start = temp;
+    SinglyCircularLinkedList<T>::node* temp = this->list;
+    SinglyCircularLinkedList<T>::node* start = temp;
 
     while (1)
     {
@@ -266,8 +266,8 @@ template <typename T> void SinglyCircularLinkedList<T>::list_all()
     if (this->list == nullptr)
         return;
 
-    SinglyCircularLinkedList<T>::SinglyCircularLL_node* temp = this->list;
-    SinglyCircularLinkedList<T>::SinglyCircularLL_node* start = temp;
+    SinglyCircularLinkedList<T>::node* temp = this->list;
+    SinglyCircularLinkedList<T>::node* start = temp;
 
     do
     {

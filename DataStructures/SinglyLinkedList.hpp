@@ -6,7 +6,7 @@ template <typename T>
 class SinglyLinkedList
 {
 private:
-    class SinglyLL_node
+    class node
     {
     private:
 
@@ -15,21 +15,21 @@ private:
 
 
     public:
-        SinglyLL_node* next = nullptr;
+        SinglyLinkedList<T>::node* next = nullptr;
         T item;
 
-        SinglyLL_node();
-        ~SinglyLL_node();
-        SinglyLL_node(T new_item);
+        node();
+        ~node();
+        node(T new_item);
     };
 
-    SinglyLL_node* list = nullptr;
+    SinglyLinkedList<T>::node* list = nullptr;
     int item_count = 0;
 
     void connect(SinglyLinkedList<T>& second);
-    void connect_sorted(SinglyLL_node* node);
+    void connect_sorted(SinglyLinkedList<T>::node* node);
 
-    SinglyLL_node* go_to_index(int index);
+    SinglyLinkedList<T>::node* go_to_index(int index);
 
 
 protected:
@@ -47,15 +47,15 @@ public:
     void list_all();
 };
 
-template <typename T> SinglyLinkedList<T>::SinglyLL_node::SinglyLL_node()
+template <typename T> SinglyLinkedList<T>::node::node()
 {
 
 }
-template <typename T> SinglyLinkedList<T>::SinglyLL_node::~SinglyLL_node()
+template <typename T> SinglyLinkedList<T>::node::~node()
 {
 
 }
-template <typename T> SinglyLinkedList<T>::SinglyLL_node::SinglyLL_node(T new_item)
+template <typename T> SinglyLinkedList<T>::node::node(T new_item)
 {
     this->item = new_item;
 }
@@ -71,10 +71,10 @@ template <typename T> SinglyLinkedList<T>::~SinglyLinkedList()
 
 template <typename T> void SinglyLinkedList<T>::connect(SinglyLinkedList<T>& second)
 {
-    SinglyLL_node* end = this->go_to_index(this->item_count - 1);
+    SinglyLinkedList<T>::node* end = this->go_to_index(this->item_count - 1);
     end->next = second.list;
 }
-template <typename T> void SinglyLinkedList<T>::connect_sorted(SinglyLinkedList<T>::SinglyLL_node* node)
+template <typename T> void SinglyLinkedList<T>::connect_sorted(SinglyLinkedList<T>::node* node)
 {
     if (this->list == nullptr)
     {
@@ -90,7 +90,7 @@ template <typename T> void SinglyLinkedList<T>::connect_sorted(SinglyLinkedList<
         return;
     }
 
-    SinglyLinkedList<T>::SinglyLL_node* temp = this->list;
+    SinglyLinkedList<T>::node* temp = this->list;
 
     while (temp->next != nullptr)
     {
@@ -108,12 +108,12 @@ template <typename T> void SinglyLinkedList<T>::connect_sorted(SinglyLinkedList<
     temp->next = node;
     node->next = nullptr;
 }
-template <typename T> typename SinglyLinkedList<T>::SinglyLL_node* SinglyLinkedList<T>::go_to_index(int index)
+template <typename T> typename SinglyLinkedList<T>::node* SinglyLinkedList<T>::go_to_index(int index)
 {
     if (index >= this->item_count)
         return nullptr;
 
-    SinglyLinkedList<T>::SinglyLL_node* temp = this->list;
+    SinglyLinkedList<T>::node* temp = this->list;
 
     for (int i = 0; i < index; i++)
     {
@@ -125,7 +125,7 @@ template <typename T> typename SinglyLinkedList<T>::SinglyLL_node* SinglyLinkedL
 
 template <typename T> void SinglyLinkedList<T>::add(T new_item)
 {
-    SinglyLinkedList<T>::SinglyLL_node* new_part = new SinglyLinkedList<T>::SinglyLL_node(new_item);
+    SinglyLinkedList<T>::node* new_part = new SinglyLinkedList<T>::node(new_item);
     this->item_count++;
 
     if (this->list == nullptr)
@@ -134,12 +134,12 @@ template <typename T> void SinglyLinkedList<T>::add(T new_item)
         return;
     }
 
-    SinglyLinkedList<T>::SinglyLL_node* end = this->go_to_index(this->item_count - 2);
+    SinglyLinkedList<T>::node* end = this->go_to_index(this->item_count - 2);
     end->next = new_part;
 }
 template <typename T> void SinglyLinkedList<T>::add_sorted(T new_item)
 {
-    SinglyLinkedList<T>::SinglyLL_node* new_part = new SinglyLinkedList<T>::SinglyLL_node(new_item);
+    SinglyLinkedList<T>::node* new_part = new SinglyLinkedList<T>::node(new_item);
     this->item_count++;
 
     if (this->list == nullptr)
@@ -156,7 +156,7 @@ template <typename T> void SinglyLinkedList<T>::add_sorted(T new_item)
         return;
     }
 
-    SinglyLinkedList<T>::SinglyLL_node* temp = this->list;
+    SinglyLinkedList<T>::node* temp = this->list;
 
     while (temp->next != nullptr)
     {
@@ -186,11 +186,11 @@ template <typename T> void SinglyLinkedList<T>::combine_sorted(SinglyLinkedList<
     if (this->list == nullptr || second.list == nullptr)
         return;
 
-    SinglyLinkedList<T>::SinglyLL_node* temp = second.list;
+    SinglyLinkedList<T>::node* temp = second.list;
 
     do
     {
-        SinglyLinkedList<T>::SinglyLL_node* temp2 = temp->next;
+        SinglyLinkedList<T>::node* temp2 = temp->next;
 
         this->connect_sorted(temp);
         temp = temp2;
@@ -204,11 +204,11 @@ template <typename T> void SinglyLinkedList<T>::reverse()
     if (this->list == nullptr)
         return;
 
-    SinglyLinkedList<T>::SinglyLL_node* t;
-    SinglyLinkedList<T>::SinglyLL_node* a = nullptr;
-    SinglyLinkedList<T>::SinglyLL_node* x;
+    SinglyLinkedList<T>::node* t;
+    SinglyLinkedList<T>::node* a = nullptr;
+    SinglyLinkedList<T>::node* x;
 
-    SinglyLinkedList<T>::SinglyLL_node* temp = this->list;
+    SinglyLinkedList<T>::node* temp = this->list;
 
     while (1)
     {
@@ -240,7 +240,7 @@ template <typename T> void SinglyLinkedList<T>::list_all()
     if (this->list == nullptr)
         return;
 
-    SinglyLinkedList<T>::SinglyLL_node* temp = this->list;
+    SinglyLinkedList<T>::node* temp = this->list;
 
     do
     {

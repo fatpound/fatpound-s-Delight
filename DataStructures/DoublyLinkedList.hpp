@@ -6,7 +6,7 @@ template <typename T>
 class DoublyLinkedList
 {
 private:
-    class DoublyLL_node
+    class node
     {
     private:
 
@@ -15,22 +15,22 @@ private:
 
 
     public:
-        DoublyLL_node* prev = nullptr;
-        DoublyLL_node* next = nullptr;
+        DoublyLinkedList<T>::node* prev = nullptr;
+        DoublyLinkedList<T>::node* next = nullptr;
         T item;
 
-        DoublyLL_node();
-        ~DoublyLL_node();
-        DoublyLL_node(T new_item);
+        node();
+        ~node();
+        node(T new_item);
     };
 
-    DoublyLL_node* list = nullptr;
+    DoublyLinkedList<T>::node* list = nullptr;
     int item_count = 0;
 
     void connect(DoublyLinkedList<T>& second);
-    void connect_sorted(DoublyLL_node* node);
+    void connect_sorted(DoublyLinkedList<T>::node* node);
 
-    DoublyLL_node* go_to_index(int index);
+    DoublyLinkedList<T>::node* go_to_index(int index);
 
 
 protected:
@@ -48,27 +48,27 @@ public:
     ~DoublyLinkedList();
 };
 
-template <typename T> DoublyLinkedList<T>::DoublyLL_node::DoublyLL_node()
+template <typename T> DoublyLinkedList<T>::node::node()
 {
 
 }
-template <typename T> DoublyLinkedList<T>::DoublyLL_node::~DoublyLL_node()
+template <typename T> DoublyLinkedList<T>::node::~node()
 {
 
 }
-template <typename T> DoublyLinkedList<T>::DoublyLL_node::DoublyLL_node(T new_item)
+template <typename T> DoublyLinkedList<T>::node::node(T new_item)
 {
     this->item = new_item;
 }
 
 template <typename T> void DoublyLinkedList<T>::connect(DoublyLinkedList<T>& second)
 {
-    DoublyLL_node* end = this->go_to_index(this->item_count - 1);
+    DoublyLinkedList<T>::node* end = this->go_to_index(this->item_count - 1);
 
     second.list->prev = end;
     end->next = second.list;
 }
-template <typename T> void DoublyLinkedList<T>::connect_sorted(DoublyLinkedList<T>::DoublyLL_node* node)
+template <typename T> void DoublyLinkedList<T>::connect_sorted(DoublyLinkedList<T>::node* node)
 {
     if (this->list == nullptr)
     {
@@ -85,7 +85,7 @@ template <typename T> void DoublyLinkedList<T>::connect_sorted(DoublyLinkedList<
         return;
     }
 
-    DoublyLinkedList<T>::DoublyLL_node* temp = this->list;
+    DoublyLinkedList<T>::node* temp = this->list;
 
     while (temp->next != nullptr)
     {
@@ -106,12 +106,12 @@ template <typename T> void DoublyLinkedList<T>::connect_sorted(DoublyLinkedList<
     node->prev = temp;
     node->next = nullptr;
 }
-template <typename T> typename DoublyLinkedList<T>::DoublyLL_node* DoublyLinkedList<T>::go_to_index(int index)
+template <typename T> typename DoublyLinkedList<T>::node* DoublyLinkedList<T>::go_to_index(int index)
 {
     if (index >= this->item_count)
         return nullptr;
 
-    DoublyLinkedList<T>::DoublyLL_node* temp = this->list;
+    DoublyLinkedList<T>::node* temp = this->list;
 
     for (int i = 0; i < index; i++)
     {
@@ -132,7 +132,7 @@ template <typename T> DoublyLinkedList<T>::~DoublyLinkedList()
 
 template <typename T> void DoublyLinkedList<T>::add(T new_item)
 {
-    DoublyLinkedList<T>::DoublyLL_node* new_part = new DoublyLinkedList<T>::DoublyLL_node(new_item);
+    DoublyLinkedList<T>::node* new_part = new DoublyLinkedList<T>::node(new_item);
     this->item_count++;
 
     if (this->list == nullptr)
@@ -142,14 +142,14 @@ template <typename T> void DoublyLinkedList<T>::add(T new_item)
         return;
     }
 
-    DoublyLinkedList<T>::DoublyLL_node* end = this->go_to_index(this->item_count - 2);
+    DoublyLinkedList<T>::node* end = this->go_to_index(this->item_count - 2);
 
     end->next = new_part;
     new_part->prev = end;
 }
 template <typename T> void DoublyLinkedList<T>::add_sorted(T new_item)
 {
-    DoublyLinkedList<T>::DoublyLL_node* new_part = new DoublyLinkedList<T>::DoublyLL_node(new_item);
+    DoublyLinkedList<T>::node* new_part = new DoublyLinkedList<T>::node(new_item);
     this->item_count++;
 
     if (this->list == nullptr)
@@ -167,7 +167,7 @@ template <typename T> void DoublyLinkedList<T>::add_sorted(T new_item)
         return;
     }
 
-    DoublyLinkedList<T>::DoublyLL_node* temp = this->list;
+    DoublyLinkedList<T>::node* temp = this->list;
 
     while (temp->next != nullptr)
     {
@@ -200,11 +200,11 @@ template <typename T> void DoublyLinkedList<T>::combine_sorted(DoublyLinkedList<
     if (this->list == nullptr || second.list == nullptr)
         return;
 
-    DoublyLinkedList<T>::DoublyLL_node* temp = second.list;
+    DoublyLinkedList<T>::node* temp = second.list;
 
     do
     {
-        DoublyLinkedList<T>::DoublyLL_node* temp2 = temp->next;
+        DoublyLinkedList<T>::node* temp2 = temp->next;
 
         this->connect_sorted(temp);
         temp = temp2;
@@ -218,7 +218,7 @@ template <typename T> void DoublyLinkedList<T>::reverse()
     if (this->list == nullptr)
         return;
 
-    DoublyLinkedList<T>::DoublyLL_node* temp = this->list;
+    DoublyLinkedList<T>::node* temp = this->list;
 
     while (temp->next != nullptr)
     {
@@ -226,12 +226,12 @@ template <typename T> void DoublyLinkedList<T>::reverse()
         temp = temp->prev;
     }
 
-    swap(temp->prev, temp->next);
+    std::swap(temp->prev, temp->next);
     this->list = temp;
 }
 template <typename T> void DoublyLinkedList<T>::list_all()
 {
-    DoublyLinkedList<T>::DoublyLL_node* temp = this->list;
+    DoublyLinkedList<T>::node* temp = this->list;
 
     do
     {
