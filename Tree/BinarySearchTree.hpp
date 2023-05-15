@@ -76,8 +76,8 @@ template <typename T> typename BinarySearchTree<T>::node* BinarySearchTree<T>::a
 {
     if (node == nullptr)
     {
-        node = new BinarySearchTree<T>::node(new_item);
-        return node;
+        BinarySearchTree<T>::node* new_node = new BinarySearchTree<T>::node(new_item);
+        return new_node;
     }
 
     if (new_item < node->item)
@@ -89,6 +89,8 @@ template <typename T> typename BinarySearchTree<T>::node* BinarySearchTree<T>::a
     {
         node->right = this->add_private(node->right, new_item);
     }
+
+    return node;
 }
 
 template <typename T> BinarySearchTree<T>::BinarySearchTree()
@@ -186,7 +188,11 @@ template <typename T> void BinarySearchTree<T>::list_leaves_reverse_private(Bina
 
 template <typename T> void BinarySearchTree<T>::add(T new_item)
 {
-    this->add_private(this->root, new_item);
+    BinarySearchTree<T>::node* root_node = this->add_private(this->root, new_item);
+
+    if (this->root == nullptr)
+        this->root = root_node;
+
     this->item_count++;
 }
 
