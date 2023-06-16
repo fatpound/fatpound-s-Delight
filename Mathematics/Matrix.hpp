@@ -66,7 +66,7 @@ namespace fatpound
 
         template <typename T> T Matrix<T>::get_rand(T first, T last)
         {
-            std::uniform_real_distribution<T> distribution(first, last);
+            std::uniform_real_distribution<double> distribution(first, last);
             std::random_device rd;
             std::default_random_engine generator(rd());
 
