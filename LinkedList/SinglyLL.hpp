@@ -10,7 +10,6 @@ namespace fatpound
         class SinglyLL
         {
         private:
-            __declspec(align(sizeof(SinglyLL<T>::node*)))
             class node
             {
             private:
@@ -22,22 +21,21 @@ namespace fatpound
             public:
                 SinglyLL<T>::node* next = nullptr;
                 T item;
-                T trash; // this is to resolve the C4820 error, can be removed
 
                 node(T new_item);
             };
 
             /********************************/
-            /*        User Variables        */
+            /*           Variables          */
             /********************************/
 
             SinglyLL<T>::node* list = nullptr;
-            SinglyLL<T>::node* last = nullptr;
-            int item_count = 0;
-            int trash; // this is to resolve the C4820 error, can be removed
+            SinglyLL<T>::node* end  = nullptr;
 
+            std::int_fast64_t item_count = 0;
+            
             /********************************/
-            /*        User Functions        */
+            /*           Functions          */
             /********************************/
 
             void connect(SinglyLL<T>& second);
@@ -72,7 +70,7 @@ namespace fatpound
         /*       Private Functions      */
         /********************************/
         //
-        // Return value : void
+        // Return type : void
         //
         template <typename T> void SinglyLL<T>::connect(SinglyLL<T>& second)
         {
@@ -118,32 +116,36 @@ namespace fatpound
         /*       Public Functions       */
         /********************************/
         //
-        // Return value : void
+        // Return type : void
         //
         template <typename T> void SinglyLL<T>::add(T new_item)
         {
             SinglyLL<T>::node* new_part = new SinglyLL<T>::node(new_item);
+
             this->item_count++;
 
             if (this->list == nullptr)
             {
                 this->list = new_part;
-                this->last = new_part;
+                this->end  = new_part;
 
                 return;
             }
 
-            this->last->next = new_part;
-            this->last       = new_part;
+            this->end->next = new_part;
+            this->end       = new_part;
         }
         template <typename T> void SinglyLL<T>::add_sorted(T new_item)
         {
             SinglyLL<T>::node* new_part = new SinglyLL<T>::node(new_item);
+
             this->item_count++;
 
             if (this->list == nullptr)
             {
                 this->list = new_part;
+                this->end  = new_part;
+
                 return;
             }
 
@@ -171,6 +173,7 @@ namespace fatpound
             }
 
             temp->next = new_part;
+            this->end  = new_part;
         }
         template <typename T> void SinglyLL<T>::combine(SinglyLL<T>& second)
         {
@@ -179,11 +182,18 @@ namespace fatpound
 
             this->connect(second);
             this->item_count += second.item_count;
+
+            this->end = second.end;
         }
         template <typename T> void SinglyLL<T>::combine_sorted(SinglyLL<T>& second)
         {
             if (this->list == nullptr || second.list == nullptr)
                 return;
+
+            this->item_count += second.item_count;
+
+            if (this->end->item < second.end->item)
+                this->end = second.end;
 
             SinglyLL<T>::node* temp = second.list;
 
@@ -195,8 +205,6 @@ namespace fatpound
                 temp = temp2;
             }
             while (temp != nullptr);
-
-            this->item_count += second.item_count;
         }
         template <typename T> void SinglyLL<T>::reverse()
         {
@@ -236,7 +244,7 @@ namespace fatpound
                 }
             }
 
-            this->last = start_backup;
+            this->end = start_backup;
         }
         template <typename T> void SinglyLL<T>::list_all()
         {
@@ -249,7 +257,8 @@ namespace fatpound
             {
                 std::cout << temp << '\t' << temp->item << '\t' << temp->next << '\n';
                 temp = temp->next;
-            } while (temp != nullptr);
+            }
+            while (temp != nullptr);
 
             std::cout << '\n';
         }
