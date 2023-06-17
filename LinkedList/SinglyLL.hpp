@@ -10,6 +10,7 @@ namespace fatpound
         class SinglyLL
         {
         private:
+            __declspec(align(sizeof(SinglyLL<T>::node*)))
             class node
             {
             private:
@@ -21,26 +22,32 @@ namespace fatpound
             public:
                 SinglyLL<T>::node* next = nullptr;
                 T item;
+                T trash; // this is to resolve the C4820 error, can be removed
 
-                node();
-                ~node();
                 node(T new_item);
             };
 
+            /********************************/
+            /*        User Variables        */
+            /********************************/
+
             SinglyLL<T>::node* list = nullptr;
+            SinglyLL<T>::node* last = nullptr;
             int item_count = 0;
+            int trash; // this is to resolve the C4820 error, can be removed
+
+            /********************************/
+            /*        User Functions        */
+            /********************************/
 
             void connect(SinglyLL<T>& second);
             void connect_sorted(SinglyLL<T>::node* node);
-
-            SinglyLL<T>::node* go_to_index(int index);
-
+            
 
         protected:
 
 
         public:
-            SinglyLL();
             ~SinglyLL();
 
             void add(T new_item);
@@ -51,28 +58,22 @@ namespace fatpound
             void list_all();
         };
 
-        template <typename T> SinglyLL<T>::node::node()
-        {
-
-        }
-        template <typename T> SinglyLL<T>::node::~node()
-        {
-
-        }
         template <typename T> SinglyLL<T>::node::node(T new_item)
         {
             this->item = new_item;
         }
 
-        template <typename T> SinglyLL<T>::SinglyLL()
-        {
-
-        }
         template <typename T> SinglyLL<T>::~SinglyLL()
         {
 
         }
 
+        /********************************/
+        /*       Private Functions      */
+        /********************************/
+        //
+        // Return value : void
+        //
         template <typename T> void SinglyLL<T>::connect(SinglyLL<T>& second)
         {
             SinglyLL<T>::node* end = this->go_to_index(this->item_count - 1);
@@ -112,21 +113,13 @@ namespace fatpound
             temp->next = node;
             node->next = nullptr;
         }
-        template <typename T> typename SinglyLL<T>::node* SinglyLL<T>::go_to_index(int index)
-        {
-            if (index >= this->item_count)
-                return nullptr;
 
-            SinglyLL<T>::node* temp = this->list;
-
-            for (int i = 0; i < index; i++)
-            {
-                temp = temp->next;
-            }
-
-            return temp;
-        }
-
+        /********************************/
+        /*       Public Functions       */
+        /********************************/
+        //
+        // Return value : void
+        //
         template <typename T> void SinglyLL<T>::add(T new_item)
         {
             SinglyLL<T>::node* new_part = new SinglyLL<T>::node(new_item);
@@ -135,11 +128,13 @@ namespace fatpound
             if (this->list == nullptr)
             {
                 this->list = new_part;
+                this->last = new_part;
+
                 return;
             }
 
-            SinglyLL<T>::node* end = this->go_to_index(this->item_count - 2);
-            end->next = new_part;
+            this->last->next = new_part;
+            this->last       = new_part;
         }
         template <typename T> void SinglyLL<T>::add_sorted(T new_item)
         {
@@ -198,7 +193,8 @@ namespace fatpound
 
                 this->connect_sorted(temp);
                 temp = temp2;
-            } while (temp != nullptr);
+            }
+            while (temp != nullptr);
 
             this->item_count += second.item_count;
         }
@@ -206,6 +202,8 @@ namespace fatpound
         {
             if (this->list == nullptr)
                 return;
+
+            SinglyLL<T>::node* start_backup = this->list;
 
             SinglyLL<T>::node* t;
             SinglyLL<T>::node* a = nullptr;
@@ -237,6 +235,8 @@ namespace fatpound
                     return;
                 }
             }
+
+            this->last = start_backup;
         }
         template <typename T> void SinglyLL<T>::list_all()
         {
