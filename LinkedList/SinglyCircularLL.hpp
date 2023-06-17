@@ -21,26 +21,24 @@ namespace fatpound
             public:
                 SinglyCircularLL<T>::node* next = nullptr;
                 T item;
+                T trash = 0; // this is to resolve the C4820 error, can be removed
 
-                node();
-                ~node();
                 node(T new_item);
             };
 
             SinglyCircularLL<T>::node* list = nullptr;
+            SinglyCircularLL<T>::node* last = nullptr;
             int item_count = 0;
+            int trash      = 0; // this is to resolve the C4820 error, can be removed
 
             void connect(SinglyCircularLL<T>& second);
             void connect_sorted(SinglyCircularLL<T>::node* node);
-
-            SinglyCircularLL<T>::node* go_to_index(int index);
 
 
         protected:
 
 
         public:
-            SinglyCircularLL();
             ~SinglyCircularLL();
 
             void add(T new_item);
@@ -51,23 +49,11 @@ namespace fatpound
             void list_all();
         };
 
-        template <typename T> SinglyCircularLL<T>::node::node()
-        {
-
-        }
-        template <typename T> SinglyCircularLL<T>::node::~node()
-        {
-
-        }
         template <typename T> SinglyCircularLL<T>::node::node(T new_item)
         {
             this->item = new_item;
         }
 
-        template <typename T> SinglyCircularLL<T>::SinglyCircularLL()
-        {
-
-        }
         template <typename T> SinglyCircularLL<T>::~SinglyCircularLL()
         {
 
@@ -75,11 +61,8 @@ namespace fatpound
 
         template <typename T> void SinglyCircularLL<T>::connect(SinglyCircularLL<T>& second)
         {
-            SinglyCircularLL<T>::node* end = this->go_to_index(this->item_count - 1);
-            end->next = second.list;
-
-            SinglyCircularLL<T>::node* second_end = second.go_to_index(second.item_count - 1);
-            second_end->next = this->list;
+            this->last->next = second.list;
+            second.last->next = this->list;
         }
         template <typename T> void SinglyCircularLL<T>::connect_sorted(SinglyCircularLL<T>::node* node)
         {
@@ -94,8 +77,7 @@ namespace fatpound
                 node->next = this->list;
                 this->list = node;
 
-                SinglyCircularLL<T>::node* end = this->go_to_index(this->item_count - 1);
-                end->next = node;
+                this->last->next = node;
 
                 return;
             }
@@ -119,20 +101,6 @@ namespace fatpound
             temp->next = node;
             node->next = start;
         }
-        template <typename T> typename SinglyCircularLL<T>::node* SinglyCircularLL<T>::go_to_index(int index)
-        {
-            if (index >= this->item_count)
-                return nullptr;
-
-            SinglyCircularLL<T>::node* temp = this->list;
-
-            for (int i = 0; i < index; i++)
-            {
-                temp = temp->next;
-            }
-
-            return temp;
-        }
 
         template <typename T> void SinglyCircularLL<T>::add(T new_item)
         {
@@ -141,15 +109,16 @@ namespace fatpound
 
             if (this->list == nullptr)
             {
-                this->list = new_part;
-                new_part->next = this->list;
+                this->list       = new_part;
+                this->last       = new_part;
+                this->list->next = this->list;
 
                 return;
             }
 
-            SinglyCircularLL<T>::node* end = this->go_to_index(this->item_count - 2);
-            end->next = new_part;
-            new_part->next = this->list;
+            this->last->next = new_part;
+            this->last       = new_part;
+            this->last->next = this->list;
         }
         template <typename T> void SinglyCircularLL<T>::add_sorted(T new_item)
         {
@@ -169,8 +138,7 @@ namespace fatpound
                 new_part->next = this->list;
                 this->list = new_part;
 
-                SinglyCircularLL<T>::node* end = this->go_to_index(this->item_count - 1);
-                end->next = new_part;
+                this->last->next = new_part;
 
                 return;
             }
@@ -216,7 +184,8 @@ namespace fatpound
 
                 this->connect_sorted(temp);
                 temp = temp2;
-            } while (temp != start);
+            }
+            while (temp != start);
 
             this->item_count += second.item_count;
         }
@@ -224,6 +193,15 @@ namespace fatpound
         {
             if (this->list == nullptr)
                 return;
+
+            // this should resolve the C6011 error but the compiler is still not smart enough for this ("t can be null")
+            // why? because if the linked list does not have at least 2 elements in it, there should be a runtime error
+            // at that time which will obviously display an error on the user's screen
+            // so i am going to add an if (t != nullptr) check to the while loop.
+            if (this->item_count < 2)
+                return;
+
+            SinglyCircularLL<T>::node* start_backup = this->list;
 
             SinglyCircularLL<T>::node* t;
             SinglyCircularLL<T>::node* a = nullptr;
@@ -239,8 +217,11 @@ namespace fatpound
                 a = t;
                 x = temp;
 
-                temp = t->next;
-                t->next = x;
+                if (t->next) // C6011
+                {
+                    temp = t->next;
+                    t->next = x;
+                }
 
                 if (temp == start)
                 {
@@ -263,6 +244,8 @@ namespace fatpound
             }
 
             start->next = temp;
+
+            this->last = start_backup;
         }
         template <typename T> void SinglyCircularLL<T>::list_all()
         {
