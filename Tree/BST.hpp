@@ -126,15 +126,15 @@ namespace fatpound::tree
         if (root->item == item)
             return root;
 
-        BST<T>::node* left_insertress = find_protected(root->left, item);
+        BST<T>::node* left_address = find_protected(root->left, item);
 
-        if (left_insertress != nullptr)
-            return left_insertress;
+        if (left_address != nullptr)
+            return left_address;
 
-        BST<T>::node* right_insertress = find_protected(root->right, item);
+        BST<T>::node* right_address = find_protected(root->right, item);
 
-        if (right_insertress != nullptr)
-            return right_insertress;
+        if (right_address != nullptr)
+            return right_address;
     }
     //
     // 
