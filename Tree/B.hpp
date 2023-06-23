@@ -42,8 +42,6 @@ namespace fatpound::tree
 
         std::uint64_t capacity_order = C;
 
-        bool has_depth = false;
-
         /********************************/
         /*            Private           */
         /*           Functions          */
