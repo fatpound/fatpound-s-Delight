@@ -56,8 +56,6 @@ namespace fatpound::tree
 
     public:
         void insert(T new_item);
-
-        void test();
     };
     
     template <typename T, std::uint64_t C> B<T, C>::node::node()
@@ -84,16 +82,6 @@ namespace fatpound::tree
         this->lesser = new_lesser;
     }
 
-    template <typename T, std::uint64_t C> void B<T, C>::test()
-    {
-        std::cout << this->root->items.at(0)->first << ' ';
-        std::cout << this->root->lesser->items.at(0)->first << ' ';
-        std::cout << this->root->items.at(0)->second->items.at(0)->first << ' ';
-        std::cout << this->root->lesser->lesser->items.at(0)->first << ' ';
-        std::cout << this->root->lesser->items.at(0)->second->items.at(0)->first << ' ';
-        std::cout << this->root->items.at(0)->second->lesser->items.at(0)->first << ' ';
-        std::cout << this->root->items.at(0)->second->items.at(0)->second->items.at(0)->first << ' ';
-    }
     template <typename T, std::uint64_t C> void B<T, C>::private_overflow(B<T, C>::node* node, std::pair<T, B<T, C>::node*>* pair)
     {
         std::vector<std::pair<T, B<T, C>::node*>*> temp_vec;
