@@ -42,6 +42,8 @@ namespace fatpound::tree
 
         std::uint64_t capacity_order = C;
 
+        int depth = 0;
+
         /********************************/
         /*            Private           */
         /*           Functions          */
@@ -56,6 +58,7 @@ namespace fatpound::tree
 
     public:
         void insert(T new_item);
+        void list_levelorder() const;
     };
     
     template <typename T, std::uint64_t C> B<T, C>::node::node()
@@ -82,6 +85,47 @@ namespace fatpound::tree
         this->lesser = new_lesser;
     }
 
+    template <typename T, std::uint64_t C> void B<T, C>::list_levelorder() const
+    {
+        std::queue<B<T, C>::node*> Q;
+
+        if (this->root != nullptr)
+            Q.push(this->root);
+
+        std::int64_t level = 1;
+
+        for (std::int64_t i = 1; Q.size() > 0; i++)
+        {
+            B<T, C>::node* u = Q.front();
+            Q.pop();
+
+            if (u != nullptr)
+            {
+                if (ISPOWOF2(i))
+                {
+                    std::cout << "Level " << level << " : ";
+                    level++;
+                }
+
+                Q.push(u->lesser);
+
+                for (int j = 0; j < u->items.size(); j++)
+                {
+                    std::cout << u->items.at(j)->first << ' ';
+
+                    Q.push(u->items.at(j)->second);
+                }
+            }
+
+            if (ISPOWOF2(i + 1))
+                std::cout << '\n';
+            else if (Q.size() != 0 && u != nullptr)
+                std::cout << "- ";
+            // else break;
+        }
+
+        std::cout << '\n';
+    }
     template <typename T, std::uint64_t C> void B<T, C>::private_overflow(B<T, C>::node* node, std::pair<T, B<T, C>::node*>* pair)
     {
         std::vector<std::pair<T, B<T, C>::node*>*> temp_vec;
@@ -113,6 +157,7 @@ namespace fatpound::tree
         {
             node->parent = new B<T, C>::node(node);
             this->root = node->parent;
+            this->depth++;
         }
 
         this->private_insert(node->parent, temp_vec.at(center), false);
@@ -191,6 +236,8 @@ namespace fatpound::tree
         if (this->root == nullptr)
         {
             this->root = new B<T, C>::node(vec);
+            this->depth++;
+
             return;
         }
         
