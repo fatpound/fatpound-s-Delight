@@ -44,6 +44,8 @@ namespace fatpound::tree
 
         int depth = 0;
 
+        bool is_deleted = false;
+
         /********************************/
         /*            Private           */
         /*           Functions          */
@@ -52,11 +54,15 @@ namespace fatpound::tree
         void private_insert  (B<T, C>::node* node, std::pair<T, B<T, C>::node*>* pair, bool add_first_time);
         void private_overflow(B<T, C>::node* node, std::pair<T, B<T, C>::node*>* pair);
 
+        void private_clear();
+
 
     protected:
 
 
     public:
+        ~B();
+
         void insert(T new_item);
         void list_levelorder() const;
     };
@@ -85,46 +91,41 @@ namespace fatpound::tree
         this->lesser = new_lesser;
     }
 
-    template <typename T, std::uint64_t C> void B<T, C>::list_levelorder() const
+    template <typename T, std::uint64_t C> B<T, C>::~B()
     {
+        if (this->is_deleted == false)
+        {
+            this->private_clear();
+            this->is_deleted = true;
+        }
+    }
+
+    template <typename T, std::uint64_t C> void B<T, C>::private_clear()
+    {
+        if (this->root == nullptr)
+            return;
+
         std::queue<B<T, C>::node*> Q;
-
-        if (this->root != nullptr)
-            Q.push(this->root);
-
-        std::int64_t level = 1;
+        Q.push(this->root);
 
         for (std::int64_t i = 1; Q.size() > 0; i++)
         {
             B<T, C>::node* u = Q.front();
             Q.pop();
 
-            if (u != nullptr)
-            {
-                if (ISPOWOF2(i))
-                {
-                    std::cout << "Level " << level << " : ";
-                    level++;
-                }
-
+            if (u->lesser != nullptr)
                 Q.push(u->lesser);
 
-                for (int j = 0; j < u->items.size(); j++)
-                {
-                    std::cout << u->items.at(j)->first << ' ';
-
+            for (int j = 0; j < u->items.size(); j++)
+            {
+                if (u->items.at(j)->second != nullptr)
                     Q.push(u->items.at(j)->second);
-                }
             }
 
-            if (ISPOWOF2(i + 1))
-                std::cout << '\n';
-            else if (Q.size() != 0 && u != nullptr)
-                std::cout << "- ";
-            // else break;
+            delete u;
         }
 
-        std::cout << '\n';
+        this->root = nullptr;
     }
     template <typename T, std::uint64_t C> void B<T, C>::private_overflow(B<T, C>::node* node, std::pair<T, B<T, C>::node*>* pair)
     {
@@ -228,6 +229,49 @@ namespace fatpound::tree
             if (node->items.size() > 1)
                 std::sort(node->items.begin(), node->items.end(), [](std::pair<T, B<T, C>::node*>* ref1, std::pair<T, B<T, C>::node*>* ref2) {return ref1->first < ref2->first; });
         }
+    }
+
+    template <typename T, std::uint64_t C> void B<T, C>::list_levelorder() const
+    {
+        if (this->root == nullptr)
+            return;
+
+        std::queue<B<T, C>::node*> Q;
+        Q.push(this->root);
+
+        std::int64_t level = 1;
+
+        for (std::int64_t i = 1; Q.size() > 0; i++)
+        {
+            B<T, C>::node* u = Q.front();
+            Q.pop();
+
+            if (u != nullptr)
+            {
+                if (ISPOWOF2(i))
+                {
+                    std::cout << "Level " << level << " : ";
+                    level++;
+                }
+
+                Q.push(u->lesser);
+
+                for (int j = 0; j < u->items.size(); j++)
+                {
+                    std::cout << u->items.at(j)->first << ' ';
+
+                    Q.push(u->items.at(j)->second);
+                }
+            }
+
+            if (ISPOWOF2(i + 1))
+                std::cout << '\n';
+            else if (Q.size() != 0 && u != nullptr)
+                std::cout << "- ";
+            // else break;
+        }
+
+        std::cout << '\n';
     }
     template <typename T, std::uint64_t C> void B<T, C>::insert(T new_item)
     {
