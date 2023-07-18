@@ -9,14 +9,14 @@ namespace fatpound
         class Prim
         {
         private:
-            std::deque<int> deque;
+            std::deque<std::int64_t> deque;
 
-            std::vector<int> key;
-            std::vector<int> pi;
+            std::vector<std::int64_t> key;
+            std::vector<std::int64_t> pi;
 
             graph* G = nullptr;
 
-            int item_count = 0;
+            std::size_t item_count = 0;
 
 
         protected:
@@ -32,65 +32,71 @@ namespace fatpound
         {
             this->G = graf;
 
-            for (int i = 0; i < this->G->nodes.size(); i++)
+            for (std::size_t i = 0; i < this->G->nodes.size(); i++)
             {
                 this->key.push_back(999); // INT32_MAX
                 this->pi.push_back(-1);
 
-                this->deque.push_back(i);
+                this->deque.push_back((std::int64_t)i);
                 this->item_count++;
             }
         }
 
         void Prim::run()
         {
+            if (this->G == nullptr)
+                return;
+
             this->key.at(0) = 0;
 
             while (this->item_count > 0)
             {
-                int min_index = -1;
+                std::size_t min_index = 0;
 
-                for (int i = 0; i < this->deque.size(); i++)
+                bool flag = true; // does min_index need to be initialized ?
+                
+                for (std::size_t i = 0; i < this->deque.size(); i++)
                 {
-                    if (this->deque.at(i) == i)
+                    if (this->deque.at(i) == (std::int64_t)i)
                     {
-                        if (min_index == -1)
-                            min_index = i;
-
-                        if (this->key.at(min_index) > this->key.at(i))
+                        if (flag)
                         {
                             min_index = i;
+                            flag = false;
                         }
+
+                        if (this->key.at(min_index) > this->key.at(i))
+                            min_index = i;
                     }
                 }
 
-                int u = this->deque.at(min_index);
+                const std::size_t u = (std::size_t)this->deque.at(min_index);
+
                 this->deque.at(min_index) = -1;
                 this->item_count--;
 
-                for (int i = 0; i < this->G->nodes.at(u)->next_list.size(); i++)
+                for (std::size_t i = 0; i < this->G->nodes.at(u)->next_list.size(); i++)
                 {
-                    int v = this->G->nodes.at(u)->next_list.at(i)->n;
-                    if (this->deque.at(v) == v && (this->key.at(v) > this->G->adj.at(u).at(v)))
+                    const std::size_t v = this->G->nodes.at(u)->next_list.at(i)->n;
+
+                    if (this->deque.at(v) == (std::int64_t)v && (this->key.at(v) > this->G->adj.at(u).at(v)))
                     {
                         this->key.at(v) = this->G->adj.at(u).at(v);
-                        this->pi.at(v) = u;
+                        this->pi.at(v)  = (std::int64_t)u;
                     }
                 }
             }
 
-            for (int i = 0; i < this->key.size(); i++)
-            {
+            for (std::size_t i = 0; i < this->key.size(); i++)
                 std::cout << this->key.at(i) << ' ';
-            }
 
             std::cout << '\n';
 
-            for (int i = 0; i < this->pi.size(); i++)
+            for (std::size_t i = 0; i < this->pi.size(); i++)
             {
                 if (this->pi.at(i) != -1)
                 {
-                    std::cout << "abcdefghi"[this->pi.at(i)] << ' ';
+                    std::cout << (char)('a' + this->pi.at(i)) << ' ';
                 }
                 else
                     std::cout << "N ";
