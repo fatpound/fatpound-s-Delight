@@ -8,6 +8,11 @@ namespace fatpound::linkedlist
     class SinglyLL
     {
     private:
+        /********************************/
+        /*            Private           */
+        /*            Classes           */
+        /********************************/
+
         class node
         {
         private:
@@ -23,14 +28,16 @@ namespace fatpound::linkedlist
             node(T new_item);
         };
 
+
         /********************************/
+        /*            Private           */
         /*           Variables          */
         /********************************/
 
         SinglyLL<T>::node* list = nullptr;
         SinglyLL<T>::node* end  = nullptr;
 
-        std::int_fast64_t item_count = 0;
+        std::int64_t item_count = 0;
         
 
     protected:
@@ -45,21 +52,41 @@ namespace fatpound::linkedlist
         void list_all();
     };
 
-    template <typename T> SinglyLL<T>::node::node(T new_item)
-    {
-        this->item = new_item;
-    }
-
-    template <typename T> SinglyLL<T>::~SinglyLL()
-    {
-
-    }
 
     /********************************/
     /*       Public Functions       */
     /********************************/
     //
-    // Return type : void
+    //
+    //   constructor
+    //   destructors
+    //
+    //
+    template <typename T> SinglyLL<T>::node::node(T new_item)
+    {
+        this->item = new_item;
+    }
+    template <typename T> SinglyLL<T>::~SinglyLL()
+    {
+        if (this->list == nullptr)
+            return;
+
+        SinglyLL<T>::node* ex = this->list;
+        SinglyLL<T>::node* temp;
+
+        do
+        {
+            temp = ex->next;
+            delete ex;
+
+            ex = temp;
+        }
+        while (ex != nullptr);
+    }
+    //
+    // 
+    //   void
+    //
     //
     template <typename T> void SinglyLL<T>::add(T new_item)
     {
@@ -118,7 +145,6 @@ namespace fatpound::linkedlist
         temp->next = new_part;
         this->end  = new_part;
     }
-
     template <typename T> void SinglyLL<T>::reverse()
     {
         if (this->list == nullptr)
