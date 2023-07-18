@@ -19,8 +19,9 @@ namespace fatpound
 
             public:
                 std::vector<graph::node*> next_list;
-                int n = -1;
+                std::size_t n = 0;
 
+                node(std::size_t idx);
                 node();
                 ~node();
 
@@ -32,20 +33,24 @@ namespace fatpound
 
 
         public:
-            std::vector<std::vector<int>> adj;
+            std::vector<std::vector<std::int64_t>> adj;
             std::vector<graph::node*> nodes;
 
-            int node_count = 0;
-            int edge_count = 0;
+            std::size_t node_count = 0;
+            std::size_t edge_count = 0;
 
             graph();
             ~graph();
             graph(std::string);
-            graph(std::vector<std::vector<int>> vec);
+            graph(std::vector<std::vector<std::int64_t>>& vec);
 
             void list_nodes();
         };
 
+        graph::node::node(std::size_t idx)
+        {
+            this->n = idx;
+        }
         graph::node::node()
         {
 
@@ -57,7 +62,7 @@ namespace fatpound
 
         void graph::node::list_all_adj()
         {
-            for (int i = 0; i < this->next_list.size(); i++)
+            for (std::size_t i = 0; i < this->next_list.size(); i++)
             {
                 std::cout << this->next_list.at(i) << "\t" << this->next_list.at(i)->n << '\n';
             }
@@ -78,13 +83,13 @@ namespace fatpound
 
             while (my_file.eof() == false)
             {
-                std::string str;
-                getline(my_file, str);
+                std::string str2;
+                getline(my_file, str2);
 
                 std::stringstream ss;
-                ss << str;
+                ss << str2;
 
-                std::vector<int> vec;
+                std::vector<std::int64_t> vec;
 
                 while (ss.eof() == false)
                 {
@@ -101,15 +106,14 @@ namespace fatpound
 
             this->node_count = this->adj.size();
 
-            for (int i = 0; i < this->adj.size(); i++)
+            for (std::size_t i = 0; i < this->adj.size(); i++)
             {
-                this->nodes.push_back(new node());
-                this->nodes.at(i)->n = i;
+                this->nodes.push_back(new graph::node(i));
             }
 
-            for (int i = 0; i < this->adj.size(); i++)
+            for (std::size_t i = 0; i < this->adj.size(); i++)
             {
-                for (int j = 0; j < this->adj.size(); j++)
+                for (std::size_t j = 0; j < this->adj.size(); j++)
                 {
                     if (this->adj.at(i).at(j) != 0)
                     {
@@ -119,20 +123,19 @@ namespace fatpound
                 }
             }
         }
-        graph::graph(std::vector<std::vector<int>> vec)
+        graph::graph(std::vector<std::vector<std::int64_t>>& vec)
         {
-            this->adj = std::vector<std::vector<int>>(vec);
+            this->adj = vec;
             this->node_count = this->adj.size();
 
-            for (int i = 0; i < this->adj.size(); i++)
+            for (std::size_t i = 0; i < this->adj.size(); i++)
             {
-                this->nodes.push_back(new node());
-                this->nodes.at(i)->n = i;
+                this->nodes.push_back(new graph::node(i));
             }
 
-            for (int i = 0; i < this->adj.size(); i++)
+            for (std::size_t i = 0; i < this->adj.size(); i++)
             {
-                for (int j = 0; j < this->adj.size(); j++)
+                for (std::size_t j = 0; j < this->adj.size(); j++)
                 {
                     if (this->adj.at(i).at(j) != 0)
                     {
@@ -145,7 +148,7 @@ namespace fatpound
 
         void graph::list_nodes()
         {
-            for (int i = 0; i < this->nodes.size(); i++)
+            for (std::size_t i = 0; i < this->nodes.size(); i++)
             {
                 std::cout << this->nodes.at(i) << "\t" << this->nodes.at(i)->n << "\tsource\n";
                 this->nodes.at(i)->list_all_adj();
