@@ -49,7 +49,7 @@ namespace fatpound::linkedlist
         void add(T new_item);
         void add_sorted(T new_item);
         void reverse();
-        void list_all();
+        void list_all() const;
     };
 
 
@@ -185,7 +185,7 @@ namespace fatpound::linkedlist
 
         this->end = start_backup;
     }
-    template <typename T> void SinglyLL<T>::list_all()
+    template <typename T> void SinglyLL<T>::list_all() const
     {
         if (this->list == nullptr)
             return;

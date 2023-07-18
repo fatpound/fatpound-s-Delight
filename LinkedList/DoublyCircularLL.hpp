@@ -39,7 +39,7 @@ namespace fatpound::linkedlist
         void add(T new_item);
         void add_sorted(T new_item);
         void reverse();
-        void list_all();
+        void list_all() const;
     };
 
 
@@ -172,7 +172,7 @@ namespace fatpound::linkedlist
         std::swap(temp->prev, temp->next);
         this->list = temp;
     }
-    template <typename T> void DoublyCircularLL<T>::list_all()
+    template <typename T> void DoublyCircularLL<T>::list_all() const
     {
         DoublyCircularLL<T>::node* temp = this->list;
         DoublyCircularLL<T>::node* start = temp;
