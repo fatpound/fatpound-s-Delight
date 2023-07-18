@@ -22,7 +22,6 @@ namespace fatpound
                 std::size_t n = 0;
 
                 node(std::size_t idx);
-                node();
                 ~node();
 
                 void list_all_adj();
@@ -50,10 +49,6 @@ namespace fatpound
         graph::node::node(std::size_t idx)
         {
             this->n = idx;
-        }
-        graph::node::node()
-        {
-
         }
         graph::node::~node()
         {
