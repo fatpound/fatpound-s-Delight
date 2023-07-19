@@ -50,7 +50,7 @@ namespace fatpound::compression
         std::size_t max_depth = 0;
 
         void set_binary_values_private(Huffman::node* node, std::string str);
-        void list_preorder_private(Huffman::node* node);
+        void list_preorder_private(Huffman::node* node) const;
 
 
     protected:
@@ -59,8 +59,8 @@ namespace fatpound::compression
     public:
         void decompress(std::string& bin);
 
-        void list_preorder();
-        void list_results();
+        void list_preorder() const;
+        void list_results() const;
 
         ~Huffman();
         Huffman(std::string input);
@@ -171,7 +171,7 @@ namespace fatpound::compression
         this->set_binary_values_private(node->left, str + "0");
         this->set_binary_values_private(node->right, str + "1");
     }
-    void Huffman::list_preorder_private(Huffman::node* node)
+    void Huffman::list_preorder_private(Huffman::node* node) const
     {
         if (node == nullptr)
             return;
@@ -245,7 +245,7 @@ namespace fatpound::compression
         std::cout << "package count: " << numerator << '\n';
         std::cout << "compression rate: %" << rate << " ~= " << numerator << '/' << denominator << '\n';
     }
-    void Huffman::list_results()
+    void Huffman::list_results() const
     {
         for (std::size_t i = 0; i < this->results_binary.size(); i++)
         {
@@ -255,7 +255,7 @@ namespace fatpound::compression
 
         std::cout << '\n';
     }
-    void Huffman::list_preorder()
+    void Huffman::list_preorder() const
     {
         std::cout << "output: ";
 
