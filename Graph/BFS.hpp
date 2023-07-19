@@ -8,7 +8,7 @@ namespace fatpound::graph
     {
     private:
         std::queue<std::size_t> queue;
-        std::vector<std::size_t> colors;
+        std::vector<std::int64_t> colors;
 
         graph* G = nullptr;
 
