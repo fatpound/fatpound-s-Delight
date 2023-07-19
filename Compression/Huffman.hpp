@@ -114,9 +114,9 @@ namespace fatpound::compression
         for (std::size_t i = 0; i < pairs.size(); i++)
             deque.push_back(new node(pairs.at(i).first, pairs.at(i).second));
 
-        std::size_t n = deque.size();
+        const std::size_t first_size = deque.size();
 
-        for (std::size_t i = 0; i < n - 1; i++)
+        for (std::size_t i = 0; i < first_size - 1; i++)
         {
             Huffman::node* sol = deque.at(0);
             Huffman::node* sag = deque.at(1);
@@ -141,7 +141,7 @@ namespace fatpound::compression
         }
 
         this->root = deque.at(0);
-        this->node_count = n * 2 - 1;
+        this->node_count = first_size * 2 - 1;
 
         this->set_binary_values_private(this->root, "");
 
