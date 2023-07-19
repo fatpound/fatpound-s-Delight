@@ -7,7 +7,7 @@ namespace fatpound::graph
     class DFS
     {
     private:
-        std::vector<int> colors;
+        std::vector<std::int64_t> colors;
         
         graph* G = nullptr;
 
