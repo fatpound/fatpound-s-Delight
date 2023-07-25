@@ -7,15 +7,8 @@ namespace fatpound::compression
     class Huffman
     {
     private:
-        class node
+        struct node
         {
-        private:
-
-
-        protected:
-
-
-        public:
             Huffman::node* left = nullptr;
             Huffman::node* right = nullptr;
 
@@ -145,8 +138,8 @@ namespace fatpound::compression
 
         this->set_binary_values_private(this->root, "");
 
-        std::cout << "min_depth: " << this->min_depth << '\n'
-                  << "max_depth: " << this->max_depth << '\n';
+        for (auto x : pairs)
+            delete x;
     }
 
     void Huffman::set_binary_values_private(Huffman::node* node, std::string str)
@@ -247,6 +240,9 @@ namespace fatpound::compression
     }
     void Huffman::list_results() const
     {
+        std::cout << "min_depth: " << this->min_depth << '\n'
+                  << "max_depth: " << this->max_depth << '\n';
+
         for (std::size_t i = 0; i < this->results_binary.size(); i++)
         {
             std::cout << this->results_binary.at(i) << ' '
