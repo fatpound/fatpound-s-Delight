@@ -6,6 +6,10 @@ namespace fatpound
 {
     namespace graph
     {
+        static constexpr std::int64_t color_white = 0;
+        static constexpr std::int64_t color_gray  = 1;
+        static constexpr std::int64_t color_black = 2;
+
         class graph
         {
         private:
@@ -26,6 +30,8 @@ namespace fatpound
 
                 void list_all_adj();
             };
+
+            std::size_t is_deleted = 0; // this isn't bool just to avoid C4820
 
 
         protected:
@@ -69,7 +75,13 @@ namespace fatpound
         }
         graph::~graph()
         {
+            if (this->is_deleted == 1)
+                return;
 
+            for (std::size_t i = 0; i < this->nodes.size(); i++)
+                delete this->nodes.at(i);
+
+            this->is_deleted = 1;
         }
         graph::graph(std::string str)
         {
