@@ -10,18 +10,11 @@ namespace fatpound::linkedlist
     private:
         /********************************/
         /*            Private           */
-        /*            Classes           */
+        /*            Structs           */
         /********************************/
 
-        class node
+        struct node
         {
-        private:
-
-
-        protected:
-
-
-        public:
             SinglyLL<T>::node* next = nullptr;
             T item;
 
@@ -37,7 +30,7 @@ namespace fatpound::linkedlist
         SinglyLL<T>::node* list = nullptr;
         SinglyLL<T>::node* end  = nullptr;
 
-        std::int64_t item_count = 0;
+        std::size_t item_count = 0;
         
 
     protected:

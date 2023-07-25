@@ -8,15 +8,8 @@ namespace fatpound::linkedlist
     class DoublyLL
     {
     private:
-        class node
+        struct node
         {
-        private:
-
-
-        protected:
-
-
-        public:
             DoublyLL<T>::node* prev = nullptr;
             DoublyLL<T>::node* next = nullptr;
             T item;
@@ -31,7 +24,7 @@ namespace fatpound::linkedlist
         DoublyLL<T>::node* list = nullptr;
         DoublyLL<T>::node* end  = nullptr;
         
-        std::int64_t item_count = 0;
+        std::size_t item_count = 0;
 
 
     protected:

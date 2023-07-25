@@ -8,15 +8,8 @@ namespace fatpound::linkedlist
     class SinglyCircularLL
     {
     private:
-        class node
+        struct node
         {
-        private:
-
-
-        protected:
-
-
-        public:
             SinglyCircularLL<T>::node* next = nullptr;
             T item;
 
@@ -30,7 +23,7 @@ namespace fatpound::linkedlist
         SinglyCircularLL<T>::node* list = nullptr;
         SinglyCircularLL<T>::node* end  = nullptr;
 
-        std::int64_t item_count = 0;
+        std::size_t item_count = 0;
 
 
     protected:
