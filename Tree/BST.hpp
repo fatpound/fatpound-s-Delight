@@ -9,24 +9,14 @@ namespace fatpound::tree
     template <typename T>
     class BST
     {
-    private:
-
-
     protected:
         /********************************/
         /*           Protected          */
         /*            Classes           */
         /********************************/
 
-        class node
+        struct node
         {
-        private:
-
-
-        protected:
-
-
-        public:
             BST<T>::node* left   = nullptr;
             BST<T>::node* right  = nullptr;
             BST<T>::node* parent = nullptr;
@@ -44,7 +34,7 @@ namespace fatpound::tree
         BST<T>::node* root          = nullptr;
         BST<T>::node* last_inserted = nullptr;
 
-        std::int64_t node_count = 0;
+        std::size_t node_count = 0;
 
         /********************************/
         /*           Protected          */
@@ -70,6 +60,10 @@ namespace fatpound::tree
         void list_leaves_reverse_protected    (BST<T>::node* node) const;
 
 
+    private:
+        void erase_private(BST<T>::node* node);
+
+
     public:
         /********************************/
         /*            Public            */
@@ -91,6 +85,23 @@ namespace fatpound::tree
         void list_leaves()            const;
         void list_leaves_reverse()    const;
     };
+
+    /********************************/
+    /*       Private Functions      */
+    /********************************/
+    //
+    //   void
+    //
+    template <typename T> void BST<T>::erase_private(BST<T>::node* node)
+    {
+        if (node == nullptr)
+            return;
+
+        this->erase_private(node->left);
+        this->erase_private(node->right);
+
+        delete node;
+    }
 
     /********************************/
     /*      Protected Functions     */
@@ -138,12 +149,8 @@ namespace fatpound::tree
     }
     //
     // 
-    //   std::int64_t
-    //
-    //
-    /**/
-    // 
     //   std::int64_t . . . const
+    //
     //
     template <typename T> std::int64_t BST<T>::get_depth_protected(BST<T>::node* node, std::int64_t depth) const
     {
@@ -286,7 +293,7 @@ namespace fatpound::tree
     }
     template <typename T> BST<T>::~BST()
     {
-
+        this->erase_private(this->root);
     }
     //
     // 
