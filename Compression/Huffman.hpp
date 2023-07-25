@@ -91,28 +91,28 @@ namespace fatpound::compression
     }
     Huffman::Huffman(std::string input)
     {
-        std::vector<std::pair<std::int64_t, char>> pairs;
+        std::vector<std::pair<std::int64_t, char>*> pairs;
 
         for (auto x : input)
         {
             std::int64_t index = -1;
 
             for (std::size_t i = 0; i < pairs.size(); i++)
-                if (pairs.at(i).second == x)
+                if (pairs.at(i)->second == x)
                     index = (std::int64_t)i;
 
             if (index == -1)
-                pairs.push_back(std::pair<std::size_t, char>{1, x});
+                pairs.push_back(new std::pair<std::int64_t, char>{1LL, x});
             else
-                pairs.at((const std::size_t)index).first++;
+                pairs.at((const std::size_t)index)->first++;
         }
 
-        std::sort(pairs.begin(), pairs.end());
+        std::sort(pairs.begin(), pairs.end(), [](std::pair<std::int64_t, char>* ref1, std::pair<std::int64_t, char>* ref2) {return ref1->first < ref2->first; });
 
         std::deque<Huffman::node*> deque;
 
         for (std::size_t i = 0; i < pairs.size(); i++)
-            deque.push_back(new node(pairs.at(i).first, pairs.at(i).second));
+            deque.push_back(new Huffman::node{ pairs.at(i)->first, pairs.at(i)->second });
 
         const std::size_t first_size = deque.size();
 
