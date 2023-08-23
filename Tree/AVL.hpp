@@ -5,7 +5,7 @@
 namespace fatpound::tree
 {
     template <typename T>
-    class AVL : public BST<T>
+    class AVL : public BST<T> // I will add a destructor to this
     {
     private:
         void balance();
