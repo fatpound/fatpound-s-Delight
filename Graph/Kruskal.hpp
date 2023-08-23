@@ -6,7 +6,7 @@ namespace fatpound
 {
     namespace graph
     {
-        class Kruskal
+        class Kruskal // not optimized yet, just implemented the algorithm to see how it works.
         {
         private:
             std::vector<int> weighs;
