@@ -31,7 +31,7 @@ namespace fatpound
                 void list_all_adj();
             };
 
-            std::size_t is_deleted = 0; // this isn't bool just to avoid C4820
+            std::size_t is_deleted = 0; // this isn't bool just to avoid C4820, I will convert this to bool again because who cares about C4820 warning
 
 
         protected:
