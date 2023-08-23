@@ -2,113 +2,121 @@
 
 #include "graph.hpp"
 
-namespace fatpound
+namespace fatpound::graph
 {
-    namespace graph
+    class Dijkstra
     {
-        class Dijkstra
+    private:
+        std::deque<std::int64_t> deque;
+
+        std::vector<std::int64_t> d;
+        std::vector<std::int64_t> p;
+
+        graph* G = nullptr;
+
+        std::size_t item_count = 0;
+
+        std::int64_t w(const std::size_t u, const std::size_t v);
+
+        void relax(const std::size_t u, const std::size_t v);
+
+
+    protected:
+
+
+    public:
+        Dijkstra(graph* graf, std::size_t source_index);
+        ~Dijkstra();
+
+        void run();
+    };
+
+
+    Dijkstra::Dijkstra(graph* graf, std::size_t source_index)
+    {
+        if (graf == nullptr)
+            return;
+
+        this->G = graf;
+
+        for (std::size_t i = 0; i < graf->nodes.size(); i++)
         {
-        private:
-            std::deque<int> deque;
+            this->d.push_back(99999); // INT32_MAX
+            this->p.push_back(-1);
 
-            std::vector<int> d;
-            std::vector<int> p;
-
-            graph* G = nullptr;
-
-            int item_count = 0;
-
-            int w(int u, int v);
-            void relax(int u, int v);
-
-
-        protected:
-
-
-        public:
-            Dijkstra(graph* graf, int source_index);
-
-            void run();
-        };
-
-        int Dijkstra::w(int u, int v)
-        {
-            return this->G->adj.at(u).at(v);
+            this->deque.push_back((std::int64_t)i);
+            this->item_count++;
         }
 
-        void Dijkstra::relax(int u, int v)
+        this->d.at(source_index) = 0;
+    }
+    Dijkstra::~Dijkstra()
+    {
+        if (this->G != nullptr)
+            this->G->~graph();
+    }
+
+    std::int64_t Dijkstra::w(const std::size_t u, const std::size_t v)
+    {
+        return this->G->adj.at(u).at(v);
+    }
+
+    void Dijkstra::relax(const std::size_t u, const std::size_t v)
+    {
+        if (this->d.at(v) > this->d.at(u) + this->w(u, v))
         {
-            if (this->d.at(v) > this->d.at(u) + this->w(u, v))
-            {
-                this->d.at(v) = this->d.at(u) + this->w(u, v);
-                this->p.at(v) = u;
-            }
+            this->d.at(v) = this->d.at(u) + this->w(u, v);
+            this->p.at(v) = (std::int64_t)u;
         }
+    }
+    void Dijkstra::run()
+    {
+        if (this->G == nullptr)
+            return;
 
-        Dijkstra::Dijkstra(graph* graf, int source_index)
+        while (this->item_count > 0)
         {
-            this->G = graf;
+            std::size_t min_index = 0;
 
-            for (int i = 0; i < graf->nodes.size(); i++)
+            bool flag = true; // does min_index need to be initialized ?
+
+            for (std::size_t i = 0; i < this->d.size(); i++)
             {
-                this->d.push_back(999); // INT32_MAX
-                this->p.push_back(-1);
-
-                this->deque.push_back(i);
-                this->item_count++;
-            }
-
-            this->d.at(source_index) = 0;
-        }
-
-        void Dijkstra::run()
-        {
-            while (this->item_count > 0)
-            {
-                int min_index = -1;
-
-                for (int i = 0; i < this->d.size(); i++)
+                if (this->deque.at(i) >= 0)
                 {
-                    if (this->deque.at(i) >= 0)
+                    if (flag)
                     {
-                        if (min_index == -1)
-                            min_index = i;
-
-                        if (this->d.at(min_index) > this->d.at(i))
-                        {
-                            min_index = i;
-                        }
+                        min_index = i;
+                        flag = false;
                     }
-                }
 
-                int u = this->deque.at(min_index);
-                this->deque.at(min_index) = -1;
-                this->item_count--;
-
-                for (int i = 0; i < this->G->nodes.at(u)->next_list.size(); i++)
-                {
-                    this->relax(u, this->G->nodes.at(u)->next_list.at(i)->n);
+                    if (this->d.at(min_index) > this->d.at(i))
+                        min_index = i;
                 }
             }
 
-            for (int i = 0; i < this->d.size(); i++)
-            {
-                std::cout << this->d.at(i) << ' ';
-            }
+            const std::size_t u = (std::size_t)this->deque.at(min_index);
 
-            std::cout << '\n';
+            this->deque.at(min_index) = -1;
+            this->item_count--;
 
-            for (int i = 0; i < this->p.size(); i++)
-            {
-                if (this->p.at(i) > -1)
-                {
-                    std::cout << "ABCDEFGHI"[this->p.at(i)];
-                }
-                else
-                    std::cout << "N";
-            }
-
-            std::cout << "\n\n";
+            for (std::size_t i = 0; i < this->G->nodes.at(u)->next_list.size(); i++)
+                this->relax(u, this->G->nodes.at(u)->next_list.at(i)->n);
         }
+
+        for (std::size_t i = 0; i < this->d.size(); i++)
+            std::cout << this->d.at(i) << ' ';
+
+        std::cout << '\n';
+
+        for (std::size_t i = 0; i < this->p.size(); i++)
+        {
+            if (this->p.at(i) > -1)
+                std::cout << (char)('A' + this->p.at(i));
+            else
+                std::cout << 'N';
+        }
+
+        std::cout << "\n\n";
     }
 }

@@ -11,10 +11,6 @@ namespace fatpound::graph
         
         graph* G = nullptr;
 
-        static constexpr std::int64_t color_white = 0;
-        static constexpr std::int64_t color_gray  = 1;
-        static constexpr std::int64_t color_black = 2;
-
         void visit(const std::size_t index);
 
 
@@ -23,6 +19,7 @@ namespace fatpound::graph
 
     public:
         DFS(graph* graf);
+        ~DFS();
 
         void run();
     };
@@ -32,12 +29,16 @@ namespace fatpound::graph
         this->G = graf;
 
         for (std::size_t i = 0; i < this->G->nodes.size(); i++)
-            this->colors.push_back(color_white);
+            this->colors.push_back(fatpound::graph::color_white);
+    }
+    DFS::~DFS()
+    {
+        this->G->~graph();
     }
 
     void DFS::visit(const std::size_t index)
     {
-        this->colors.at(index) = color_gray;
+        this->colors.at(index) = fatpound::graph::color_gray;
 
         std::cout << this->G->nodes.at(index) << '\t' << this->G->nodes.at(index)->n << '\n';
 
@@ -45,17 +46,20 @@ namespace fatpound::graph
         {
             const std::size_t next_index = this->G->nodes.at(index)->next_list.at(i)->n;
 
-            if (this->colors.at(next_index) == color_white)
+            if (this->colors.at(next_index) == fatpound::graph::color_white)
                 this->visit(next_index);
         }
 
-        this->colors.at(index) = color_black;
+        this->colors.at(index) = fatpound::graph::color_black;
     }
     void DFS::run()
     {
+        if (this->G == nullptr)
+            return;
+
         for (std::size_t i = 0; i < this->G->nodes.size(); i++)
         {
-            if (this->colors.at(i) == color_white)
+            if (this->colors.at(i) == fatpound::graph::color_white)
                 this->visit(i);
         }
     }

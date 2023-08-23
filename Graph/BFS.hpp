@@ -12,23 +12,26 @@ namespace fatpound::graph
 
         graph* G = nullptr;
 
-        static constexpr std::int64_t color_white = 0;
-        static constexpr std::int64_t color_gray  = 1;
-        static constexpr std::int64_t color_black = 2;
-
 
     protected:
 
 
     public:
         BFS(graph* graf);
+        ~BFS();
 
         void run();
     };
 
     BFS::BFS(graph* graf)
     {
-        this->G = graf;
+        if (graf != nullptr)
+            this->G = graf;
+    }
+    BFS::~BFS()
+    {
+        if (this->G != nullptr)
+            this->G->~graph();
     }
 
     void BFS::run()
@@ -37,7 +40,7 @@ namespace fatpound::graph
             return;
 
         for (std::size_t i = 0; i < this->G->nodes.size(); i++)
-            this->colors.push_back(color_white);
+            this->colors.push_back(fatpound::graph::color_white);
 
         this->queue.push(0);
 
@@ -50,14 +53,14 @@ namespace fatpound::graph
             {
                 const std::size_t v = this->G->nodes.at(u)->next_list.at(i)->n;
 
-                if (this->colors.at(v) == color_white)
+                if (this->colors.at(v) == fatpound::graph::color_white)
                 {
-                    this->colors.at(v) = color_gray;
+                    this->colors.at(v) = fatpound::graph::color_gray;
                     this->queue.push(v);
                 }
             }
 
-            this->colors.at(u) = color_black;
+            this->colors.at(u) = fatpound::graph::color_black;
             std::cout << (char)('a' + u);
         }
 

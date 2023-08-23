@@ -24,6 +24,9 @@ namespace fatpound::graph
 
     FloydWarshall::FloydWarshall(graph* graf)
     {
+        if (graf == nullptr)
+            return;
+
         this->G = graf;
 
         for (std::size_t i = 0; i < this->G->adj.size(); i++)
@@ -51,11 +54,15 @@ namespace fatpound::graph
     }
     FloydWarshall::~FloydWarshall()
     {
-        this->G->~graph();
+        if (this->G != nullptr)
+            this->G->~graph();
     }
 
     void FloydWarshall::run()
     {
+        if (this->G == nullptr)
+            return;
+
         for (std::size_t k = 0; k < this->result.size(); k++)
         {
             for (std::size_t i = 0; i < this->result.size(); i++)
