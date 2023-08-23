@@ -5,7 +5,7 @@
 namespace fatpound::tree
 {
     template <typename T, std::size_t C>
-    class B
+    class B // I will add a destructor to this
     {
     private:
         /********************************/
