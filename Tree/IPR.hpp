@@ -5,7 +5,7 @@
 namespace fatpound::tree
 {
     template <typename T>
-    class IPR : public AVL<T> // I will add a destructor to this
+    class IPR : public AVL<T>
     {
     private:
         void balance();
