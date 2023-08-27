@@ -296,6 +296,6 @@ namespace fatpound::tree
             return;
         }
         
-        this->private_insert(this->root, new  std::pair<T, B<T, C>::node*>{new_item, nullptr}, true);
+        this->private_insert(this->root, new std::pair<T, B<T, C>::node*>{new_item, nullptr}, true);
     }
 }
