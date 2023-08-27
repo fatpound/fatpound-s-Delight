@@ -5,7 +5,7 @@
 namespace fatpound::tree
 {
     template <typename T, std::size_t C>
-    class B // I will add a destructor to this beacuse I have to free the memory I allocated, so just look at the code, dont use it unless I leave a comment
+    class B
     {
     private:
         /********************************/
@@ -28,8 +28,8 @@ namespace fatpound::tree
             B<T, C>::node* parent = nullptr;
 
             node();
-            node(std::vector<T>& new_items);
-            node(std::vector<T>& new_items, B<T, C>::node* new_parent);
+            node(std::pair<T, B<T, C>::node*>* new_item);
+            node(std::pair<T, B<T, C>::node*>* new_item, B<T, C>::node* new_parent);
             node(B<T, C>::node* new_lesser);
         };
 
@@ -43,14 +43,6 @@ namespace fatpound::tree
         std::size_t depth = 0;
 
         bool is_deleted = false;
-
-        bool trash0 = false; // to avoid C4820
-        bool trash1 = false;
-        bool trash2 = false;
-        bool trash3 = false;
-        bool trash4 = false;
-        bool trash5 = false;
-        bool trash6 = false;
 
         /********************************/
         /*            Private           */
@@ -68,6 +60,8 @@ namespace fatpound::tree
 
     public:
         ~B();
+        B( const B<T,C>& src ) = delete;
+        B& operator = ( const B<T,C>& src ) = delete;
 
         void insert(T new_item);
         void list_levelorder() const;
@@ -77,19 +71,13 @@ namespace fatpound::tree
     {
 
     }
-    template <typename T, std::size_t C> B<T, C>::node::node(std::vector<T>& new_items)
+    template <typename T, std::size_t C> B<T, C>::node::node(std::pair<T, B<T, C>::node*>* new_item)
     {
-        for (std::size_t i = 0; i < new_items.size(); i++)
-            this->items.push_back(new std::pair<T, B<T, C>::node*>{new_items.at(i), nullptr});
+        this->items.push_back(new_item);
     }
-    template <typename T, std::size_t C> B<T, C>::node::node(std::vector<T>& new_items, B<T, C>::node* new_parent)
+    template <typename T, std::size_t C> B<T, C>::node::node(std::pair<T, B<T, C>::node*>* new_item, B<T, C>::node* new_parent)
     {
-        for (int i = 0; i < new_items.size(); i++)
-        {
-            std::pair<T, B<T, C>::node*> pair{new_items.at(i), nullptr};
-            this->items.push_back(pair);
-        }
-
+        this->items.push_back(new_item);
         this->parent = new_parent;
     }
     template <typename T, std::size_t C> B<T, C>::node::node(B<T, C>::node* new_lesser)
@@ -126,6 +114,8 @@ namespace fatpound::tree
             {
                 if (u->items.at(j)->second != nullptr)
                     Q.push(u->items.at(j)->second);
+
+                delete u->items.at(j);
             }
 
             delete u;
@@ -286,16 +276,16 @@ namespace fatpound::tree
     }
     template <typename T, std::size_t C> void B<T, C>::insert(T new_item)
     {
-        std::vector<T> vec{new_item};
+        std::pair<T, B<T, C>::node*>* new_pair = new std::pair<T, B<T, C>::node*>{ new_item, nullptr };
 
         if (this->root == nullptr)
         {
-            this->root = new B<T, C>::node(vec);
+            this->root = new B<T, C>::node(new_pair);
             this->depth++;
 
             return;
         }
         
-        this->private_insert(this->root, new std::pair<T, B<T, C>::node*>{new_item, nullptr}, true);
+        this->private_insert(this->root, new_pair, true);
     }
 }
