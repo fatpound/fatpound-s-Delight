@@ -5,7 +5,7 @@
 namespace fatpound::tree
 {
     template <typename T, std::size_t C>
-    class B // I will add a destructor to this
+    class B // I will add a destructor to this beacuse I have to free the memory I allocated, so just look at the code, dont use it unless I leave a comment
     {
     private:
         /********************************/
