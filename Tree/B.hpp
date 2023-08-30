@@ -102,7 +102,7 @@ namespace fatpound::tree
         std::queue<B<T, C>::node*> Q;
         Q.push(this->root);
 
-        for (std::int64_t i = 1; Q.size() > 0; i++)
+        while (Q.size() > 0)
         {
             B<T, C>::node* u = Q.front();
             Q.pop();
