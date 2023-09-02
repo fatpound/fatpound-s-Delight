@@ -8,21 +8,21 @@ namespace fatpound::tree
     class IPR : public AVL<T>
     {
     private:
-        void balance();
+        void Balance();
 
 
     protected:
 
 
     public:
-        void add(T new_item);
+        void Insert(T new_item);
 
 
     };
 
-    template <typename T> void IPR<T>::balance()
+    template <typename T> void IPR<T>::Balance()
     {
-        typename __super::node* last = __super::last_added; // Y
+        typename __super::node* last = __super::last_Inserted; // Y
 
         while (last->parent != nullptr) // Going up
         {
@@ -30,28 +30,28 @@ namespace fatpound::tree
             int nb;
             int nc;
 
-            bool a_location; // left => false, right => true
+            bool a_location; // false => left, true => right
 
             if (last->parent->item < last->item)
             {
-                na = __super::get_count_private(last->parent->left);
+                na = __super::GetNodeCount_Protected(last->parent->left);
                 a_location = false;
             }
             else
             {
-                na = __super::get_count_private(last->parent->right);
+                na = __super::GetNodeCount_Protected(last->parent->right);
                 a_location = true;
             }
 
             if (a_location == false)
             {
-                nb = __super::get_count_private(last->left);
-                nc = __super::get_count_private(last->right);
+                nb = __super::GetNodeCount_Protected(last->left);
+                nc = __super::GetNodeCount_Protected(last->right);
             }
             else
             {
-                nb = __super::get_count_private(last->right);
-                nc = __super::get_count_private(last->left);
+                nb = __super::GetNodeCount_Protected(last->right);
+                nc = __super::GetNodeCount_Protected(last->left);
             }
 
             /*
@@ -64,24 +64,24 @@ namespace fatpound::tree
             
             if (nc > na && a_location == false)
             {
-                this->rotate_left(last->parent, last);
+                RotateLeft(last->parent, last);
             }
             else
             if (nc > na && a_location == true)
             {
-                this->rotate_right(last->parent, last);
+                RotateRight(last->parent, last);
             }
             else
             if (nb > na && a_location == false)
             {
-                this->rotate_right(last, last->left);
-                this->rotate_left(last->parent->parent, last->parent);
+                RotateRight(last, last->left);
+                RotateLeft(last->parent->parent, last->parent);
             }
             else
             if (nb > na && a_location == true)
             {
-                this->rotate_left(last, last->right);
-                this->rotate_right(last->parent->parent, last->parent);
+                RotateLeft(last, last->right);
+                RotateRight(last->parent->parent, last->parent);
             }
             
             if (last->parent == nullptr)
@@ -90,14 +90,14 @@ namespace fatpound::tree
             last = last->parent;
         }
     }
-    template <typename T> void IPR<T>::add(T new_item)
+    template <typename T> void IPR<T>::Insert(T new_item)
     {
-        typename __super::node* new_root = __super::add_private(nullptr, __super::root, new_item);
+        typename __super::node* new_root = __super::Insert_Protected(nullptr, __super::root, new_item);
 
         if (__super::root == nullptr)
             __super::root = new_root;
         else
-            this->balance();
+            this->Balance();
 
         __super::node_count++;
     }
