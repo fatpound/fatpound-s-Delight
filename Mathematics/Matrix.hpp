@@ -8,57 +8,66 @@ namespace fatpound::math
     class Matrix
     {
     private:
-        T* matrix = nullptr;
+        std::unique_ptr<T[]> matrix = nullptr;
 
-        std::size_t rowCount = 0;
-        std::size_t columnCount = 0;
+        size_t rowCount = 0;
+        size_t colCount = 0;
 
-        std::int64_t determinant = 0;
+        int64_t determinant = INT64_MIN;
+        bool detInitialized = false;
 
-        bool determinantInitialized = false;
-
-
-        T GetRand(T first, T last) const;
-
+        static T GetRand(T first, T last);
         void CalculateDeterminant();
+        
 
+        Matrix<T>* AddedMatrix(const Matrix<T>& src) const;
+        Matrix<T>* SubtractedMatrix(const Matrix<T>& src) const;
+        Matrix<T>* MultipliedMatrix(const Matrix<T>& src) const;
+        Matrix<T>* TransposedMatrix() const;
+        Matrix<T>* MinorMatrix(const int64_t row, const int64_t col) const;
+        Matrix<T>* AdjacentMatrix() const;
+        Matrix<T>* InverseMatrix() const;
+        
 
     protected:
 
 
     public:
-        Matrix() = delete;
-        Matrix(const std::int64_t row, const std::int64_t col);
-        Matrix(const std::vector<T>& vec, const std::int64_t row, const std::int64_t col);
-        ~Matrix();
-        Matrix(const Matrix<T>& src);
-        Matrix& operator = (const Matrix<T>& src);
+        Matrix() = default;
+        ~Matrix() noexcept;
+        Matrix(const Matrix<T>& src) noexcept;
+        Matrix(Matrix<T>&& src) noexcept;
+        Matrix& operator = (const Matrix<T>& src) noexcept;
+        Matrix& operator = (Matrix<T>&& src) noexcept;
 
-        void PrintAll() const;
-        void PrintRow(const std::int64_t row) const;
-        void PrintColumn(const std::int64_t col) const;
+        Matrix(const int64_t row, const int64_t col);
+        Matrix(const std::vector<T>& vec, const int64_t row, const int64_t col);
 
-        void ConvertToUnit();
-        void SetValue(const std::int64_t row, const std::int64_t col, const T value);
-        void SetRand(const std::int64_t row, const std::int64_t col, const std::int64_t max_excluded);
+        void Print() const;
+        void PrintRow(const int64_t row) const;
+        void PrintColumn(const int64_t col) const;
+        
+        void SetValue(const int64_t row, const int64_t col, const T value);
+        void SetRand(const int64_t row, const int64_t col, const int64_t max_excluded);
         void FillValue(const T value);
         void FillRand(const T max_excluded);
 
         void Transpose();
+        void ConvertToUnit();
         void Add(const Matrix<T>& second);
         void Subtract(const Matrix<T>& second);
         void Multiply(const Matrix<T>& second);
         void Multiply(const T k);
 
-        T GetDeterminant();
+        T GetValue(const int64_t row, const int64_t col) const;
+        T GetDeterminant() const;
+        
+        Matrix<T>  operator ~  ();
+        Matrix<T>  operator !  ();
 
-        Matrix<T> AddedMatrix(const Matrix<T>& src) const;
-        Matrix<T> SubtractedMatrix(const Matrix<T>& src) const;
-        Matrix<T> MultipliedMatrix(const Matrix<T>& src) const;
-        Matrix<T> TransposedMatrix() const;
-        Matrix<T> MinorMatrix(const std::int64_t row, const std::int64_t col) const;
-        Matrix<T> AdjacentMatrix() const;
-        Matrix<T> InverseMatrix() const;
+        Matrix<T>  operator +  (const Matrix<T>& src);
+        Matrix<T>  operator -  (const Matrix<T>& src);
+        Matrix<T>  operator *  (const Matrix<T>& src);
 
         Matrix<T>& operator += (const Matrix<T>& src);
         Matrix<T>& operator -= (const Matrix<T>& src);
@@ -66,305 +75,368 @@ namespace fatpound::math
     };
 
 
-    template <typename T> Matrix<T>::Matrix(const std::int64_t row, const std::int64_t col)
+    template <typename T> Matrix<T>::~Matrix() noexcept
     {
-        if (row < 1 || col < 1)
-            return;
 
-        rowCount = row;
-        columnCount = col;
-
-        matrix = new T[row * col];
     }
-    template <typename T> Matrix<T>::Matrix(const std::vector<T>& vec, const std::int64_t row, const std::int64_t col)
+    template <typename T> Matrix<T>::Matrix(const Matrix<T>& src) noexcept
     {
-        if (row < 1 || col < 1)
-            return;
-
-        if (row * col != vec.size())
-            return;
-
-        rowCount = row;
-        columnCount = col;
-
-        matrix = new T[row * col];
-
-        std::size_t n = 0;
-
-        for (std::size_t i = 0; i < rowCount; i++)
+        if (src.matrix != nullptr)
         {
-            for (std::size_t j = 0; j < columnCount; j++)
+            rowCount = src.rowCount;
+            colCount = src.colCount;
+
+            determinant = src.determinant;
+            detInitialized = src.detInitialized;
+
+            matrix = std::make_unique<T[]>(rowCount * colCount);
+
+            for (size_t i = 0; i < rowCount; i++)
             {
-                matrix[i][j] = vec[n];
-                n++;
+                for (size_t j = 0; j < colCount; j++)
+                {
+                    matrix[i * colCount + j] = src.matrix[i * colCount + j];
+                }
             }
+
+            CalculateDeterminant();
         }
     }
-    template <typename T> Matrix<T>::~Matrix()
+    template <typename T> Matrix<T>::Matrix(Matrix<T>&& src) noexcept
     {
-        delete [] matrix;
-        matrix = nullptr;
-    }
-    template <typename T> Matrix<T>::Matrix(const Matrix<T>& src)
-    {
-        if (src.rowCount < 1 || src.columnCount < 1)
-            return;
-
-        rowCount = src.rowCount;
-        columnCount = src.columnCount;
-
-        matrix = new T[rowCount * columnCount];
-
-        for (std::size_t i = 0; i < rowCount; i++)
+        if (src.matrix != nullptr)
         {
-            for (std::size_t j = 0; j < columnCount; j++)
-            {
-                matrix[i * columnCount + j] = src.matrix[i * columnCount + j];
-            }
+            matrix = std::move(src.matrix);
+
+            rowCount = std::move(src.rowCount);
+            colCount = std::move(src.colCount);
+
+            src.rowCount = 0;
+            src.colCount = 0;
+
+            determinant = std::move(src.determinant);
+            detInitialized = std::move(src.detInitialized);
+
+            src.determinant = INT64_MIN;
+            src.detInitialized = false;
         }
     }
-    template <typename T> Matrix<T>& Matrix<T>::operator = (const Matrix<T>& src)
+    template <typename T> Matrix<T>& Matrix<T>::operator = (const Matrix<T>& src) noexcept
     {
-        if ( ! (src.rowCount < 1 || src.columnCount < 1) && (*this != src))
+        if (this != std::addressof(src) && src.matrix != nullptr)
         {
             if (matrix != nullptr)
             {
-                delete [] matrix;
-                matrix = nullptr;
-
-                rowCount = 0;
-                columnCount = 0;
+                T* p = matrix.release();
+                delete [] p;
             }
 
             rowCount = src.rowCount;
-            columnCount = src.columnCount;
+            colCount = src.colCount;
 
-            matrix = new T[rowCount * columnCount];
+            determinant = src.determinant;
+            detInitialized = src.detInitialized;
 
-            for (std::size_t i = 0; i < rowCount; i++)
+            matrix = std::make_unique<T[]>(rowCount * colCount);
+
+            for (size_t i = 0; i < rowCount; i++)
             {
-                for (std::size_t j = 0; j < columnCount; j++)
+                for (size_t j = 0; j < colCount; j++)
                 {
-                    matrix[i * columnCount + j] = src.matrix[i * columnCount + j];
+                    matrix[i * colCount + j] = src.matrix[i * colCount + j];
                 }
             }
+
+            CalculateDeterminant();
+        }
+
+        return *this;
+    }
+    template <typename T> Matrix<T>& Matrix<T>::operator = (Matrix<T>&& src) noexcept
+    {
+        if (this != std::addressof(src) && src.matrix != nullptr)
+        {
+            if (matrix != nullptr)
+            {
+                T* p = matrix.release();
+                delete [] p;
+            }
+
+            matrix = std::move(src.matrix);
+
+            rowCount = std::move(src.rowCount);
+            colCount = std::move(src.colCount);
+
+            src.rowCount = 0;
+            src.colCount = 0;
+
+            determinant = std::move(src.determinant);
+            detInitialized = std::move(src.detInitialized);
+
+            src.determinant = INT64_MIN;
+            src.detInitialized = false;
         }
 
         return *this;
     }
 
-    template <typename T> void Matrix<T>::PrintAll() const
+    template <typename T> Matrix<T>::Matrix(const int64_t row, const int64_t col)
     {
-        for (std::size_t i = 0; i < rowCount; i++)
+        if (row < 1 || col < 1)
+        {
+            return;
+        }
+
+        rowCount = row;
+        colCount = col;
+
+        matrix = std::make_unique<T[]>(rowCount * colCount);
+    }
+    template <typename T> Matrix<T>::Matrix(const std::vector<T>& vec, const int64_t row, const int64_t col)
+    {
+        if (row < 1 || col < 1)
+        {
+            return;
+        }
+
+        if (row * col != vec.size())
+        {
+            return;
+        }
+
+        rowCount = row;
+        colCount = col;
+
+        matrix = std::make_unique<T[]>(rowCount * colCount);
+
+        for (size_t i = 0; i < rowCount * colCount; i++)
+        {
+            matrix[i] = vec[i];
+        }
+
+        CalculateDeterminant();
+    }
+
+    template <typename T> void Matrix<T>::Print() const
+    {
+        for (size_t i = 0; i < rowCount; i++)
         {
             PrintRow(i);
         }
 
         std::cout << '\n';
     }
-    template <typename T> void Matrix<T>::PrintRow(const std::int64_t row) const
+    template <typename T> void Matrix<T>::PrintRow(const int64_t row) const
     {
-        for (std::size_t i = 0; i < columnCount; i++)
+        for (size_t i = 0; i < colCount; i++)
         {
-            std::cout << matrix[row * columnCount + i] << " ";
+            std::cout << matrix[row * colCount + i] << " ";
         }
 
         std::cout << '\n';
     }
-    template <typename T> void Matrix<T>::PrintColumn(const std::int64_t col) const
+    template <typename T> void Matrix<T>::PrintColumn(const int64_t col) const
     {
-        for (std::size_t j = 0; j < rowCount; j++)
+        for (size_t j = 0; j < rowCount; j++)
         {
             std::cout << matrix[j * rowCount + col] << '\n';
         }
     }
 
-    template <typename T> void Matrix<T>::ConvertToUnit()
+    template <typename T> void Matrix<T>::SetValue(const int64_t row, const int64_t col, const T value)
     {
-        if (rowCount != columnCount)
-            return;
+        matrix[row * colCount + col] = value;
 
-        if (rowCount < 1 || columnCount < 1)
-            return;
+        CalculateDeterminant();
+    }
+    template <typename T> void Matrix<T>::SetRand(const int64_t row, const int64_t col, const int64_t max_excluded)
+    {
+        matrix[row * colCount + col] = GetRand(0, max_excluded);
 
-        for (std::size_t i = 0; i < rowCount; i++)
-        {
-            for (std::size_t j = 0; j < columnCount; j++)
-            {
-                matrix[i * columnCount + j] = (i == j ? 1 : 0);
-            }
-        }
-    }
-    template <typename T> void Matrix<T>::SetValue(const std::int64_t row, const std::int64_t col, const T value)
-    {
-        matrix[row * columnCount + col] = value;
-    }
-    template <typename T> void Matrix<T>::SetRand(const std::int64_t row, const std::int64_t col, const std::int64_t max_excluded)
-    {
-        matrix[row * columnCount + col] = GetRand(0, max_excluded);
+        CalculateDeterminant();
     }
     template <typename T> void Matrix<T>::FillValue(const T value)
     {
-        for (std::size_t i = 0; i < rowCount; i++)
+        for (size_t i = 0; i < rowCount * colCount; i++)
         {
-            for (std::size_t j = 0; j < columnCount; j++)
-            {
-                matrix[i * columnCount + j] = value;
-            }
+            matrix[i] = value;
         }
+
+        CalculateDeterminant();
     }
     template <typename T> void Matrix<T>::FillRand(const T max_excluded)
     {
-        for (std::size_t i = 0; i < rowCount; i++)
+        for (size_t i = 0; i < rowCount * colCount; i++)
         {
-            for (std::size_t j = 0; j < columnCount; j++)
-            {
-                matrix[i * columnCount + j] = GetRand(0, max_excluded);
-            }
+            matrix[i] = GetRand(0, max_excluded);
         }
+
+        CalculateDeterminant();
     }
 
     template <typename T> void Matrix<T>::Transpose()
     {
+        assert(rowCount > 0 && colCount > 0);
+
         Matrix<T> copy(*this);
 
-        for (std::size_t i = 0; i < rowCount; i++)
+        for (size_t i = 0; i < rowCount; i++)
         {
-            for (std::size_t j = 0; j < columnCount; j++)
+            for (size_t j = 0; j < colCount; j++)
             {
-                matrix[i * columnCount + j] = copy.matrix[j * rowCount + i];
+                matrix[i * colCount + j] = copy.matrix[j * rowCount + i];
             }
         }
 
-        std::swap(rowCount, columnCount);
+        std::swap(rowCount, colCount);
+
+        CalculateDeterminant();
+    }
+    template <typename T> void Matrix<T>::ConvertToUnit()
+    {
+        assert(rowCount > 0 && rowCount == colCount);
+
+        for (size_t i = 0; i < rowCount; i++)
+        {
+            for (size_t j = 0; j < colCount; j++)
+            {
+                matrix[i * colCount + j] = (i == j ? 1 : 0);
+            }
+        }
+
+        determinant = 1;
     }
     template <typename T> void Matrix<T>::Add(const Matrix<T>& second)
     {
-        if (rowCount != second.rowCount || columnCount != second.columnCount)
-            return;
+        assert(rowCount == second.rowCount && colCount == second.colCount);
 
-        for (std::size_t i = 0; i < rowCount; i++)
+        for (size_t i = 0; i < rowCount; i++)
         {
-            for (std::size_t j = 0; j < columnCount; j++)
+            for (size_t j = 0; j < colCount; j++)
             {
-                if (second.matrix[i * columnCount + j] != 0)
+                if (second.matrix[i * colCount + j] != 0)
                 {
-                    matrix[i * columnCount + j] += second.matrix[i * columnCount + j];
+                    matrix[i * colCount + j] += second.matrix[i * colCount + j];
                 }
             }
         }
+
+        CalculateDeterminant();
     }
     template <typename T> void Matrix<T>::Subtract(const Matrix<T>& second)
     {
-        if (rowCount != second.rowCount || columnCount != second.columnCount)
-            return;
+        assert(rowCount == second.rowCount && colCount == second.colCount);
 
-        for (std::size_t i = 0; i < rowCount; i++)
+        for (size_t i = 0; i < rowCount; i++)
         {
-            for (std::size_t j = 0; j < columnCount; j++)
+            for (size_t j = 0; j < colCount; j++)
             {
-                if (second.matrix[i * columnCount + j] != 0)
+                if (second.matrix[i * colCount + j] != 0)
                 {
-                    matrix[i * columnCount + j] -= second.matrix[i * columnCount + j];
+                    matrix[i * colCount + j] -= second.matrix[i * colCount + j];
                 }
             }
         }
+
+        CalculateDeterminant();
     }
     template <typename T> void Matrix<T>::Multiply(const Matrix<T>& second)
     {
-        if (columnCount != second.rowCount)
-            return;
+        assert(colCount == second.rowCount);
 
-        Matrix<T> temp(rowCount, second.columnCount);
+        Matrix<T> temp(rowCount, second.colCount);
 
-        for (std::size_t i = 0; i < rowCount; i++)
+        for (size_t i = 0; i < rowCount; i++)
         {
-            for (std::size_t k = 0; k < second.columnCount; k++)
+            for (size_t k = 0; k < second.colCount; k++)
             {
                 T sum = 0;
 
-                for (std::size_t j = 0; j < columnCount; j++)
+                for (size_t j = 0; j < colCount; j++)
                 {
-                    if (matrix[i * columnCount + j] != 0 && second.matrix[j * second.columnCount + k] != 0)
+                    if (matrix[i * colCount + j] != 0 && second.matrix[j * second.colCount + k] != 0)
                     {
-                        sum += matrix[i * columnCount + j] * second.matrix[j * second.columnCount + k];
+                        sum += matrix[i * colCount + j] * second.matrix[j * second.colCount + k];
                     }
                 }
 
-                temp.matrix[i * temp.columnCount + k] = sum;
+                temp.matrix[i * temp.colCount + k] = sum;
             }
         }
 
-        columnCount = second.columnCount;
+        *this = std::move(temp);
 
-        for (std::size_t i = 0; i < rowCount; i++)
-        {
-            for (std::size_t j = 0; j < columnCount; j++)
-            {
-                matrix[i * columnCount + j] = temp.matrix[i * columnCount + j];
-            }
-        }
+        CalculateDeterminant();
     }
     template <typename T> void Matrix<T>::Multiply(const T k)
     {
-        if (k == 1)
-            return;
-
-        for (std::size_t i = 0; i < rowCount; i++)
+        if (k == static_cast<T>(1))
         {
-            for (std::size_t j = 0; j < columnCount; j++)
+            return;
+        }
+
+        for (size_t i = 0; i < rowCount; i++)
+        {
+            for (size_t j = 0; j < colCount; j++)
             {
-                matrix[i * columnCount + j] *= k;
+                matrix[i * colCount + j] *= k;
             }
         }
+
+        CalculateDeterminant();
     }
     
-    template <typename T> Matrix<T> Matrix<T>::AddedMatrix(const Matrix<T>& src) const
+    template <typename T> Matrix<T>* Matrix<T>::AddedMatrix(const Matrix<T>& src) const
     {
-        Matrix<T> newm(*this);
+        assert(rowCount == src.rowCount && colCount == src.colCount);
 
-        newm.Add(src);
+        Matrix<T>* newm = new Matrix<T>(*this);
+        newm->Add(src);
 
         return newm;
     }
-    template <typename T> Matrix<T> Matrix<T>::SubtractedMatrix(const Matrix<T>& src) const
+    template <typename T> Matrix<T>* Matrix<T>::SubtractedMatrix(const Matrix<T>& src) const
     {
-        Matrix<T> newm(*this);
+        assert(rowCount == src.rowCount && colCount == src.colCount);
 
-        newm.Subtract(src);
+        Matrix<T>* newm = new Matrix<T>(*this);
+        newm->Subtract(src);
 
         return newm;
     }
-    template <typename T> Matrix<T> Matrix<T>::MultipliedMatrix(const Matrix<T>& src) const
+    template <typename T> Matrix<T>* Matrix<T>::MultipliedMatrix(const Matrix<T>& src) const
     {
-        Matrix<T> newm(*this);
+        assert(colCount == src.rowCount);
 
-        newm.Multiply(src);
-
+        Matrix<T>* newm = new Matrix<T>(*this);
+        newm->Multiply(src);
+        
         return newm;
     }
-    template <typename T> Matrix<T> Matrix<T>::TransposedMatrix() const
+    template <typename T> Matrix<T>* Matrix<T>::TransposedMatrix() const
     {
-        Matrix<T> newm(columnCount, rowCount);
+        Matrix<T>* newm = new Matrix<T>(colCount, rowCount);
 
-        for (std::size_t j = 0; j < columnCount; j++)
+        for (size_t j = 0; j < colCount; j++)
         {
-            for (std::size_t i = 0; i < rowCount; i++)
+            for (size_t i = 0; i < rowCount; i++)
             {
-                newm.matrix[j * newm.columnCount + i] = matrix[i * columnCount + j];
+                newm->matrix[j * rowCount + i] = matrix[i * colCount + j];
             }
         }
 
+        newm->CalculateDeterminant();
+
         return newm;
     }
-    template <typename T> Matrix<T> Matrix<T>::MinorMatrix(const std::int64_t row, const std::int64_t col) const
+    template <typename T> Matrix<T>* Matrix<T>::MinorMatrix(const int64_t row, const int64_t col) const
     {
-        Matrix<T> newm(rowCount - 1, columnCount - 1);
+        Matrix<T>* newm = new Matrix<T>(rowCount - 1, colCount - 1);
 
         T x = 0;
         T y ;
 
-        for (std::size_t i = 0; i < rowCount; i++)
+        for (size_t i = 0; i < rowCount; i++)
         {
             if (i == row)
             {
@@ -374,7 +446,7 @@ namespace fatpound::math
 
             y = 0;
 
-            for (std::size_t j = 0; j < columnCount; j++)
+            for (size_t j = 0; j < colCount; j++)
             {
                 if (j == col)
                 {
@@ -382,116 +454,174 @@ namespace fatpound::math
                 }
                 else
                 {
-                    newm.matrix[(x == 1 ? i - 1 : i) * newm.columnCount + (y == 1 ? j - 1 : j)] = matrix[i * columnCount + j];
+                    newm->matrix[(x == 1 ? i - 1 : i) * newm->colCount + (y == 1 ? j - 1 : j)] = matrix[i * colCount + j];
                 }
             }
         }
 
+        newm->CalculateDeterminant();
+
         return newm;
     }
-    template <typename T> Matrix<T> Matrix<T>::AdjacentMatrix() const
+    template <typename T> Matrix<T>* Matrix<T>::AdjacentMatrix() const
     {
-        Matrix<T> newm(rowCount, columnCount);
+        Matrix<T>* newm = new Matrix<T>(rowCount, colCount);
 
-        for (std::size_t i = 0; i < rowCount; i++)
+        for (size_t i = 0; i < rowCount; i++)
         {
-            for (std::size_t j = 0; j < columnCount; j++)
+            for (size_t j = 0; j < colCount; j++)
             {
-                newm.SetValue(i, j, MinorMatrix(i, j).GetDeterminant() * ((i + j) % 2 == 0 ? 1 : -1));
+                Matrix<T>* minor = MinorMatrix(i, j);
+
+                newm->SetValue(i, j, minor->GetDeterminant() * ((i + j) % 2 == 0 ? 1 : -1));
+
+                delete minor;
             }
         }
 
-        newm.Transpose();
+        newm->Transpose();
 
         return newm;
     }
-    template <typename T> Matrix<T> Matrix<T>::InverseMatrix() const
+    template <typename T> Matrix<T>* Matrix<T>::InverseMatrix() const
     {
-        if (determinantInitialized && determinant != 0)
+        if (CalculateDeterminant() != 0 && CalculateDeterminant() != INT64_MIN) // (detInitialized && determinant != 0)
         {
-            Matrix<T> newm = AdjacentMatrix();
+            Matrix<T>* adj = AdjacentMatrix();
+            Matrix<T>* newm = new Matrix<T>(std::move(*adj));
 
-            newm.Multiply(1 / GetDeterminant());
+            delete adj;
+
+            newm->Multiply(1 / static_cast<double>(GetDeterminant()));
 
             return newm;
         }
 
-        return Matrix<T>();
+        return nullptr;
     }
     
     template <typename T> void Matrix<T>::CalculateDeterminant()
     {
-        if (rowCount == columnCount && rowCount > 0)
+        if (rowCount != colCount || rowCount > 11)
         {
-            switch (rowCount)
-            {
-            case 1:
-            {
-                determinant = matrix[0];
-            }
-            break;
+            return;
+        }
 
-            case 2:
-            {
-                determinant = (matrix[0] * matrix[columnCount + 1] - matrix[1] * matrix[columnCount]);
-            }
-            break;
+        determinant = 0;
 
-            case 3:
+        switch (rowCount)
+        {
+        case 1:
+        {
+            determinant = matrix[0];
+        }
+        break;
+
+        case 2:
+        {
+            determinant = (matrix[0] * matrix[colCount + 1] - matrix[1] * matrix[colCount]);
+        }
+        break;
+
+        case 3:
+        {
+            for (size_t k = 0; k < 2; k++)
             {
-                for (std::size_t k = 0; k < 2; k++)
+                for (size_t i = 0; i < 3; i++)
                 {
-                    for (std::size_t i = 0; i < 3; i++)
+                    T prod = 1;
+
+                    for (size_t j = 0; j < 3; j++)
                     {
-                        T prod = 1;
-
-                        for (std::size_t j = 0; j < 3; j++)
-                        {
-                            prod *= matrix[((i + (k == 0 ? j : 2 - j)) % 3) * columnCount + j];
-                        }
-
-                        determinant += prod * (k == 0 ? 1 : -1);
+                        prod *= matrix[((i + (k == 0 ? j : 2 - j)) % 3) * colCount + j];
                     }
+
+                    determinant += prod * (k == 0 ? 1 : -1);
                 }
-            }
-            break;
-
-            default:
-            {
-                for (std::size_t i = 0; i < rowCount; i++)
-                {
-                    Matrix* newm = MinorMatrix(i, 0);
-
-                    determinant += matrix[i * columnCount] * newm->GetDeterminant() * (i % 2 == 0 ? 1 : -1);
-
-                    delete newm;
-                }
-            }
-            break;
             }
         }
+        break;
+
+        default:
+        {
+            for (size_t i = 0; i < rowCount; i++)
+            {
+                Matrix<T>* newm = MinorMatrix(i, 0);
+                
+                determinant += matrix[i * colCount] * newm->GetDeterminant() * (i % 2 == 0 ? 1 : -1);
+
+                delete newm;
+            }
+        }
+        break;
+        }
+
+        detInitialized = true;
     }
 
-    template <typename T> T Matrix<T>::GetRand(T first, T last) const
+    template <typename T> static T Matrix<T>::GetRand(T first, T last)
     {
         std::uniform_real_distribution<double> distribution(first, last);
         std::random_device rd;
         std::default_random_engine rng(rd());
 
-        return distribution(rng);
+        return static_cast<T>(distribution(rng));
     }
-    template <typename T> T Matrix<T>::GetDeterminant()
+    template <typename T> T Matrix<T>::GetValue(const int64_t row, const int64_t col) const
     {
-        if ( ! determinantInitialized )
-        {
-            CalculateDeterminant();
-
-            determinantInitialized = true;
-        }
-
-        return determinant;
+        return matrix[row * colCount + col];
+    }
+    template <typename T> T Matrix<T>::GetDeterminant() const
+    {
+        return detInitialized ? determinant : INT64_MIN;
     }
     
+    template <typename T> Matrix<T>  Matrix<T>::operator ~  ()
+    {
+        Matrix<T>* p = TransposedMatrix();
+        Matrix<T> newm(std::move(*p));
+
+        delete p;
+
+        return newm;
+    }
+    template <typename T> Matrix<T>  Matrix<T>::operator !  ()
+    {
+        Matrix<T>* p = InverseMatrix();
+        Matrix<T> newm(std::move(*p));
+
+        delete p;
+
+        return newm;
+    }
+
+    template <typename T> Matrix<T>  Matrix<T>::operator +  (const Matrix<T>& src)
+    {
+        Matrix<T>* p = AddedMatrix(src);
+        Matrix<T> newm(std::move(*p));
+
+        delete p;
+
+        return newm;
+    }
+    template <typename T> Matrix<T>  Matrix<T>::operator -  (const Matrix<T>& src)
+    {
+        Matrix<T>* p = SubtractedMatrix(src);
+        Matrix<T> newm(std::move(*p));
+
+        delete p;
+
+        return newm;
+    }
+    template <typename T> Matrix<T>  Matrix<T>::operator *  (const Matrix<T>& src)
+    {
+        Matrix<T>* p = MultipliedMatrix(src);
+        Matrix<T> newm(std::move(*p));
+
+        delete p;
+
+        return newm;
+    }
     template <typename T> Matrix<T>& Matrix<T>::operator += (const Matrix<T>& src)
     {
         Add(src);
