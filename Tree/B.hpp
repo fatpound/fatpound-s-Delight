@@ -4,7 +4,7 @@
 
 namespace fatpound::tree
 {
-    template <typename T, std::size_t C>
+    template <typename T, size_t C>
     class B
     {
     private:
@@ -17,20 +17,38 @@ namespace fatpound::tree
 
 
         public:
-            std::vector<std::pair<T, B<T, C>::node*>*> items;
+            std::vector<std::pair<T, node*>*> items;
 
-            B<T, C>::node* lesser = nullptr;
-            B<T, C>::node* parent = nullptr;
+            node* lesser = nullptr;
+            node* parent = nullptr;
 
-            node();
-            node(B<T, C>::node* new_lesser);
-            node(std::pair<T, B<T, C>::node*>* new_item);
-            node(std::pair<T, B<T, C>::node*>* new_item, B<T, C>::node* new_parent);
+            node() = default;
+            ~node() = default;
+            node(const node& src) = delete;
+            node(node&& src) = delete;
+            node& operator = (const node& src) = delete;
+            node& operator = (node&& src) = delete;
+
+            node(B<T, C>::node* new_lesser)
+                :
+                lesser(new_lesser)
+            {
+
+            }
+            node(std::pair<T, node*>* new_item, node* new_parent = nullptr)
+                :
+                parent(new_parent)
+            {
+                if (new_item)
+                {
+                    items.push_back(new_item);
+                }
+            }
         };
 
-        B<T, C>::node* root = nullptr;
+        node* root = nullptr;
 
-        std::size_t depth = 0;
+        size_t depth = 0;
 
         void Insert(B<T, C>::node* node, std::pair<T, B<T, C>::node*>* pair, bool add_first_time);
         void Overflow(B<T, C>::node* node, std::pair<T, B<T, C>::node*>* pair);
@@ -41,34 +59,18 @@ namespace fatpound::tree
 
     public:
         B() = default;
-        ~B();
+        ~B() noexcept;
         B( const B<T,C>& src ) = delete;
+        B( B<T,C>&& src ) = delete;
         B& operator = ( const B<T,C>& src ) = delete;
+        B& operator = ( B<T,C>&& src ) = delete;
 
         void Insert(T new_item);
         void ListLevelorder() const;
     };
 
-    
-    template <typename T, std::size_t C> B<T, C>::node::node()
-    {
 
-    }
-    template <typename T, std::size_t C> B<T, C>::node::node(B<T, C>::node* new_lesser)
-    {
-        lesser = new_lesser;
-    }
-    template <typename T, std::size_t C> B<T, C>::node::node(std::pair<T, B<T, C>::node*>* new_item)
-    {
-        items.push_back(new_item);
-    }
-    template <typename T, std::size_t C> B<T, C>::node::node(std::pair<T, B<T, C>::node*>* new_item, B<T, C>::node* new_parent)
-    {
-        items.push_back(new_item);
-        parent = new_parent;
-    }
-
-    template <typename T, std::size_t C> B<T, C>::~B()
+    template <typename T, size_t C> B<T, C>::~B() noexcept
     {
         if (root == nullptr)
             return;
@@ -84,7 +86,7 @@ namespace fatpound::tree
             if (u->lesser != nullptr)
                 Q.push(u->lesser);
 
-            for (std::size_t i = 0; i < u->items.size(); i++)
+            for (size_t i = 0; i < u->items.size(); i++)
             {
                 if (u->items[i]->second != nullptr)
                     Q.push(u->items[i]->second);
@@ -98,31 +100,41 @@ namespace fatpound::tree
         root = nullptr;
     }
 
-    template <typename T, std::size_t C> void B<T, C>::Overflow(B<T, C>::node* node, std::pair<T, B<T, C>::node*>* pair)
+    template <typename T, size_t C> void B<T, C>::Overflow(B<T, C>::node* node, std::pair<T, B<T, C>::node*>* pair)
     {
         std::vector<std::pair<T, B<T, C>::node*>*> temp_vec;
 
         temp_vec.push_back(pair);
 
-        for (std::size_t i = 0; i < C * 2; i++)
+        for (size_t i = 0; i < C * 2; i++)
+        {
             temp_vec.push_back(node->items[i]);
+        }
 
-        std::sort(temp_vec.begin(), temp_vec.end(), [](std::pair<T, B<T, C>::node*>* ref1, std::pair<T, B<T, C>::node*>* ref2) {return ref1->first < ref2->first; });
+        std::sort
+        (
+            temp_vec.begin(),
+            temp_vec.end(),
+            [] (std::pair<T, B<T, C>::node*>* p1, std::pair<T, B<T, C>::node*>* p2)
+            {
+                return p1->first < p2->first;
+            }
+        );
 
-        std::size_t center = (C * 2 + 1) / 2;
+        size_t center = (C * 2 + 1) / 2;
 
         std::vector<std::pair<T, B<T, C>::node*>*> temp_vec_less;
         std::vector<std::pair<T, B<T, C>::node*>*> temp_vec_more;
 
-        for (std::size_t i = 0; i < center; i++)
+        for (size_t i = 0; i < center; i++)
             temp_vec_less.push_back(temp_vec[i]);
 
-        for (std::size_t i = center + 1; i <= C * 2; i++)
+        for (size_t i = center + 1; i <= C * 2; i++)
             temp_vec_more.push_back(temp_vec[i]);
 
         node->items.clear();
 
-        for (std::size_t i = 0; i < temp_vec_less.size(); i++)
+        for (size_t i = 0; i < temp_vec_less.size(); i++)
             node->items.push_back(temp_vec_less[i]);
 
         if (node == root)
@@ -137,16 +149,18 @@ namespace fatpound::tree
         B<T, C>::node* new_node = new B<T, C>::node();
         new_node->parent = node->parent;
 
-        for (std::size_t i = 0; i < temp_vec_more.size(); i++)
+        for (size_t i = 0; i < temp_vec_more.size(); i++)
             new_node->items.push_back(temp_vec_more[i]);
 
         new_node->lesser = temp_vec[center]->second;
         temp_vec[center]->second = new_node;
     }
-    template <typename T, std::size_t C> void B<T, C>::Insert  (B<T, C>::node* node, std::pair<T, B<T, C>::node*>* pair, bool add_first_time)
+    template <typename T, size_t C> void B<T, C>::Insert  (B<T, C>::node* node, std::pair<T, B<T, C>::node*>* pair, bool add_first_time)
     {
         if (node == nullptr)
+        {
             return;
+        }
 
     label:
 
@@ -154,27 +168,35 @@ namespace fatpound::tree
         {
             if (add_first_time)
             {
-                std::size_t idx = 0;
+                size_t idx = 0;
                 bool flag = false;
 
-                for (std::size_t i = 0; i < node->items.size(); i++)
+                for (size_t i = 0; i < node->items.size(); i++)
                 {
                     if (pair->first > node->items[i]->first && node->items[i]->second != nullptr)
                     {
                         if (flag == false)
+                        {
                             flag = true;
+                        }
 
                         idx = i;
                     }
                 }
 
                 if (flag)
+                {
                     Insert(node->items[idx]->second, pair, true);
+                }
                 else
+                {
                     Overflow(node, pair);
+                }
             }
             else
+            {
                 Overflow(node, pair);
+            }
         }
         else
         {
@@ -186,12 +208,14 @@ namespace fatpound::tree
                     goto label;
                 }
 
-                std::size_t index = 0;
+                size_t index = 0;
 
-                for (std::size_t i = 0; i < node->items.size(); i++)
+                for (size_t i = 0; i < node->items.size(); i++)
                 {
                     if (pair->first > node->items[i]->first)
+                    {
                         index = i;
+                    }
                 }
 
                 if (node->items[index]->second != nullptr)
@@ -204,11 +228,21 @@ namespace fatpound::tree
             node->items.push_back(pair);
 
             if (node->items.size() > 1)
-                std::sort(node->items.begin(), node->items.end(), [](std::pair<T, B<T, C>::node*>* ref1, std::pair<T, B<T, C>::node*>* ref2) {return ref1->first < ref2->first; });
+            {
+                std::sort
+                (
+                    node->items.begin(),
+                    node->items.end(),
+                    [](std::pair<T, B<T, C>::node*>* p1, std::pair<T, B<T, C>::node*>* p2)
+                    {
+                        return p1->first < p2->first;
+                    }
+                );
+            }
         }
     }
 
-    template <typename T, std::size_t C> void B<T, C>::ListLevelorder() const
+    template <typename T, size_t C> void B<T, C>::ListLevelorder() const
     {
         if (root == nullptr)
             return;
@@ -216,42 +250,33 @@ namespace fatpound::tree
         std::queue<B<T, C>::node*> Q;
         Q.push(root);
 
-        std::int64_t level = 1;
-
-        for (std::int64_t i = 1; Q.size() > 0; i++)
+        while (Q.size() > 0)
         {
             B<T, C>::node* u = Q.front();
             Q.pop();
 
-            if (fatpound::math::IsPowerOf2(i))
-            {
-                std::cout << "Level " << level << " : ";
-                level++;
-            }
 
             if (u->lesser != nullptr)
             {
                 Q.push(u->lesser);
             }
             
-            for (std::size_t j = 0; j < u->items.size(); j++)
+            for (size_t i = 0; i < u->items.size(); i++)
             {
-                std::cout << u->items[j]->first << ' ';
+                std::cout << u->items[i]->first << ' ';
 
-                if (u->items[j]->second != nullptr)
-                    Q.push(u->items[j]->second);
+                if (u->items[i]->second != nullptr)
+                {
+                    Q.push(u->items[i]->second);
+                }
             }
 
-            if (fatpound::math::IsPowerOf2(i))
-                std::cout << "\n";
-            else if (Q.size() != 0 && u != nullptr)
-                std::cout << "- ";
-            // else break;
+            std::cout << "\n";
         }
 
         std::cout << "\n";
     }
-    template <typename T, std::size_t C> void B<T, C>::Insert(T new_item)
+    template <typename T, size_t C> void B<T, C>::Insert(T new_item)
     {
         std::pair<T, B<T, C>::node*>* new_pair = new std::pair<T, B<T, C>::node*>{ new_item, nullptr };
 
