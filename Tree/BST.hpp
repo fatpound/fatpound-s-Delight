@@ -10,37 +10,38 @@ namespace fatpound::tree
     protected:
         struct node
         {
-            BST<T>::node* left   = nullptr;
-            BST<T>::node* right  = nullptr;
-            BST<T>::node* parent = nullptr;
+            node* left   = nullptr;
+            node* right  = nullptr;
+            node* parent = nullptr;
 
             T item;
 
-            node(T& new_item, BST<T>::node* parent);
+            node(T new_item, node* parent);
         };
 
         BST<T>::node* root = nullptr;
-        BST<T>::node* lastInserted = nullptr;
 
-        std::size_t nodeCount = 0;
+        size_t nodeCount = 0;
 
+        BST<T>::node* Insert(BST<T>::node* __restrict parent, BST<T>::node* __restrict node, T new_item);
+        BST<T>::node* Cloner(BST<T>::node* node) const;
+        BST<T>::node* Find(BST<T>::node* root, T item) const;
 
-        BST<T>::node* Insert_Protected(BST<T>::node* parent, BST<T>::node* node, T& new_item);
-        BST<T>::node* Find_Protected(BST<T>::node* root, T item) const;
-
-        std::int64_t GetDepth_Protected(BST<T>::node* node, std::int64_t depth) const;
-        std::int64_t GetNodeCount_Protected(BST<T>::node* node) const;
+        int64_t GetDepth(BST<T>::node* node, int64_t depth = 0) const;
+        int64_t GetDepthLeft(BST<T>::node* node, int64_t depth = 0) const;
+        int64_t GetDepthRight(BST<T>::node* node, int64_t depth = 0) const;
+        int64_t GetNodeCount(BST<T>::node* node) const;
         
-
-        void Mirror_Protected               (BST<T>::node* node);
-        void ListPreorder_Protected         (BST<T>::node* node) const;
-        void ListPreorderReverse_Protected  (BST<T>::node* node) const;
-        void ListInorder_Protected          (BST<T>::node* node) const;
-        void ListInorderReverse_Protected   (BST<T>::node* node) const;
-        void ListPostorder_Protected        (BST<T>::node* node) const;
-        void ListPostorderReverse_Protected (BST<T>::node* node) const;
-        void ListLeaves_Protected           (BST<T>::node* node) const;
-        void ListLeavesReverse_Protected    (BST<T>::node* node) const;
+        void ListPreorder         (const BST<T>::node* node) const;
+        void ListPreorderReverse  (const BST<T>::node* node) const;
+        void ListInorder          (const BST<T>::node* node) const;
+        void ListInorderReverse   (const BST<T>::node* node) const;
+        void ListPostorder        (const BST<T>::node* node) const;
+        void ListPostorderReverse (const BST<T>::node* node) const;
+        void ListLeaves           (const BST<T>::node* node) const;
+        void ListLeavesReverse    (const BST<T>::node* node) const;
+        void ListLevelorder       (const BST<T>::node* node, int64_t level) const;
+        void Mirror               (      BST<T>::node* node);
 
 
     private:
@@ -49,15 +50,14 @@ namespace fatpound::tree
 
     public:
         BST() = default;
-        ~BST();
-        BST(const BST<T>& src) = delete;
-        BST& operator = (const BST<T>& src) = delete;
+        ~BST() noexcept;
+        BST(const BST<T>& src) noexcept;
+        BST(BST<T>&& src) noexcept;
+        BST& operator = (const BST<T>& src) noexcept;
+        BST& operator = (BST<T>&& src) noexcept;
 
-        std::int64_t GetTotalNodeCount() const;
+        int64_t GetTotalNodeCount() const;
 
-        void Insert(T new_item);
-        void Mirror();
-        void ListLevelorder()       const;
         void ListPreorder()         const;
         void ListPreorderReverse()  const;
         void ListInorder()          const;
@@ -66,272 +66,374 @@ namespace fatpound::tree
         void ListPostorderReverse() const;
         void ListLeaves()           const;
         void ListLeavesReverse()    const;
+        void ListLevelorder()       const;
+
+        void Mirror();
+        void Insert(T new_item);
     };
 
 
-    template <typename T> void BST<T>::Erase(BST<T>::node* node)
+    template <typename T> BST<T>::node::node(T new_item, BST<T>::node* new_parent)
+        :
+        item(new_item),
+        parent(new_parent)
     {
-        if (node == nullptr)
-            return;
-
-        Erase(node->left);
-        Erase(node->right);
-
-        delete node;
     }
 
-    template <typename T> typename BST<T>::node* BST<T>::Insert_Protected(BST<T>::node* parent, BST<T>::node* node, T& new_item)
+    template <typename T> BST<T>::~BST() noexcept
+    {
+        Erase(root);
+        root = nullptr;
+    }
+    template <typename T> BST<T>::BST(const BST<T>& src) noexcept
+    {
+        if (src.root != nullptr)
+        {
+            root = src.Cloner(src.root);
+            nodeCount = src.nodeCount;
+        }
+    }
+    template <typename T> BST<T>::BST(BST<T>&& src) noexcept
+    {
+        if (src.root != nullptr)
+        {
+            root = src.root;
+            nodeCount = src.nodeCount;
+
+            src.root = nullptr;
+            src.nodeCount = 0ull;
+        }
+    }
+    template <typename T> BST<T>& BST<T>::operator = (const BST<T>& src) noexcept
+    {
+        if (this != std::addressof(src) && src.root != nullptr)
+        {
+            if (root != nullptr)
+            {
+                Erase(root);
+
+                // root = nullptr;
+                // nodeCount = 0ull;
+            }
+
+            root = src.Cloner(src.root);
+            nodeCount = src.nodeCount;
+        }
+
+        return *this;
+    }
+    template <typename T> BST<T>& BST<T>::operator = (BST<T>&& src) noexcept
+    {
+        if (this != std::addressof(src) && src.root != nullptr)
+        {
+            if (root != nullptr)
+            {
+                Erase(root);
+
+                // root = nullptr;
+                // nodeCount = 0ull;
+            }
+
+            root = src.root;
+            nodeCount = src.nodeCount;
+
+            src.root = nullptr;
+            src.nodeCount = 0ull;
+        }
+
+        return *this;
+    }
+
+    template <typename T> typename BST<T>::node* BST<T>::Insert(BST<T>::node* __restrict parent, BST<T>::node* __restrict node, T new_item)
     {
         if (node == nullptr)
         {
-            lastInserted = new BST<T>::node(new_item, parent);
-            return lastInserted;
+            return new BST<T>::node(new_item, parent);
         }
 
         if (new_item < node->item)
-            node->left  = Insert_Protected(node, node->left,  new_item);
-        else if (new_item > node->item)
-            node->right = Insert_Protected(node, node->right, new_item);
+        {
+            node->left = Insert(node, node->left, new_item);
+        }
+        else
+        if (new_item > node->item)
+        {
+            node->right = Insert(node, node->right, new_item);
+        }
 
         return node;
     }
-    template <typename T> typename BST<T>::node* BST<T>::Find_Protected(BST<T>::node* root, T item) const
-    {
-        if (root == nullptr)
-            return nullptr;
-
-        if (root->item == item)
-            return root;
-
-        BST<T>::node* left_address = Find_Protected(root->left, item);
-
-        if (left_address != nullptr)
-            return left_address;
-
-        BST<T>::node* right_address = Find_Protected(root->right, item);
-
-        if (right_address != nullptr)
-            return right_address;
-    }
-
-    template <typename T> std::int64_t BST<T>::GetDepth_Protected(BST<T>::node* node, std::int64_t depth) const
+    template <typename T> typename BST<T>::node* BST<T>::Cloner(BST<T>::node* node) const
     {
         if (node == nullptr)
-            return depth;
+        {
+            return nullptr;
+        }
 
-        const std::int64_t  left_val = GetDepth_Protected(node->left,  depth + 1);
-        const std::int64_t right_val = GetDepth_Protected(node->right, depth + 1);
+        BST<T>::node* new_node = new BST<T>::node(node->item, node->parent);
+
+        new_node->left = Cloner(node->left);
+        new_node->right = Cloner(node->right);
+
+        return new_node;
+    }
+    template <typename T> typename BST<T>::node* BST<T>::Find(BST<T>::node* root, T item) const
+    {
+        if (root == nullptr)
+        {
+            return nullptr;
+        }
+
+        if (root->item == item)
+        {
+            return root;
+        }
+
+        BST<T>::node* left_address = Find(root->left, item);
+
+        if (left_address != nullptr)
+        {
+            return left_address;
+        }
+
+        BST<T>::node* right_address = Find(root->right, item);
+
+        if (right_address != nullptr)
+        {
+            return right_address;
+        }
+    }
+
+    template <typename T> int64_t BST<T>::GetDepth(BST<T>::node* node, int64_t depth) const
+    {
+        if (node == nullptr)
+        {
+            return depth;
+        }
+
+        const int64_t  left_val = GetDepth(node->left,  depth + 1LL);
+        const int64_t right_val = GetDepth(node->right, depth + 1LL);
 
         return std::max(left_val, right_val);
     }
-    template <typename T> std::int64_t BST<T>::GetNodeCount_Protected(BST<T>::node* node) const
+    template <typename T> int64_t BST<T>::GetDepthLeft(BST<T>::node* node, int64_t depth) const
+    {
+        return node ? GetDepthLeft(node->left, depth + 1LL) : depth;
+    }
+    template <typename T> int64_t BST<T>::GetDepthRight(BST<T>::node* node, int64_t depth) const
+    {
+        return node ? GetDepthLeft(node->right, depth + 1LL) : depth;
+    }
+    template <typename T> int64_t BST<T>::GetNodeCount(BST<T>::node* node) const
     {
         if (node == nullptr)
-            return 0;
+        {
+            return 0ll;
+        }
 
-        const std::int64_t  left_val = GetNodeCount_Protected(node->left);
-        const std::int64_t right_val = GetNodeCount_Protected(node->right);
+        const int64_t  left_val = GetNodeCount(node->left);
+        const int64_t right_val = GetNodeCount(node->right);
 
-        return 1 + left_val + right_val;
+        return 1LL + left_val + right_val;
     }
-    template <typename T> std::int64_t BST<T>::GetTotalNodeCount() const
+    template <typename T> int64_t BST<T>::GetTotalNodeCount() const
     {
         return nodeCount;
     }
 
-    template <typename T> void BST<T>::Mirror_Protected(BST<T>::node* node)
+    template <typename T> void BST<T>::ListPreorder         (const BST<T>::node* node) const
     {
-        if (node == nullptr)
-            return;
-
-        std::swap(node->left, node->right);
-
-        Mirror_Protected(node->left);
-        Mirror_Protected(node->right);
-    }
-    template <typename T> void BST<T>::ListPreorder_Protected         (BST<T>::node* node) const
-    {
-        if (node == nullptr)
-            return;
-
-        std::cout << node->item << ' ';
-        ListPreorder_Protected(node->left);
-        ListPreorder_Protected(node->right);
-    }
-    template <typename T> void BST<T>::ListPreorderReverse_Protected  (BST<T>::node* node) const
-    {
-        if (node == nullptr)
-            return;
-
-        std::cout << node->item << ' ';
-        ListPreorderReverse_Protected(node->right);
-        ListPreorderReverse_Protected(node->left);
-    }
-    template <typename T> void BST<T>::ListInorder_Protected          (BST<T>::node* node) const
-    {
-        if (node == nullptr)
-            return;
-
-        ListInorder_Protected(node->left);
-        std::cout << node->item << ' ';
-        ListInorder_Protected(node->right);
-    }
-    template <typename T> void BST<T>::ListInorderReverse_Protected   (BST<T>::node* node) const
-    {
-        if (node == nullptr)
-            return;
-
-        ListInorderReverse_Protected(node->right);
-        std::cout << node->item << ' ';
-        ListInorderReverse_Protected(node->left);
-    }
-    template <typename T> void BST<T>::ListPostorder_Protected        (BST<T>::node* node) const
-    {
-        if (node == nullptr)
-            return;
-
-        ListPostorder_Protected(node->left);
-        ListPostorder_Protected(node->right);
-        std::cout << node->item << ' ';
-    }
-    template <typename T> void BST<T>::ListPostorderReverse_Protected (BST<T>::node* node) const
-    {
-        if (node == nullptr)
-            return;
-
-        ListPostorderReverse_Protected(node->right);
-        ListPostorderReverse_Protected(node->left);
-        std::cout << node->item << ' ';
-    }
-    template <typename T> void BST<T>::ListLeaves_Protected           (BST<T>::node* node) const
-    {
-        if (node == nullptr)
-            return;
-
-        if (node->left == nullptr && node->right == nullptr)
+        if (node != nullptr)
         {
             std::cout << node->item << ' ';
-            return;
+            ListPreorder(node->left);
+            ListPreorder(node->right);
         }
-
-        ListLeaves_Protected(root->left);
-        ListLeaves_Protected(root->right);
     }
-    template <typename T> void BST<T>::ListLeavesReverse_Protected    (BST<T>::node* node) const
+    template <typename T> void BST<T>::ListPreorderReverse  (const BST<T>::node* node) const
     {
-        if (node == nullptr)
-            return;
-
-        if (node->left == nullptr && node->right == nullptr)
+        if (node != nullptr)
         {
             std::cout << node->item << ' ';
-            return;
+            ListPreorderReverse(node->right);
+            ListPreorderReverse(node->left);
         }
-
-        ListLeavesReverse_Protected(root->right);
-        ListLeavesReverse_Protected(root->left);
     }
-    
-    template <typename T> BST<T>::node::node(T& new_item, BST<T>::node* new_parent)
+    template <typename T> void BST<T>::ListInorder          (const BST<T>::node* node) const
     {
-        item = new_item;
-        parent = new_parent;
-    }
-    template <typename T> BST<T>::~BST()
-    {
-        Erase(root);
-    }
-
-    template <typename T> void BST<T>::Insert(T new_item)
-    {
-        BST<T>::node* new_root = Insert_Protected(nullptr, root, new_item);
-
-        if (root == nullptr)
-            root = new_root;
-        
-        nodeCount++;
-    }
-    template <typename T> void BST<T>::Mirror()
-    {
-        Mirror_Protected(root);
-    }
-    template <typename T> void BST<T>::ListLevelorder()       const
-    {
-        std::queue<BST<T>::node*> Q;
-
-        if (root != nullptr)
-            Q.push(root);
-
-        std::int64_t level = 1;
-
-        for (std::int64_t i = 1; Q.size() > 0; i++)
+        if (node != nullptr)
         {
-            if (fatpound::math::IsPowerOf2(i))
+            ListInorder(node->left);
+            std::cout << node->item << ' ';
+            ListInorder(node->right);
+        }
+    }
+    template <typename T> void BST<T>::ListInorderReverse   (const BST<T>::node* node) const
+    {
+        if (node != nullptr)
+        {
+            ListInorderReverse(node->right);
+            std::cout << node->item << ' ';
+            ListInorderReverse(node->left);
+        }
+    }
+    template <typename T> void BST<T>::ListPostorder        (const BST<T>::node* node) const
+    {
+        if (node != nullptr)
+        {
+            ListPostorder(node->left);
+            ListPostorder(node->right);
+            std::cout << node->item << ' ';
+        }
+    }
+    template <typename T> void BST<T>::ListPostorderReverse (const BST<T>::node* node) const
+    {
+        if (node != nullptr)
+        {
+            ListPostorderReverse(node->right);
+            ListPostorderReverse(node->left);
+            std::cout << node->item << ' ';
+        }
+    }
+    template <typename T> void BST<T>::ListLeaves           (const BST<T>::node* node) const
+    {
+        if (node != nullptr)
+        {
+            if (node->left == nullptr && node->right == nullptr)
             {
-                std::cout << "Seviye " << level << " : ";
-                level++;
+                std::cout << node->item << ' ';
+                return;
             }
 
-            BST<T>::node* u = Q.front();
-            Q.pop();
-
-            if (u != nullptr)
+            ListLeaves(root->left);
+            ListLeaves(root->right);
+        }
+    }
+    template <typename T> void BST<T>::ListLeavesReverse    (const BST<T>::node* node) const
+    {
+        if (node != nullptr)
+        {
+            if (node->left == nullptr && node->right == nullptr)
             {
-                Q.push(u->left);
-                Q.push(u->right);
+                std::cout << node->item << ' ';
+                return;
+            }
 
-                std::cout << u->item;
+            ListLeavesReverse(root->right);
+            ListLeavesReverse(root->left);
+        }
+    }
+    template <typename T> void BST<T>::ListLevelorder       (const BST<T>::node* node, int64_t level) const
+    {
+        if (node != nullptr)
+        {
+            if (level == 1)
+            {
+                std::cout << node->item << ' ';
             }
             else
-                std::cout << "bos";
-
-            if (fatpound::math::IsPowerOf2(i + 1))
-                std::cout << '\n';
-            else if (Q.size() != 0)
-                std::cout << ", ";
-            // else break;
+            if (level > 1)
+            {
+                ListLevelorder(node->left, level - 1);
+                ListLevelorder(node->right, level - 1);
+            }
         }
-
-        std::cout << '\n';
+        else
+        if (level == 1)
+        {
+            std::cout << "x ";
+        }
     }
+
     template <typename T> void BST<T>::ListPreorder()         const
     {
-        ListPreorder_Protected(root);
+        ListPreorder(root);
         std::cout << '\n';
     }
     template <typename T> void BST<T>::ListPreorderReverse()  const
     {
-        ListPreorderReverse_Protected(root);
+        ListPreorderReverse(root);
         std::cout << '\n';
     }
     template <typename T> void BST<T>::ListInorder()          const
     {
-        ListInorder_Protected(root);
+        ListInorder(root);
         std::cout << '\n';
     }
     template <typename T> void BST<T>::ListInorderReverse()   const
     {
-        ListInorderReverse_Protected(root);
+        ListInorderReverse(root);
         std::cout << '\n';
     }
     template <typename T> void BST<T>::ListPostorder()        const
     {
-        ListPostorder_Protected(root);
+        ListPostorder(root);
         std::cout << '\n';
     }
     template <typename T> void BST<T>::ListPostorderReverse() const
     {
-        ListPostorderReverse_Protected(root);
+        ListPostorderReverse(root);
         std::cout << '\n';
     }
     template <typename T> void BST<T>::ListLeaves()           const
     {
-        ListLeaves_Protected(root);
+        ListLeaves(root);
         std::cout << '\n';
     }
     template <typename T> void BST<T>::ListLeavesReverse()    const
     {
-        ListLeavesReverse_Protected(root);
+        ListLeavesReverse(root);
         std::cout << '\n';
+    }
+    template <typename T> void BST<T>::ListLevelorder()       const
+    {
+        const int64_t height = GetDepth(root);
+
+        for (int64_t i = 1; i <= height; i++)
+        {
+            std::cout << "Level " << i << " : ";
+
+            ListLevelorder(root, i);
+
+            std::cout << '\n';
+        }
+
+        std::cout << '\n';
+    }
+
+    template <typename T> void BST<T>::Mirror(BST<T>::node* node)
+    {
+        if (node != nullptr)
+        {
+            std::swap(node->left, node->right);
+
+            Mirror(node->left);
+            Mirror(node->right);
+        }
+    }
+    template <typename T> void BST<T>::Mirror()
+    {
+        Mirror(root);
+    }
+    template <typename T> void BST<T>::Erase(BST<T>::node* node)
+    {
+        if (node != nullptr)
+        {
+            Erase(node->left);
+            Erase(node->right);
+
+            delete node;
+        }
+    }
+    template <typename T> void BST<T>::Insert(T new_item)
+    {
+        BST<T>::node* new_root = Insert(nullptr, root, new_item);
+
+        if (root == nullptr)
+        {
+            root = new_root;
+        }
+
+        nodeCount++;
     }
 }

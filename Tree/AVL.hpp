@@ -8,7 +8,7 @@ namespace fatpound::tree
     class AVL : public BST<T>
     {
     private:
-        void Balance();
+        void Balance(AVL<T>::node* lastInserted);
 
 
     protected:
@@ -22,14 +22,14 @@ namespace fatpound::tree
 
     };
 
-    template <typename T> void AVL<T>::Balance()
+    template <typename T> void AVL<T>::Balance(AVL<T>::node* lastInserted)
     {
-        typename __super::node* last = __super::lastInserted; // Y
+        typename AVL<T>::node* last = lastInserted; // Y
         
         while (last->parent != nullptr) // Going up
         {
-            const int  left_val = __super::GetDepth_Protected(last->parent->left,  0);
-            const int right_val = __super::GetDepth_Protected(last->parent->right, 0);
+            const int  left_val = BST<T>::GetDepth(last->parent->left);
+            const int right_val = BST<T>::GetDepth(last->parent->right);
 
             const int balanceFactor = right_val - left_val;
 
@@ -41,54 +41,62 @@ namespace fatpound::tree
             std::cout << "Balance : " << balanceFactor << "\n\n";
             */
 
-            if (balanceFactor >  1 && __super::lastInserted->item > last->item)
+            if (balanceFactor >  1 && lastInserted->item > last->item)
             {
                 RotateLeft(last->parent, last);
             }
             else
-            if (balanceFactor < -1 && __super::lastInserted->item < last->item)
+            if (balanceFactor < -1 && lastInserted->item < last->item)
             {
                 RotateRight(last->parent, last);
             }
             else
-            if (balanceFactor >  1 && __super::lastInserted->item < last->item)
+            if (balanceFactor >  1 && lastInserted->item < last->item)
             {
                 RotateRight(last, last->left);
                 RotateLeft(last->parent->parent, last->parent);
             }
             else
-            if (balanceFactor < -1 && __super::lastInserted->item > last->item)
+            if (balanceFactor < -1 && lastInserted->item > last->item)
             {
                 RotateLeft(last, last->right);
                 RotateRight(last->parent->parent, last->parent);
             }
 
             if (last->parent == nullptr)
+            {
                 break;
+            }
 
             last = last->parent;
         }
     }
     template <typename T> void AVL<T>::Insert(T new_item)
     {
-        typename __super::node* new_root = __super::Insert_Protected(nullptr, __super::root, new_item);
+        typename AVL<T>::node* new_root = BST<T>::Insert(nullptr, this->root, new_item);
         
-        if (__super::root == nullptr)
-            __super::root = new_root;
+        if (this->root == nullptr)
+        {
+            this->root = new_root;
+        }
         else
-            this->Balance();
+        {
+            this->Balance(new_root);
+        }
 
-        __super::node_count++;
+        this->nodeCount++;
     }
 
     template <typename T> void AVL<T>::RotateLeft (AVL<T>::node* X, AVL<T>::node* Y)
     {
-        typename __super::node* parent_of_parent = X->parent;
+        typename AVL<T>::node* parent_of_parent = X->parent;
 
         X->right = Y->left;
 
         if (X->right != nullptr)
+        {
             X->right->parent = X;
+        }
         
         Y->left  = X;
 
@@ -96,7 +104,9 @@ namespace fatpound::tree
         Y->parent = parent_of_parent;
 
         if (parent_of_parent == nullptr)
-            __super::root = Y;
+        {
+            this->root = Y;
+        }
         else
         {
             if (parent_of_parent->item < X->item)
@@ -111,12 +121,14 @@ namespace fatpound::tree
     }
     template <typename T> void AVL<T>::RotateRight(AVL<T>::node* X, AVL<T>::node* Y)
     {
-        typename __super::node* parent_of_parent = X->parent;
+        typename AVL<T>::node* parent_of_parent = X->parent;
 
         X->left = Y->right;
 
         if (X->left != nullptr)
+        {
             X->left->parent = X;
+        }
         
         Y->right = X;
 
@@ -124,7 +136,9 @@ namespace fatpound::tree
         Y->parent = parent_of_parent;
 
         if (parent_of_parent == nullptr)
-            __super::root = Y;
+        {
+            this->root = Y;
+        }
         else
         {
             if (parent_of_parent->item < X->item)

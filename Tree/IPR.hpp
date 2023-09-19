@@ -8,7 +8,7 @@ namespace fatpound::tree
     class IPR : public AVL<T>
     {
     private:
-        void Balance();
+        void Balance(IPR<T>::node* lastInserted);
 
 
     protected:
@@ -20,9 +20,9 @@ namespace fatpound::tree
 
     };
 
-    template <typename T> void IPR<T>::Balance()
+    template <typename T> void IPR<T>::Balance(IPR<T>::node* lastInserted)
     {
-        typename __super::node* last = __super::last_Inserted; // Y
+        typename IPR<T>::node* last = lastInserted; // Y
 
         while (last->parent != nullptr) // Going up
         {
@@ -34,24 +34,24 @@ namespace fatpound::tree
 
             if (last->parent->item < last->item)
             {
-                na = __super::GetNodeCount_Protected(last->parent->left);
+                na = BST<T>::GetNodeCount(last->parent->left);
                 a_location = false;
             }
             else
             {
-                na = __super::GetNodeCount_Protected(last->parent->right);
+                na = BST<T>::GetNodeCount(last->parent->right);
                 a_location = true;
             }
 
             if (a_location == false)
             {
-                nb = __super::GetNodeCount_Protected(last->left);
-                nc = __super::GetNodeCount_Protected(last->right);
+                nb = BST<T>::GetNodeCount(last->left);
+                nc = BST<T>::GetNodeCount(last->right);
             }
             else
             {
-                nb = __super::GetNodeCount_Protected(last->right);
-                nc = __super::GetNodeCount_Protected(last->left);
+                nb = BST<T>::GetNodeCount(last->right);
+                nc = BST<T>::GetNodeCount(last->left);
             }
 
             /*
@@ -64,41 +64,47 @@ namespace fatpound::tree
             
             if (nc > na && a_location == false)
             {
-                RotateLeft(last->parent, last);
+                AVL<T>::RotateLeft(last->parent, last);
             }
             else
             if (nc > na && a_location == true)
             {
-                RotateRight(last->parent, last);
+                AVL<T>::RotateRight(last->parent, last);
             }
             else
             if (nb > na && a_location == false)
             {
-                RotateRight(last, last->left);
-                RotateLeft(last->parent->parent, last->parent);
+                AVL<T>::RotateRight(last, last->left);
+                AVL<T>::RotateLeft(last->parent->parent, last->parent);
             }
             else
             if (nb > na && a_location == true)
             {
-                RotateLeft(last, last->right);
-                RotateRight(last->parent->parent, last->parent);
+                AVL<T>::RotateLeft(last, last->right);
+                AVL<T>::RotateRight(last->parent->parent, last->parent);
             }
             
             if (last->parent == nullptr)
+            {
                 break;
+            }
 
             last = last->parent;
         }
     }
     template <typename T> void IPR<T>::Insert(T new_item)
     {
-        typename __super::node* new_root = __super::Insert_Protected(nullptr, __super::root, new_item);
+        typename BST<T>::node* new_root = BST<T>::Insert(nullptr, this->root, new_item);
 
-        if (__super::root == nullptr)
-            __super::root = new_root;
+        if (this->root == nullptr)
+        {
+            this->root = new_root;
+        }
         else
-            this->Balance();
+        {
+            this->Balance(new_root);
+        }
 
-        __super::node_count++;
+        this->nodeCount++;
     }
 }
