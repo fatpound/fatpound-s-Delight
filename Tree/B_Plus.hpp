@@ -48,7 +48,7 @@ namespace fatpound::tree
         };
 
 
-        node* root = nullptr;
+        B_Plus<T, I, S>::node* root = nullptr;
 
         size_t depth = 0; // except sequence set
         size_t count = 0;

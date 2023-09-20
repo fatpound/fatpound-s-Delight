@@ -46,7 +46,7 @@ namespace fatpound::tree
             }
         };
 
-        node* root = nullptr;
+        B<T, C>::node* root = nullptr;
 
         size_t depth = 0;
 
