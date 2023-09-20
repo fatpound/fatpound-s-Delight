@@ -45,7 +45,7 @@ namespace fatpound::tree
 
 
     private:
-        void Erase(BST<T>::node* node);
+        void Delete(BST<T>::node* node) noexcept;
 
 
     public:
@@ -82,7 +82,7 @@ namespace fatpound::tree
 
     template <typename T> BST<T>::~BST() noexcept
     {
-        Erase(root);
+        Delete(root);
         root = nullptr;
     }
     template <typename T> BST<T>::BST(const BST<T>& src) noexcept
@@ -110,9 +110,9 @@ namespace fatpound::tree
         {
             if (root != nullptr)
             {
-                Erase(root);
+                Delete(root);
 
-                // root = nullptr;
+                root = nullptr;
                 // nodeCount = 0ull;
             }
 
@@ -128,7 +128,7 @@ namespace fatpound::tree
         {
             if (root != nullptr)
             {
-                Erase(root);
+                Delete(root);
 
                 // root = nullptr;
                 // nodeCount = 0ull;
@@ -415,12 +415,12 @@ namespace fatpound::tree
     {
         Mirror(root);
     }
-    template <typename T> void BST<T>::Erase(BST<T>::node* node)
+    template <typename T> void BST<T>::Delete(BST<T>::node* node) noexcept
     {
         if (node != nullptr)
         {
-            Erase(node->left);
-            Erase(node->right);
+            Delete(node->left);
+            Delete(node->right);
 
             delete node;
         }
