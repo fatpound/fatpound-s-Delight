@@ -20,17 +20,28 @@ namespace fatpound::graph
 
             size_t n = 0;
 
-            node() = delete;
-            node(const size_t index);
+            node() = default;
+            ~node() = default;
+            node(const node& src) noexcept;
+            node(node&& src) = default;
+            node& operator = (const node& src) noexcept;
+            node& operator = (node&& src) = default;
+
+            node(const size_t index)
+                :
+                n(index)
+            {
+
+            }
         };
 
         std::vector<std::vector<int64_t>> adj;
         std::vector<node*> nodes;
 
-        std::string str;
-
         size_t nodeCount = 0;
         size_t edgeCount = 0;
+
+        void Delete() noexcept;
 
 
     protected:
@@ -39,10 +50,10 @@ namespace fatpound::graph
     public:
         Graph() = default;
         ~Graph() noexcept;
-        Graph(const Graph& src) = delete;
-        Graph(Graph&& src) = delete;
-        Graph& operator = (const Graph& src) = delete;
-        Graph& operator = (Graph&& src) = delete;
+        Graph(const Graph& src) noexcept;
+        Graph(Graph&& src) noexcept;
+        Graph& operator = (const Graph& src) noexcept;
+        Graph& operator = (Graph&& src) noexcept;
 
         Graph(const std::string input_filename);
 
@@ -57,25 +68,104 @@ namespace fatpound::graph
     };
 
 
-    Graph::node::node(const size_t index)
+    Graph::node::node(const node& src) noexcept
         :
-        n(index)
+        n(src.n),
+        next(src.next)
     {
     }
+    Graph::node& Graph::node::operator = (const node& src) noexcept
+    {
+        n = src.n;
+        next = src.next;
+
+        return *this;
+    }
+
 
     Graph::~Graph() noexcept
     {
-        for (size_t i = 0; i < nodes.size(); i++)
+        Delete();
+    }
+    Graph::Graph(const Graph& src) noexcept
+    {
+        if (src.nodeCount != 0)
         {
-            delete nodes[i];
+            nodeCount = src.nodeCount;
+            edgeCount = src.edgeCount;
+
+            adj = src.adj;
+
+            for (size_t i = 0; i < nodeCount; i++)
+            {
+                nodes.push_back(new Graph::node(*src.nodes[i]));
+            }
         }
     }
+    Graph::Graph(Graph&& src) noexcept
+    {
+        if (src.nodeCount != 0)
+        {
+            nodes = std::move(src.nodes);
+            adj = std::move(src.adj);
+
+            nodeCount = src.nodeCount;
+            edgeCount = src.edgeCount;
+
+            src.nodeCount = 0;
+            src.edgeCount = 0;
+        }
+    }
+    Graph& Graph::operator = (const Graph& src) noexcept
+    {
+        if (this != std::addressof(src) && src.nodeCount != 0)
+        {
+            if (nodeCount != 0)
+            {
+                Delete();
+            }
+
+            nodeCount = src.nodeCount;
+            edgeCount = src.edgeCount;
+
+            adj = src.adj;
+
+            for (size_t i = 0; i < nodeCount; i++)
+            {
+                nodes.push_back(new Graph::node(*src.nodes[i]));
+            }
+        }
+
+        return *this;
+    }
+    Graph& Graph::operator = (Graph&& src) noexcept
+    {
+        if (this != std::addressof(src) && src.nodeCount != 0)
+        {
+            if (nodeCount != 0)
+            {
+                Delete();
+            }
+
+            nodes = std::move(src.nodes);
+            adj = std::move(src.adj);
+
+            nodeCount = src.nodeCount;
+            edgeCount = src.edgeCount;
+
+            src.nodeCount = 0;
+            src.edgeCount = 0;
+        }
+
+        return *this;
+    }
+
     Graph::Graph(const std::string input_filename)
     {
         {
             std::ifstream my_file(input_filename, std::ios_base::binary);
 
-            if (!my_file.is_open())
+            if ( ! my_file.is_open())
                 return;
             
             while (my_file.eof() == false)
@@ -104,14 +194,14 @@ namespace fatpound::graph
 
         nodeCount = adj.size();
 
-        for (size_t i = 0; i < adj.size(); i++)
+        for (size_t i = 0; i < nodeCount; i++)
         {
             nodes.push_back(new node(i));
         }
 
-        for (size_t i = 0; i < adj.size(); i++)
+        for (size_t i = 0; i < nodeCount; i++)
         {
-            for (size_t j = 0; j < adj.size(); j++)
+            for (size_t j = 0; j < nodeCount; j++)
             {
                 if (adj[i][j] != 0)
                 {
@@ -120,24 +210,6 @@ namespace fatpound::graph
                 }
             }
         }
-
-        std::stringstream ss;
-
-        for (size_t i = 0; i < nodes.size(); i++)
-        {
-            ss << nodes[i] << "\t" << nodes[i]->n << "\tsource\n";
-
-            for (size_t j = 0; j < nodes[i]->next.size(); j++)
-            {
-                ss << nodes[i]->next[j];
-            }
-
-            ss << "----------------\n";
-        }
-
-        ss << "\n";
-
-        str = std::move(ss.str());
     }
 
     Graph::node* Graph::GetNodeAt(const int64_t i) const
@@ -159,8 +231,33 @@ namespace fatpound::graph
         return edgeCount;
     }
 
+    void Graph::Delete() noexcept
+    {
+        for (size_t i = 0ull; i < nodeCount; i++)
+        {
+            delete nodes[i];
+        }
+
+        nodes.clear();
+        adj.clear();
+
+        nodeCount = 0ull;
+        edgeCount = 0ull;
+    }
     void Graph::PrintNodes() const
     {
-        std::cout << str;
+        for (size_t i = 0; i < nodeCount; i++)
+        {
+            std::cout << nodes[i] << "\t" << nodes[i]->n << "\tsource\n";
+
+            for (size_t j = 0; j < nodes[i]->next.size(); j++)
+            {
+                std::cout << nodes[i]->next[j];
+            }
+
+            std::cout << "----------------\n";
+        }
+
+        std::cout << "\n";
     }
 }
