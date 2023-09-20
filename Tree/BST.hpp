@@ -130,7 +130,7 @@ namespace fatpound::tree
             {
                 Delete(root);
 
-                // root = nullptr;
+                root = nullptr;
                 // nodeCount = 0ull;
             }
 
