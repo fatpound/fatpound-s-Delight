@@ -17,6 +17,11 @@ namespace fatpound::tree
 
 
         public:
+            std::vector<std::pair<T, node*>*> items;
+
+            node* lesser = nullptr;
+            node* parent = nullptr;
+
             node() = default;
             ~node() = default;
             node(std::vector<std::pair<T, node*>*>& new_items, node* new_lesser, node* new_parent)
@@ -40,11 +45,6 @@ namespace fatpound::tree
             {
                 items.push_back(new std::pair<T, B_Plus<T, I, S>::node*>(new_item, nullptr));
             }
-
-            std::vector<std::pair<T, node*>*> items;
-
-            node* lesser = nullptr;
-            node* parent = nullptr;
         };
 
 
@@ -53,6 +53,9 @@ namespace fatpound::tree
         size_t depth = 0; // except sequence set
         size_t count = 0;
 
+        int64_t GetDepth(B_Plus<T, I, S>::node* node, int64_t depth = 0) const;
+
+        void ListLevelorder(const B_Plus<T, I, S>::node* node, int64_t level) const;
 
         void Insert(B_Plus<T, I, S>::node* node, T new_item)
         {
@@ -73,16 +76,18 @@ namespace fatpound::tree
         B_Plus& operator = (const B_Plus<T, I, S>& src) = delete;
         B_Plus& operator = (B_Plus<T, I, S>&& src) = delete;
 
-        void Insert(T new_item);
-
         void ListLevelorder() const;
+
+        void Insert(T new_item);
     };
 
 
     template <typename T, size_t I, size_t S> B_Plus<T, I, S>::~B_Plus() noexcept
     {
         if (root == nullptr)
+        {
             return;
+        }
 
         std::queue<B_Plus<T, I, S>::node*> Q;
         Q.push(root);
@@ -113,42 +118,60 @@ namespace fatpound::tree
         root = nullptr;
     }
 
-    template <typename T, size_t I, size_t S> void B_Plus<T, I, S>::ListLevelorder() const
+
+    template <typename T, size_t I, size_t S> int64_t B_Plus<T, I, S>::GetDepth(B_Plus<T, I, S>::node* node, int64_t depth) const
     {
-        if (root == nullptr)
+        if (node == nullptr)
         {
-            return;
+            return depth;
         }
 
-        std::queue<B_Plus<T, I, S>::node*> Q;
-        Q.push(root);
+        return GetDepth(node->lesser, depth + 1LL);
+    }
 
-        while (Q.size() > 0)
+    template <typename T, size_t I, size_t S> void B_Plus<T, I, S>::ListLevelorder(const B_Plus<T, I, S>::node* node, int64_t level) const
+    {
+        if (node != nullptr)
         {
-            B_Plus<T, I, S>::node* u = Q.front();
-            Q.pop();
-
-            if (u->lesser != nullptr)
+            if (level == 1)
             {
-                Q.push(u->lesser);
-            }
-
-            for (size_t i = 0; i < u->items.size(); i++)
-            {
-                // to print only sequence set
-                //if (u->lesser == nullptr)
-                std::cout << u->items[i]->first << ' ';
-
-                if (u->items[i]->second != nullptr)
+                for (size_t i = 0; i < node->items.size(); i++)
                 {
-                    Q.push(u->items[i]->second);
+                    std::cout << node->items[i]->first << ' ';
                 }
             }
+            else
+            if (level > 1)
+            {
+                ListLevelorder(node->lesser, level - 1);
 
-            std::cout << "\n";
+                for (size_t i = 0; i < node->items.size(); i++)
+                {
+                    ListLevelorder(node->items[i]->second, level - 1);
+                    std::cout << '\t';
+                }
+            }
+        }
+        else
+        if (level == 1)
+        {
+            std::cout << "x ";
+        }
+    }
+    template <typename T, size_t I, size_t S> void B_Plus<T, I, S>::ListLevelorder() const
+    {
+        const int64_t height = GetDepth(root);
+
+        for (int64_t i = 1; i <= height; i++)
+        {
+            std::cout << "Level " << i << " : ";
+
+            ListLevelorder(root, i);
+
+            std::cout << '\n';
         }
 
-        std::cout << "\n";
+        std::cout << '\n';
     }
 
     template <typename T, size_t I, size_t S> void B_Plus<T, I, S>::Overflow(B_Plus<T, I, S>::node* node, std::pair<T, B_Plus<T, I, S>::node*>* new_pair, B_Plus<T, I, S>::node* extend_node, bool extend)
@@ -233,7 +256,7 @@ namespace fatpound::tree
             goto extension;
         }
 
-        int index;
+        size_t index;
 
 
     control:
@@ -252,7 +275,7 @@ namespace fatpound::tree
 
         index = 0;
 
-        for (int i = 0; i < node->items.size(); i++)
+        for (size_t i = 0; i < node->items.size(); i++)
         {
             if (new_pair->first > node->items[i]->first)
             {
