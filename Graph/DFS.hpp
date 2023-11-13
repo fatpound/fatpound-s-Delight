@@ -1,66 +1,88 @@
 #pragma once
 
-#include "graph.hpp"
+#include "Graph.hpp"
+
+#include <sstream>
+#include <vector>
+#include <string>
+#include <memory>
 
 namespace fatpound::graph
 {
     class DFS
     {
-    private:
-        std::vector<std::int64_t> colors;
-        
-        graph* G = nullptr;
+    public:
+        DFS() = delete;
+        ~DFS() = default;
+        DFS(const DFS& src) = delete;
+        DFS(DFS&& src) noexcept
+        {
+            G = std::move(src.G);
+            output = std::move(src.output);
+        }
+        DFS& operator = (const DFS& src) = delete;
+        DFS& operator = (DFS&& src) noexcept
+        {
+            G = std::move(src.G);
+            output = std::move(src.output);
 
-        void visit(const std::size_t index);
+            return *this;
+        }
+
+        DFS(const std::string& input_filename)
+            :
+            G{ std::make_unique<fatpound::graph::Graph>(input_filename) }
+        {
+            std::vector<fatpound::colors::Color> colors(G->GetNodeCount());
+
+            for (size_t i = 0; i < G->GetNodeCount(); i++)
+            {
+                if (colors[i] == fatpound::colors::White)
+                {
+                    Visit(colors, i);
+                }
+            }
+
+            output += '\n';
+        }
+
+        void PrintResults() const
+        {
+            std::cout << output;
+        }
 
 
     protected:
 
 
-    public:
-        DFS(graph* graf);
-        ~DFS();
+    private:
+        std::unique_ptr<Graph> G = nullptr;
 
-        void run();
+        std::string output;
+
+        void Visit(std::vector<fatpound::colors::Color>& colors, const size_t index)
+        {
+            colors[index] = fatpound::colors::Gray;
+
+            {
+                std::stringstream ss;
+
+                ss << G->GetNodeAt(index) << '\t' << G->GetNodeAt(index)->n << '\n';
+
+                output += std::move(ss.str());
+            }
+
+            for (size_t i = 0; i < G->GetNodeAt(index)->next.size(); i++)
+            {
+                const size_t next_index = G->GetNodeAt(index)->next[i];
+
+                if (colors[next_index] == fatpound::colors::White)
+                {
+                    Visit(colors, next_index);
+                }
+            }
+
+            colors[index] = fatpound::colors::Black;
+        }
     };
-
-    DFS::DFS(graph* graf)
-    {
-        this->G = graf;
-
-        for (std::size_t i = 0; i < this->G->nodes.size(); i++)
-            this->colors.push_back(fatpound::graph::color_white);
-    }
-    DFS::~DFS()
-    {
-        this->G->~graph();
-    }
-
-    void DFS::visit(const std::size_t index)
-    {
-        this->colors.at(index) = fatpound::graph::color_gray;
-
-        std::cout << this->G->nodes.at(index) << '\t' << this->G->nodes.at(index)->n << '\n';
-
-        for (std::size_t i = 0; i < this->G->nodes.at(index)->next_list.size(); i++)
-        {
-            const std::size_t next_index = this->G->nodes.at(index)->next_list.at(i)->n;
-
-            if (this->colors.at(next_index) == fatpound::graph::color_white)
-                this->visit(next_index);
-        }
-
-        this->colors.at(index) = fatpound::graph::color_black;
-    }
-    void DFS::run()
-    {
-        if (this->G == nullptr)
-            return;
-
-        for (std::size_t i = 0; i < this->G->nodes.size(); i++)
-        {
-            if (this->colors.at(i) == fatpound::graph::color_white)
-                this->visit(i);
-        }
-    }
 }

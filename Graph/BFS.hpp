@@ -1,69 +1,79 @@
 #pragma once
 
-#include "graph.hpp"
+#include "Graph.hpp"
+
+#include <queue>
 
 namespace fatpound::graph
 {
     class BFS
     {
-    private:
-        std::queue<std::size_t> queue;
-        std::vector<std::int64_t> colors;
+    public:
+        BFS() = delete;
+        ~BFS() = default;
+        BFS(const BFS& src) = delete;
+        BFS(BFS&& src) noexcept
+        {
+            G = std::move(src.G);
+            output = std::move(src.output);
+        }
+        BFS& operator = (const BFS& src) = delete;
+        BFS& operator = (BFS&& src) noexcept
+        {
+            G = std::move(src.G);
+            output = std::move(src.output);
 
-        graph* G = nullptr;
+            return *this;
+        }
+
+        BFS(const std::string& input_filename)
+            :
+            G{ std::make_unique<fatpound::graph::Graph>(input_filename) }
+        {
+            std::vector<fatpound::colors::Color> colors(G->GetNodeCount());
+
+            std::queue<size_t> queue;
+            queue.push(0ull);
+
+            std::stringstream ss;
+
+            while (queue.size() > 0ull)
+            {
+                size_t u = queue.front();
+                queue.pop();
+
+                for (size_t i = 0; i < G->GetNodeAt(u)->next.size(); i++)
+                {
+                    const size_t v = G->GetNodeAt(u)->next[i];
+
+                    if (colors[v] == fatpound::colors::White)
+                    {
+                        colors[v] = fatpound::colors::Gray;
+                        queue.push(v);
+                    }
+                }
+
+                colors[u] = fatpound::colors::Black;
+
+                ss << (char)('a' + u);
+            }
+
+            output = std::move(ss.str());
+            output += "\n\n";
+        }
+
+        void PrintResults() const
+        {
+            std::cout << output;
+        }
 
 
     protected:
 
 
-    public:
-        BFS(graph* graf);
-        ~BFS();
+    private:
+        std::unique_ptr<Graph> G = nullptr;
 
-        void run();
+        std::string output;
     };
-
-    BFS::BFS(graph* graf)
-    {
-        if (graf != nullptr)
-            this->G = graf;
-    }
-    BFS::~BFS()
-    {
-        if (this->G != nullptr)
-            this->G->~graph();
-    }
-
-    void BFS::run()
-    {
-        if (this->G == nullptr)
-            return;
-
-        for (std::size_t i = 0; i < this->G->nodes.size(); i++)
-            this->colors.push_back(fatpound::graph::color_white);
-
-        this->queue.push(0);
-
-        while (this->queue.size() > 0)
-        {
-            std::size_t u = this->queue.front();
-            this->queue.pop();
-
-            for (std::size_t i = 0; i < this->G->nodes.at(u)->next_list.size(); i++)
-            {
-                const std::size_t v = this->G->nodes.at(u)->next_list.at(i)->n;
-
-                if (this->colors.at(v) == fatpound::graph::color_white)
-                {
-                    this->colors.at(v) = fatpound::graph::color_gray;
-                    this->queue.push(v);
-                }
-            }
-
-            this->colors.at(u) = fatpound::graph::color_black;
-            std::cout << (char)('a' + u);
-        }
-
-        std::cout << '\n';
-    }
 }

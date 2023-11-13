@@ -1,122 +1,136 @@
 #pragma once
 
-#include "graph.hpp"
+#include "Graph.hpp"
+#include <deque>
+#include <memory>
+#include <string>
 
 namespace fatpound::graph
 {
     class Dijkstra
     {
-    private:
-        std::deque<std::int64_t> deque;
+    public:
+        Dijkstra() = delete;
+        ~Dijkstra() = default;
+        Dijkstra(const Dijkstra& src) = delete;
+        Dijkstra(Dijkstra&& src) noexcept
+            :
+            G{ std::move(src.G) },
+            output{ std::move(src.output) }
+        {}
+        Dijkstra& operator = (const Dijkstra& src) = delete;
+        Dijkstra& operator = (Dijkstra&& src) noexcept
+        {
+            G = std::move(src.G);
+            output = std::move(src.output);
 
-        std::vector<std::int64_t> d;
-        std::vector<std::int64_t> p;
+            return *this;
+        }
 
-        graph* G = nullptr;
+        Dijkstra(const std::string& input_filename, size_t source_index)
+            :
+            G{ std::make_unique<fatpound::graph::Graph>(input_filename) }
+        {
+            std::deque<int64_t> deque;
+            std::vector<int64_t> d;
+            std::vector<int64_t> p;
 
-        std::size_t item_count = 0;
+            for (size_t i = 0; i < G->GetNodeCount(); i++)
+            {
+                d.push_back(std::numeric_limits<int64_t>::max());
+                p.push_back(-1);
 
-        std::int64_t w(const std::size_t u, const std::size_t v);
+                deque.push_back((int64_t)i);
+            }
 
-        void relax(const std::size_t u, const std::size_t v);
+            size_t item_count = G->GetNodeCount();
+
+            d[source_index] = 0;
+
+            while (item_count > 0)
+            {
+                size_t min_index = 0;
+
+                bool flag = true; // does min_index need to be initialized ?
+
+                for (size_t i = 0; i < d.size(); i++)
+                {
+                    if (deque[i] >= 0)
+                    {
+                        if (flag)
+                        {
+                            min_index = i;
+                            flag = false;
+                        }
+
+                        if (d[min_index] > d[i])
+                        {
+                            min_index = i;
+                        }
+                    }
+                }
+
+                const size_t u = (size_t)deque[min_index];
+
+                deque[min_index] = -1;
+                item_count--;
+
+                auto& nextindexes = G->GetNodeAt(u)->GetNextIndexesList();
+
+                for (size_t i = 0; i < nextindexes.size(); i++)
+                {
+                    relax(d, p, u, nextindexes[i]);
+                }
+            }
+
+            for (size_t i = 0; i < d.size(); i++)
+            {
+                output += std::to_string(d[i]) + ' ';
+            }
+
+            output += '\n';
+
+            for (size_t i = 0; i < p.size(); i++)
+            {
+                if (p[i] > -1)
+                {
+                    output += (char)('A' + p[i]);
+                    output += ' ';
+                }
+                else
+                {
+                    output += "N ";
+                }
+            }
+
+            output += "\n\n";
+        }
+
+        void PrintResults()
+        {
+            std::cout << output;
+        }
 
 
     protected:
 
 
-    public:
-        Dijkstra(graph* graf, std::size_t source_index);
-        ~Dijkstra();
+    private:
+        std::unique_ptr<Graph> G = nullptr;
 
-        void run();
-    };
+        std::string output;
 
-
-    Dijkstra::Dijkstra(graph* graf, std::size_t source_index)
-    {
-        if (graf == nullptr)
-            return;
-
-        this->G = graf;
-
-        for (std::size_t i = 0; i < graf->nodes.size(); i++)
+        void relax(std::vector<int64_t>& d, std::vector<int64_t>& p, const size_t u, const size_t v)
         {
-            this->d.push_back(99999); // INT32_MAX
-            this->p.push_back(-1);
-
-            this->deque.push_back((std::int64_t)i);
-            this->item_count++;
-        }
-
-        this->d.at(source_index) = 0;
-    }
-    Dijkstra::~Dijkstra()
-    {
-        if (this->G != nullptr)
-            this->G->~graph();
-    }
-
-    std::int64_t Dijkstra::w(const std::size_t u, const std::size_t v)
-    {
-        return this->G->adj.at(u).at(v);
-    }
-
-    void Dijkstra::relax(const std::size_t u, const std::size_t v)
-    {
-        if (this->d.at(v) > this->d.at(u) + this->w(u, v))
-        {
-            this->d.at(v) = this->d.at(u) + this->w(u, v);
-            this->p.at(v) = (std::int64_t)u;
-        }
-    }
-    void Dijkstra::run()
-    {
-        if (this->G == nullptr)
-            return;
-
-        while (this->item_count > 0)
-        {
-            std::size_t min_index = 0;
-
-            bool flag = true; // does min_index need to be initialized ?
-
-            for (std::size_t i = 0; i < this->d.size(); i++)
+            if (d[v] > d[u] + w(u, v))
             {
-                if (this->deque.at(i) >= 0)
-                {
-                    if (flag)
-                    {
-                        min_index = i;
-                        flag = false;
-                    }
-
-                    if (this->d.at(min_index) > this->d.at(i))
-                        min_index = i;
-                }
+                d[v] = d[u] + w(u, v);
+                p[v] = (int64_t)u;
             }
-
-            const std::size_t u = (std::size_t)this->deque.at(min_index);
-
-            this->deque.at(min_index) = -1;
-            this->item_count--;
-
-            for (std::size_t i = 0; i < this->G->nodes.at(u)->next_list.size(); i++)
-                this->relax(u, this->G->nodes.at(u)->next_list.at(i)->n);
         }
-
-        for (std::size_t i = 0; i < this->d.size(); i++)
-            std::cout << this->d.at(i) << ' ';
-
-        std::cout << '\n';
-
-        for (std::size_t i = 0; i < this->p.size(); i++)
+        int64_t w(const size_t u, const size_t v) const
         {
-            if (this->p.at(i) > -1)
-                std::cout << (char)('A' + this->p.at(i));
-            else
-                std::cout << 'N';
+            return G->GetAdjAt(u, v);
         }
-
-        std::cout << "\n\n";
-    }
+    };
 }
