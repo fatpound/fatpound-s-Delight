@@ -1,114 +1,131 @@
 #pragma once
 
-#include "graph.hpp"
+#include "Graph.hpp"
+#include <deque>
 
 namespace fatpound::graph
 {
     class Prim
     {
-    private:
-        std::deque<std::int64_t> deque;
+    
+    public:
+        Prim() = delete;
+        ~Prim() = default;
+        Prim(const Prim& src) = delete;
+        Prim(Prim&& src) noexcept
+        {
+            G = std::move(src.G);
+            output = std::move(src.output);
+        }
+        Prim& operator = (const Prim& src) = delete;
+        Prim& operator = (Prim&& src) noexcept
+        {
+            G = std::move(src.G);
+            output = std::move(src.output);
 
-        std::vector<std::int64_t> key;
-        std::vector<std::int64_t> pi;
+            return *this;
+        }
 
-        graph* G = nullptr;
+        Prim(const std::string& input_filename)
+            :
+            G{ std::make_unique<fatpound::graph::Graph>(input_filename) }
+        {
+            std::vector<int64_t> key;
+            std::vector<int64_t> pi;
 
-        std::size_t item_count = 0;
+            std::deque<int64_t> deque;
+
+            size_t item_count = G->GetNodeCount();
+
+            for (size_t i = 0; i < item_count; i++)
+            {
+                key.push_back(INT64_MAX);
+                pi.push_back(-1ll);
+
+                deque.push_back(int64_t(i));
+            }
+
+            key[0] = 0;
+
+            while (item_count > 0)
+            {
+                size_t min_index = 0;
+
+                bool flag = true; // does min_index need to be initialized ?
+
+                for (size_t i = 0; i < deque.size(); i++)
+                {
+                    if (deque[i] == int64_t(i))
+                    {
+                        if (flag)
+                        {
+                            min_index = i;
+                            flag = false;
+                        }
+
+                        if (key[min_index] > key[i])
+                        {
+                            min_index = i;
+                        }
+                    }
+                }
+
+                const size_t u = size_t(deque[min_index]);
+
+                deque[min_index] = -1LL;
+                item_count--;
+
+                for (size_t i = 0; i < G->GetNodeAt(u)->next.size(); i++)
+                {
+                    const size_t v = G->GetNodeAt(u)->next[i];
+                    const int64_t next_val = G->GetNodeAt(v)->n;
+
+                    if (deque[v] == int64_t(v) && key[v] > next_val)
+                    {
+                        key[v] = next_val;
+                        pi[v] = int64_t(u);
+                    }
+                }
+            }
+
+            std::stringstream ss;
+
+            for (size_t i = 0; i < key.size(); i++)
+            {
+                ss << key[i] << ' ';
+            }
+
+            ss << '\n';
+
+            for (size_t i = 0; i < pi.size(); i++)
+            {
+                if (pi[i] != -1)
+                {
+                    ss << (char)('a' + pi[i]) << ' ';
+                }
+                else
+                {
+                    ss << "N ";
+                }
+            }
+
+            ss << "\n\n";
+
+            output += std::move(ss.str());
+        }
+
+        void PrintResults()
+        {
+            std::cout << output;
+        }
 
 
     protected:
 
 
-    public:
-        Prim(graph* graf);
-        ~Prim();
+    private:
+        std::unique_ptr<Graph> G = nullptr;
 
-        void run();
+        std::string output;
     };
-
-    Prim::Prim(graph* graf)
-    {
-        if (graf == nullptr)
-            return;
-
-        this->G = graf;
-
-        for (std::size_t i = 0; i < this->G->nodes.size(); i++)
-        {
-            this->key.push_back(999); // INT32_MAX
-            this->pi.push_back(-1);
-
-            this->deque.push_back((std::int64_t)i);
-            this->item_count++;
-        }
-    }
-    Prim::~Prim()
-    {
-        if (this->G != nullptr)
-            this->G->~graph();
-    }
-
-    void Prim::run()
-    {
-        if (this->G == nullptr)
-            return;
-
-        this->key.at(0) = 0;
-
-        while (this->item_count > 0)
-        {
-            std::size_t min_index = 0;
-
-            bool flag = true; // does min_index need to be initialized ?
-            
-            for (std::size_t i = 0; i < this->deque.size(); i++)
-            {
-                if (this->deque.at(i) == (std::int64_t)i)
-                {
-                    if (flag)
-                    {
-                        min_index = i;
-                        flag = false;
-                    }
-
-                    if (this->key.at(min_index) > this->key.at(i))
-                        min_index = i;
-                }
-            }
-
-            const std::size_t u = (std::size_t)this->deque.at(min_index);
-
-            this->deque.at(min_index) = -1;
-            this->item_count--;
-
-            for (std::size_t i = 0; i < this->G->nodes.at(u)->next_list.size(); i++)
-            {
-                const std::size_t v = this->G->nodes.at(u)->next_list.at(i)->n;
-
-                if (this->deque.at(v) == (std::int64_t)v && (this->key.at(v) > this->G->adj.at(u).at(v)))
-                {
-                    this->key.at(v) = this->G->adj.at(u).at(v);
-                    this->pi.at(v)  = (std::int64_t)u;
-                }
-            }
-        }
-
-        for (std::size_t i = 0; i < this->key.size(); i++)
-            std::cout << this->key.at(i) << ' ';
-
-        std::cout << '\n';
-
-        for (std::size_t i = 0; i < this->pi.size(); i++)
-        {
-            if (this->pi.at(i) != -1)
-            {
-                std::cout << (char)('a' + this->pi.at(i)) << ' ';
-            }
-            else
-                std::cout << "N ";
-        }
-
-        std::cout << '\n';
-    }
 }
