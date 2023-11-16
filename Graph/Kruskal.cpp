@@ -4,6 +4,17 @@
 
 namespace fatpound::graph
 {
+    Kruskal::Kruskal(Kruskal&& src) noexcept
+        :
+        G{ std::move(src.G) }
+    {}
+    Kruskal& Kruskal::operator = (Kruskal&& src) noexcept
+    {
+        G = std::move(src.G);
+
+        return *this;
+    }
+
     Kruskal::Kruskal(const std::string& input_filename)
         :
         G{ std::make_unique<Graph>(input_filename) }

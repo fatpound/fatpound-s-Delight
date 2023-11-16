@@ -11,6 +11,13 @@ namespace fatpound::graph
     class Kruskal
     {
     public:
+        Kruskal()= delete;
+        ~Kruskal() = default;
+        Kruskal(const Kruskal& src) = delete;
+        Kruskal(Kruskal&& src) noexcept;
+        Kruskal& operator = (const Kruskal& src) = delete;
+        Kruskal& operator = (Kruskal&& src) noexcept;
+
         Kruskal(const std::string& input_filename);
 
 
