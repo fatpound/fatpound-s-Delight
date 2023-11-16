@@ -7,18 +7,17 @@ namespace fatpound::tree
     template <typename T>
     class IPR : public AVL<T>
     {
-    private:
-        void Balance(IPR<T>::node* lastInserted);
-
+    public:
+        void Insert(T new_item);
+    
 
     protected:
 
 
-    public:
-        void Insert(T new_item);
-
-
+    private:
+        void Balance(IPR<T>::node* lastInserted);
     };
+
 
     template <typename T> void IPR<T>::Balance(IPR<T>::node* lastInserted)
     {
@@ -66,19 +65,16 @@ namespace fatpound::tree
             {
                 AVL<T>::RotateLeft(last->parent, last);
             }
-            else
-            if (nc > na && a_location == true)
+            else if (nc > na && a_location == true)
             {
                 AVL<T>::RotateRight(last->parent, last);
             }
-            else
-            if (nb > na && a_location == false)
+            else if (nb > na && a_location == false)
             {
                 AVL<T>::RotateRight(last, last->left);
                 AVL<T>::RotateLeft(last->parent->parent, last->parent);
             }
-            else
-            if (nb > na && a_location == true)
+            else if (nb > na && a_location == true)
             {
                 AVL<T>::RotateLeft(last, last->right);
                 AVL<T>::RotateRight(last->parent->parent, last->parent);

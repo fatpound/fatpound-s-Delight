@@ -1,12 +1,141 @@
 #pragma once
 
-#include "fatpound.hpp"
+#include <iostream>
 
 namespace fatpound::tree
 {
     template <typename T>
     class BST
     {
+    public:
+        BST() = default;
+        ~BST() noexcept
+        {
+            Delete(root);
+            root = nullptr;
+        }
+        BST(const BST<T>& src) noexcept
+        {
+            if (src.root != nullptr)
+            {
+                root = src.Cloner(src.root);
+                nodeCount = src.nodeCount;
+            }
+        }
+        BST(BST<T>&& src) noexcept
+        {
+            if (src.root != nullptr)
+            {
+                root = src.root;
+                nodeCount = src.nodeCount;
+
+                src.root = nullptr;
+                src.nodeCount = 0ull;
+            }
+        }
+        BST& operator = (const BST<T>& src) noexcept
+        {
+            if (this != std::addressof(src) && src.root != nullptr)
+            {
+                if (root != nullptr)
+                {
+                    Delete(root);
+
+                    root = nullptr;
+                    // nodeCount = 0ull;
+                }
+
+                root = src.Cloner(src.root);
+                nodeCount = src.nodeCount;
+            }
+
+            return *this;
+        }
+        BST& operator = (BST<T>&& src) noexcept
+        {
+            if (this != std::addressof(src) && src.root != nullptr)
+            {
+                if (root != nullptr)
+                {
+                    Delete(root);
+
+                    root = nullptr;
+                    // nodeCount = 0ull;
+                }
+
+                root = src.root;
+                nodeCount = src.nodeCount;
+
+                src.root = nullptr;
+                src.nodeCount = 0ull;
+            }
+
+            return *this;
+        }
+
+
+    public:
+        int64_t GetTotalNodeCount() const;
+
+        void ListPreorder()         const
+        {
+            ListPreorder(root);
+            std::cout << '\n';
+        }
+        void ListPreorderReverse()  const
+        {
+            ListPreorderReverse(root);
+            std::cout << '\n';
+        }
+        void ListInorder()          const
+        {
+            ListInorder(root);
+            std::cout << '\n';
+        }
+        void ListInorderReverse()   const
+        {
+            ListInorderReverse(root);
+            std::cout << '\n';
+        }
+        void ListPostorder()        const
+        {
+            ListPostorder(root);
+            std::cout << '\n';
+        }
+        void ListPostorderReverse() const
+        {
+            ListPostorderReverse(root);
+            std::cout << '\n';
+        }
+        void ListLeaves()           const
+        {
+            ListLeaves(root);
+            std::cout << '\n';
+        }
+        void ListLeavesReverse()    const
+        {
+            ListLeavesReverse(root);
+            std::cout << '\n';
+        }
+        void ListLevelorder()       const;
+
+        void Mirror()
+        {
+            Mirror(root);
+        }
+        void Insert(T new_item)
+        {
+            BST<T>::node* new_root = Insert(nullptr, root, new_item);
+
+            if (root == nullptr)
+            {
+                root = new_root;
+            }
+
+            nodeCount++;
+        }
+
+
     protected:
         struct node
         {
@@ -16,13 +145,15 @@ namespace fatpound::tree
 
             T item;
 
-            node(T new_item, node* parent);
+            node(T new_item, node* new_parent)
+            :
+            item(new_item),
+                parent(new_parent)
+            {}
         };
 
-        BST<T>::node* root = nullptr;
 
-        size_t nodeCount = 0;
-
+    protected:
         BST<T>::node* Insert(BST<T>::node* __restrict parent, BST<T>::node* __restrict node, T new_item);
         BST<T>::node* Cloner(BST<T>::node* node) const;
         BST<T>::node* Find(BST<T>::node* root, T item) const;
@@ -32,6 +163,17 @@ namespace fatpound::tree
         int64_t GetDepthRight(BST<T>::node* node, int64_t depth = 0) const;
         int64_t GetNodeCount(BST<T>::node* node) const;
         
+        void Mirror(BST<T>::node* node)
+        {
+            if (node != nullptr)
+            {
+                std::swap(node->left, node->right);
+
+                Mirror(node->left);
+                Mirror(node->right);
+            }
+        }
+
         void ListPreorder         (const BST<T>::node* node) const;
         void ListPreorderReverse  (const BST<T>::node* node) const;
         void ListInorder          (const BST<T>::node* node) const;
@@ -41,108 +183,27 @@ namespace fatpound::tree
         void ListLeaves           (const BST<T>::node* node) const;
         void ListLeavesReverse    (const BST<T>::node* node) const;
         void ListLevelorder       (const BST<T>::node* node, int64_t level) const;
-        void Mirror               (      BST<T>::node* node);
+
+
+    protected:
+        BST<T>::node* root = nullptr;
+
+        size_t nodeCount = 0;
 
 
     private:
-        void Delete(BST<T>::node* node) noexcept;
+        void Delete(BST<T>::node* node) noexcept
+        {
+            if (node != nullptr)
+            {
+                Delete(node->left);
+                Delete(node->right);
 
-
-    public:
-        BST() = default;
-        ~BST() noexcept;
-        BST(const BST<T>& src) noexcept;
-        BST(BST<T>&& src) noexcept;
-        BST& operator = (const BST<T>& src) noexcept;
-        BST& operator = (BST<T>&& src) noexcept;
-
-        int64_t GetTotalNodeCount() const;
-
-        void ListPreorder()         const;
-        void ListPreorderReverse()  const;
-        void ListInorder()          const;
-        void ListInorderReverse()   const;
-        void ListPostorder()        const;
-        void ListPostorderReverse() const;
-        void ListLeaves()           const;
-        void ListLeavesReverse()    const;
-        void ListLevelorder()       const;
-
-        void Mirror();
-        void Insert(T new_item);
+                delete node;
+            }
+        }
     };
 
-
-    template <typename T> BST<T>::node::node(T new_item, BST<T>::node* new_parent)
-        :
-        item(new_item),
-        parent(new_parent)
-    {
-    }
-
-    template <typename T> BST<T>::~BST() noexcept
-    {
-        Delete(root);
-        root = nullptr;
-    }
-    template <typename T> BST<T>::BST(const BST<T>& src) noexcept
-    {
-        if (src.root != nullptr)
-        {
-            root = src.Cloner(src.root);
-            nodeCount = src.nodeCount;
-        }
-    }
-    template <typename T> BST<T>::BST(BST<T>&& src) noexcept
-    {
-        if (src.root != nullptr)
-        {
-            root = src.root;
-            nodeCount = src.nodeCount;
-
-            src.root = nullptr;
-            src.nodeCount = 0ull;
-        }
-    }
-    template <typename T> BST<T>& BST<T>::operator = (const BST<T>& src) noexcept
-    {
-        if (this != std::addressof(src) && src.root != nullptr)
-        {
-            if (root != nullptr)
-            {
-                Delete(root);
-
-                root = nullptr;
-                // nodeCount = 0ull;
-            }
-
-            root = src.Cloner(src.root);
-            nodeCount = src.nodeCount;
-        }
-
-        return *this;
-    }
-    template <typename T> BST<T>& BST<T>::operator = (BST<T>&& src) noexcept
-    {
-        if (this != std::addressof(src) && src.root != nullptr)
-        {
-            if (root != nullptr)
-            {
-                Delete(root);
-
-                root = nullptr;
-                // nodeCount = 0ull;
-            }
-
-            root = src.root;
-            nodeCount = src.nodeCount;
-
-            src.root = nullptr;
-            src.nodeCount = 0ull;
-        }
-
-        return *this;
-    }
 
     template <typename T> typename BST<T>::node* BST<T>::Insert(BST<T>::node* __restrict parent, BST<T>::node* __restrict node, T new_item)
     {
@@ -155,8 +216,7 @@ namespace fatpound::tree
         {
             node->left = Insert(node, node->left, new_item);
         }
-        else
-        if (new_item > node->item)
+        else if (new_item > node->item)
         {
             node->right = Insert(node, node->right, new_item);
         }
@@ -213,7 +273,7 @@ namespace fatpound::tree
 
         const int64_t  left_val = GetDepth(node->left,  depth + 1LL);
         const int64_t right_val = GetDepth(node->right, depth + 1LL);
-
+        
         return std::max(left_val, right_val);
     }
     template <typename T> int64_t BST<T>::GetDepthLeft(BST<T>::node* node, int64_t depth) const
@@ -331,61 +391,19 @@ namespace fatpound::tree
             {
                 std::cout << node->item << ' ';
             }
-            else
-            if (level > 1)
+            else if (level > 1)
             {
                 ListLevelorder(node->left, level - 1);
                 ListLevelorder(node->right, level - 1);
             }
         }
-        else
-        if (level == 1)
+        else if (level == 1)
         {
             std::cout << "x ";
         }
     }
 
-    template <typename T> void BST<T>::ListPreorder()         const
-    {
-        ListPreorder(root);
-        std::cout << '\n';
-    }
-    template <typename T> void BST<T>::ListPreorderReverse()  const
-    {
-        ListPreorderReverse(root);
-        std::cout << '\n';
-    }
-    template <typename T> void BST<T>::ListInorder()          const
-    {
-        ListInorder(root);
-        std::cout << '\n';
-    }
-    template <typename T> void BST<T>::ListInorderReverse()   const
-    {
-        ListInorderReverse(root);
-        std::cout << '\n';
-    }
-    template <typename T> void BST<T>::ListPostorder()        const
-    {
-        ListPostorder(root);
-        std::cout << '\n';
-    }
-    template <typename T> void BST<T>::ListPostorderReverse() const
-    {
-        ListPostorderReverse(root);
-        std::cout << '\n';
-    }
-    template <typename T> void BST<T>::ListLeaves()           const
-    {
-        ListLeaves(root);
-        std::cout << '\n';
-    }
-    template <typename T> void BST<T>::ListLeavesReverse()    const
-    {
-        ListLeavesReverse(root);
-        std::cout << '\n';
-    }
-    template <typename T> void BST<T>::ListLevelorder()       const
+    template <typename T> void BST<T>::ListLevelorder() const
     {
         const int64_t height = GetDepth(root);
 
@@ -399,41 +417,5 @@ namespace fatpound::tree
         }
 
         std::cout << '\n';
-    }
-
-    template <typename T> void BST<T>::Mirror(BST<T>::node* node)
-    {
-        if (node != nullptr)
-        {
-            std::swap(node->left, node->right);
-
-            Mirror(node->left);
-            Mirror(node->right);
-        }
-    }
-    template <typename T> void BST<T>::Mirror()
-    {
-        Mirror(root);
-    }
-    template <typename T> void BST<T>::Delete(BST<T>::node* node) noexcept
-    {
-        if (node != nullptr)
-        {
-            Delete(node->left);
-            Delete(node->right);
-
-            delete node;
-        }
-    }
-    template <typename T> void BST<T>::Insert(T new_item)
-    {
-        BST<T>::node* new_root = Insert(nullptr, root, new_item);
-
-        if (root == nullptr)
-        {
-            root = new_root;
-        }
-
-        nodeCount++;
     }
 }

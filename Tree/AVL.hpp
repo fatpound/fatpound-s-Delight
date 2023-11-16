@@ -7,8 +7,8 @@ namespace fatpound::tree
     template <typename T>
     class AVL : public BST<T>
     {
-    private:
-        void Balance(AVL<T>::node* lastInserted);
+    public:
+        void Insert(T new_item);
 
 
     protected:
@@ -16,11 +16,10 @@ namespace fatpound::tree
         void RotateRight(AVL<T>::node* X, AVL<T>::node* Y);
 
 
-    public:
-        void Insert(T new_item);
-
-
+    private:
+        void Balance(AVL<T>::node* lastInserted);
     };
+
 
     template <typename T> void AVL<T>::Balance(AVL<T>::node* lastInserted)
     {
