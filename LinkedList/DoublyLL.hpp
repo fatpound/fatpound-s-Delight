@@ -1,121 +1,112 @@
 #pragma once
 
-#include "fatpound.hpp"
+#include <iostream>
 
 namespace fatpound::linkedlist
 {
     template <typename T>
     class DoublyLL
     {
-    private:
-        struct node
+    public:
+        DoublyLL() = default;
+        ~DoublyLL()
         {
-            DoublyLL<T>::node* prev = nullptr;
-            DoublyLL<T>::node* next = nullptr;
-            T item;
+            if (list == nullptr)
+            {
+                return;
+            }
 
-            node(T new_item);
-        };
+            DoublyLL<T>::node* ex = list;
+            DoublyLL<T>::node* temp;
 
-        /********************************/
-        /*           Variables          */
-        /********************************/
+            do
+            {
+                temp = ex->next;
+                delete ex;
 
-        DoublyLL<T>::node* list = nullptr;
-        DoublyLL<T>::node* end  = nullptr;
-        
-        std::size_t item_count = 0;
+                ex = temp;
+            }
+            while (ex != nullptr);
+        }
+        DoublyLL(const DoublyLL& src) = delete;
+        DoublyLL(DoublyLL&& src) = delete;
+        DoublyLL operator = (const DoublyLL& src) = delete;
+        DoublyLL operator = (DoublyLL&& src) = delete;
+
+
+    public:
+        void Add(T new_item);
+        void AddOrdered(T new_item);
+        void Reverse();
+        void Print() const;
 
 
     protected:
 
 
-    public:
-        ~DoublyLL();
+    private:
+        struct node
+        {
+            node* prev = nullptr;
+            node* next = nullptr;
+            T item;
 
-        void add(T new_item);
-        void add_sorted(T new_item);
-        void reverse();
-        void list_all() const;
+            node(T new_item)
+                :
+                item{ new_item }
+            {}
+        };
+
+
+    private:
+        node* list = nullptr;
+        node* end  = nullptr;
+        
+        size_t item_count = 0;
     };
 
 
-    /********************************/
-    /*       Public Functions       */
-    /********************************/
-    //
-    //
-    //   constructor
-    //   destructors
-    //
-    //
-    template <typename T> DoublyLL<T>::node::node(T new_item)
-    {
-        this->item = new_item;
-    }
-    template <typename T> DoublyLL<T>::~DoublyLL()
-    {
-        if (this->list == nullptr)
-            return;
-
-        DoublyLL<T>::node* ex = this->list;
-        DoublyLL<T>::node* temp;
-
-        do
-        {
-            temp = ex->next;
-            delete ex;
-
-            ex = temp;
-        }
-        while (ex != nullptr);
-    }
-    //
-    // 
-    //   void
-    //
-    //
-    template <typename T> void DoublyLL<T>::add(T new_item)
+    template <typename T> void DoublyLL<T>::Add(T new_item)
     {
         DoublyLL<T>::node* new_part = new DoublyLL<T>::node(new_item);
 
-        this->item_count++;
+        item_count++;
 
-        if (this->list == nullptr)
+        if (list == nullptr)
         {
-            this->list = new_part;
-            this->end  = new_part;
+            list = new_part;
+            end  = new_part;
 
             return;
         }
 
-        this->end->next = new_part;
-        new_part->prev  = this->end;
+        end->next = new_part;
+        new_part->prev  = end;
 
-        this->end = new_part;
+        end = new_part;
     }
-    template <typename T> void DoublyLL<T>::add_sorted(T new_item)
+    template <typename T> void DoublyLL<T>::AddOrdered(T new_item)
     {
         DoublyLL<T>::node* new_part = new DoublyLL<T>::node(new_item);
 
-        this->item_count++;
+        item_count++;
 
-        if (this->list == nullptr)
+        if (list == nullptr)
         {
-            this->list = new_part;
+            list = new_part;
             return;
         }
 
-        if (new_item < this->list->item)
+        if (new_item < list->item)
         {
-            new_part->next = this->list;
-            this->list->prev = new_part;
-            this->list = new_part;
+            new_part->next = list;
+            list->prev = new_part;
+            list = new_part;
 
             return;
         }
 
-        DoublyLL<T>::node* temp = this->list;
+        DoublyLL<T>::node* temp = list;
 
         while (temp->next != nullptr)
         {
@@ -135,12 +126,14 @@ namespace fatpound::linkedlist
         temp->next = new_part;
         new_part->prev = temp;
     }
-    template <typename T> void DoublyLL<T>::reverse()
+    template <typename T> void DoublyLL<T>::Reverse()
     {
-        if (this->list == nullptr)
+        if (list == nullptr)
+        {
             return;
+        }
 
-        DoublyLL<T>::node* temp = this->list;
+        DoublyLL<T>::node* temp = list;
 
         while (temp->next != nullptr)
         {
@@ -149,17 +142,18 @@ namespace fatpound::linkedlist
         }
 
         std::swap(temp->prev, temp->next);
-        this->list = temp;
+        list = temp;
     }
-    template <typename T> void DoublyLL<T>::list_all() const
+    template <typename T> void DoublyLL<T>::Print() const
     {
-        DoublyLL<T>::node* temp = this->list;
+        DoublyLL<T>::node* temp = list;
 
         do
         {
             std::cout << temp->prev << '\t' << temp << '\t' << temp->item << '\t' << temp->next << '\n';
             temp = temp->next;
-        } while (temp != nullptr);
+        }
+        while (temp != nullptr);
 
         std::cout << '\n';
     }

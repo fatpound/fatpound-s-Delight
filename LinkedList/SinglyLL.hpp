@@ -1,126 +1,110 @@
 #pragma once
 
-#include "fatpound.hpp"
+#include <iostream>
 
 namespace fatpound::linkedlist
 {
     template <typename T>
     class SinglyLL
     {
-    private:
-        /********************************/
-        /*            Private           */
-        /*            Structs           */
-        /********************************/
-
-        struct node
+    public:
+        SinglyLL() = default;
+        ~SinglyLL()
         {
-            SinglyLL<T>::node* next = nullptr;
-            T item;
+            if (list_ == nullptr)
+            {
+                return;
+            }
 
-            node(T new_item);
-        };
+            node* ex = list_;
+            node* temp;
+
+            do
+            {
+                temp = ex->next;
+                delete ex;
+
+                ex = temp;
+            }
+            while (ex != nullptr);
+        }
+        SinglyLL(const SinglyLL& src) = delete;
+        SinglyLL(SinglyLL&& src) = delete;
+        SinglyLL& operator = (const SinglyLL& src) = delete;
+        SinglyLL& operator = (SinglyLL&& src) = delete;
 
 
-        /********************************/
-        /*            Private           */
-        /*           Variables          */
-        /********************************/
+    public:
+        void Add(T new_item);
+        void AddOrdered(T new_item);
+        void Reverse();
+        void Print() const;
 
-        SinglyLL<T>::node* list = nullptr;
-        SinglyLL<T>::node* end  = nullptr;
-
-        std::size_t item_count = 0;
-        
 
     protected:
 
 
-    public:
-        ~SinglyLL();
+    private:
+        struct node
+        {
+            node* next = nullptr;
+            T item;
 
-        void add(T new_item);
-        void add_sorted(T new_item);
-        void reverse();
-        void list_all() const;
+            node(T new_item)
+                :
+                item{ new_item }
+            {}
+        };
+
+
+    private:
+        node* list_ = nullptr;
+        node* end_ = nullptr;
+
+        size_t item_count_ = 0;
     };
 
 
-    /********************************/
-    /*       Public Functions       */
-    /********************************/
-    //
-    //
-    //   constructor
-    //   destructors
-    //
-    //
-    template <typename T> SinglyLL<T>::node::node(T new_item)
+    template <typename T> void SinglyLL<T>::Add(T new_item)
     {
-        this->item = new_item;
+        node* new_part = new node(new_item);
+
+        item_count_++;
+
+        if (list_ == nullptr)
+        {
+            list_ = new_part;
+            end_  = new_part;
+
+            return;
+        }
+
+        end_->next = new_part;
+        end_       = new_part;
     }
-    template <typename T> SinglyLL<T>::~SinglyLL()
+    template <typename T> void SinglyLL<T>::AddOrdered(T new_item)
     {
-        if (this->list == nullptr)
-            return;
+        node* new_part = new node(new_item);
 
-        SinglyLL<T>::node* ex = this->list;
-        SinglyLL<T>::node* temp;
+        item_count_++;
 
-        do
+        if (list_ == nullptr)
         {
-            temp = ex->next;
-            delete ex;
-
-            ex = temp;
-        }
-        while (ex != nullptr);
-    }
-    //
-    // 
-    //   void
-    //
-    //
-    template <typename T> void SinglyLL<T>::add(T new_item)
-    {
-        SinglyLL<T>::node* new_part = new SinglyLL<T>::node(new_item);
-
-        this->item_count++;
-
-        if (this->list == nullptr)
-        {
-            this->list = new_part;
-            this->end  = new_part;
+            list_ = new_part;
+            end_  = new_part;
 
             return;
         }
 
-        this->end->next = new_part;
-        this->end       = new_part;
-    }
-    template <typename T> void SinglyLL<T>::add_sorted(T new_item)
-    {
-        SinglyLL<T>::node* new_part = new SinglyLL<T>::node(new_item);
-
-        this->item_count++;
-
-        if (this->list == nullptr)
+        if (new_item < list_->item)
         {
-            this->list = new_part;
-            this->end  = new_part;
+            new_part->next = list_;
+            list_ = new_part;
 
             return;
         }
 
-        if (new_item < this->list->item)
-        {
-            new_part->next = this->list;
-            this->list = new_part;
-
-            return;
-        }
-
-        SinglyLL<T>::node* temp = this->list;
+        node* temp = list_;
 
         while (temp->next != nullptr)
         {
@@ -136,20 +120,22 @@ namespace fatpound::linkedlist
         }
 
         temp->next = new_part;
-        this->end  = new_part;
+        end_  = new_part;
     }
-    template <typename T> void SinglyLL<T>::reverse()
+    template <typename T> void SinglyLL<T>::Reverse()
     {
-        if (this->list == nullptr)
+        if (list_ == nullptr)
+        {
             return;
+        }
 
-        SinglyLL<T>::node* start_backup = this->list;
+        node* start_backup = list_;
 
-        SinglyLL<T>::node* t;
-        SinglyLL<T>::node* a = nullptr;
-        SinglyLL<T>::node* x;
+        node* t;
+        node* a = nullptr;
+        node* x;
 
-        SinglyLL<T>::node* temp = this->list;
+        node* temp = list_;
 
         while (true)
         {
@@ -163,27 +149,29 @@ namespace fatpound::linkedlist
 
             if (temp == nullptr)
             {
-                this->list = t;
+                list_ = t;
                 return;
             }
 
             if (temp->next == nullptr)
             {
                 temp->next = t;
-                this->list = temp;
+                list_ = temp;
 
                 return;
             }
         }
 
-        this->end = start_backup;
+        end_ = start_backup;
     }
-    template <typename T> void SinglyLL<T>::list_all() const
+    template <typename T> void SinglyLL<T>::Print() const
     {
-        if (this->list == nullptr)
+        if (list_ == nullptr)
+        {
             return;
+        }
 
-        SinglyLL<T>::node* temp = this->list;
+        node* temp = list_;
 
         do
         {
