@@ -30,8 +30,8 @@ namespace fatpound::linkedlist
         }
         DoublyLL(const DoublyLL& src) = delete;
         DoublyLL(DoublyLL&& src) = delete;
-        DoublyLL operator = (const DoublyLL& src) = delete;
-        DoublyLL operator = (DoublyLL&& src) = delete;
+        DoublyLL& operator = (const DoublyLL& src) = delete;
+        DoublyLL& operator = (DoublyLL&& src) = delete;
 
 
     public:
@@ -49,6 +49,7 @@ namespace fatpound::linkedlist
         {
             node* prev = nullptr;
             node* next = nullptr;
+
             T item;
 
             node(T new_item)
