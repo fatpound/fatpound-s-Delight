@@ -1,181 +1,187 @@
 #pragma once
 
-#include "fatpound.hpp"
+#include <iostream>
 
 namespace fatpound::linkedlist
 {
     template <typename T>
     class DoublyCircularLL
     {
-    private:
-        struct node
+    public:
+        DoublyCircularLL() = default;
+        ~DoublyCircularLL()
         {
-            DoublyCircularLL<T>::node* prev = nullptr;
-            DoublyCircularLL<T>::node* next = nullptr;
-            T item;
+            if (list_ == nullptr)
+            {
+                return;
+            }
 
-            node(T new_item);
-        };
+            node* start = list_;
+            node* ex = list_;
+            node* temp;
 
-        DoublyCircularLL<T>::node* list = nullptr;
-        DoublyCircularLL<T>::node* end  = nullptr;
+            do
+            {
+                temp = ex->next;
+                delete ex;
 
-        std::size_t item_count = 0;
+                ex = temp;
+            }
+            while (ex != start);
+        }
+        DoublyCircularLL(const DoublyCircularLL& src) = delete;
+        DoublyCircularLL(DoublyCircularLL&& src)
+            :
+            list_{ std::move(src.list_) },
+            end_{ std::move(src.end_) },
+            item_count_{ std::exchange(src.item_count_, 0ui64) }
+        {
+
+        }
+        DoublyCircularLL& operator = (const DoublyCircularLL& src) = delete;
+        DoublyCircularLL& operator = (DoublyCircularLL&& src)
+        {
+            list_ = std::move(src.list_);
+            end_ = std::move(src.end_);
+            item_count_ = std::exchange(src.item_count_, 0ui64);
+
+            return *this;
+        }
+
+
+    public:
+        void Add(T new_item)
+        {
+            node* new_part = new node(new_item);
+
+            item_count_++;
+
+            if (list_ == nullptr)
+            {
+                new_part->next = new_part;
+                new_part->prev = new_part;
+
+                list_ = new_part;
+                end_ = new_part;
+
+                return;
+            }
+
+            end_->next = new_part;
+            new_part->prev = end_;
+            new_part->next = list_;
+            list_->prev = new_part;
+
+            end_ = new_part;
+        }
+        void AddOrdered(T new_item)
+        {
+            node* new_part = new node(new_item);
+            item_count_++;
+
+            if (list_ == nullptr)
+            {
+                new_part->prev = new_part;
+                new_part->next = new_part;
+                list_ = new_part;
+
+                return;
+            }
+
+            if (new_item < list_->item)
+            {
+                new_part->next = list_;
+                list_->prev = new_part;
+                list_ = new_part;
+
+                end_->next = list_;
+                list_->prev = end_;
+
+                return;
+            }
+
+            node* temp = list_;
+            node* start = temp;
+
+            while (temp->next != start)
+            {
+                if (temp->item <= new_item && new_item <= temp->next->item)
+                {
+                    new_part->next = temp->next;
+                    new_part->prev = temp;
+                    temp->next->prev = new_part;
+                    temp->next = new_part;
+
+                    return;
+                }
+
+                temp = temp->next;
+            }
+
+            temp->next = new_part;
+            new_part->prev = temp;
+
+            new_part->next = start;
+            start->prev = new_part;
+        }
+        void Reverse()
+        {
+            if (list_ == nullptr)
+            {
+                return;
+            }
+
+            node* temp = list_;
+            node* start = list_;
+
+            while (temp->next != start)
+            {
+                std::swap(temp->prev, temp->next);
+                temp = temp->prev;
+            }
+
+            std::swap(temp->prev, temp->next);
+            list_ = temp;
+        }
+        void Print() const
+        {
+            node* temp = list_;
+            node* start = temp;
+
+            do
+            {
+                std::cout << temp->prev << '\t' << temp << '\t' << temp->item << '\t' << temp->next << '\n';
+                temp = temp->next;
+            }
+            while (temp != start);
+
+            std::cout << '\n';
+        }
 
 
     protected:
 
 
-    public:
-        ~DoublyCircularLL();
-
-        void add(T new_item);
-        void add_sorted(T new_item);
-        void reverse();
-        void list_all() const;
-    };
-
-
-    /********************************/
-    /*       Public Functions       */
-    /********************************/
-    //
-    //
-    //   constructor
-    //   destructors
-    //
-    //
-    template <typename T> DoublyCircularLL<T>::node::node(T new_item)
-    {
-        this->item = new_item;
-    }
-    template <typename T> DoublyCircularLL<T>::~DoublyCircularLL()
-    {
-        if (this->list == nullptr)
-            return;
-
-        DoublyCircularLL<T>::node* start = this->list;
-        DoublyCircularLL<T>::node* ex    = this->list;
-        DoublyCircularLL<T>::node* temp;
-
-        do
+    private:
+        struct node
         {
-            temp = ex->next;
-            delete ex;
+            node* prev = nullptr;
+            node* next = nullptr;
+            T item;
 
-            ex = temp;
-        }
-        while (ex != start);
-    }
-    //
-    // 
-    //   void
-    //
-    //
-    template <typename T> void DoublyCircularLL<T>::add(T new_item)
-    {
-        DoublyCircularLL<T>::node* new_part = new DoublyCircularLL<T>::node(new_item);
-
-        this->item_count++;
-
-        if (this->list == nullptr)
-        {
-            new_part->next = new_part;
-            new_part->prev = new_part;
-
-            this->list = new_part;
-            this->end  = new_part;
-
-            return;
-        }
-
-        this->end->next = new_part;
-        new_part->prev = this->end;
-        new_part->next = this->list;
-        this->list->prev = new_part;
-
-        this->end = new_part;
-    }
-    template <typename T> void DoublyCircularLL<T>::add_sorted(T new_item)
-    {
-        DoublyCircularLL<T>::node* new_part = new DoublyCircularLL<T>::node(new_item);
-        this->item_count++;
-
-        if (this->list == nullptr)
-        {
-            new_part->prev = new_part;
-            new_part->next = new_part;
-            this->list = new_part;
-
-            return;
-        }
-
-        if (new_item < this->list->item)
-        {
-            new_part->next = this->list;
-            this->list->prev = new_part;
-            this->list = new_part;
-
-            DoublyCircularLL<T>::node* end = this->go_to_index(this->item_count - 1);
-
-            end->next = this->list;
-            this->list->prev = end;
-
-            return;
-        }
-
-        DoublyCircularLL<T>::node* temp = this->list;
-        DoublyCircularLL<T>::node* start = temp;
-
-        while (temp->next != start)
-        {
-            if (temp->item <= new_item && new_item <= temp->next->item)
+            node(T new_item)
+                :
+                item(new_item)
             {
-                new_part->next = temp->next;
-                new_part->prev = temp;
-                temp->next->prev = new_part;
-                temp->next = new_part;
 
-                return;
             }
+        };
 
-            temp = temp->next;
-        }
 
-        temp->next = new_part;
-        new_part->prev = temp;
+    private:
+        node* list_ = nullptr;
+        node* end_  = nullptr;
 
-        new_part->next = start;
-        start->prev = new_part;
-    }
-    template <typename T> void DoublyCircularLL<T>::reverse()
-    {
-        if (this->list == nullptr)
-            return;
-
-        DoublyCircularLL<T>::node* temp = this->list;
-        DoublyCircularLL<T>::node* start = this->list;
-
-        while (temp->next != start)
-        {
-            swap(temp->prev, temp->next);
-            temp = temp->prev;
-        }
-
-        std::swap(temp->prev, temp->next);
-        this->list = temp;
-    }
-    template <typename T> void DoublyCircularLL<T>::list_all() const
-    {
-        DoublyCircularLL<T>::node* temp = this->list;
-        DoublyCircularLL<T>::node* start = temp;
-
-        do
-        {
-            std::cout << temp->prev << '\t' << temp << '\t' << temp->item << '\t' << temp->next << '\n';
-            temp = temp->next;
-        } while (temp != start);
-
-        std::cout << '\n';
-    }
+        size_t item_count_ = 0ui64;
+    };
 }
