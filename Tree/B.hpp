@@ -1,27 +1,71 @@
 #pragma once
 
-#include "fatpound.hpp"
+#include <iostream>
+#include <vector>
+#include <queue>
 
 namespace fatpound::tree
 {
     template <typename T, size_t C>
     class B
     {
+    public:
+        B() = default;
+        ~B() noexcept
+        {
+            if (root_ == nullptr)
+            {
+                return;
+            }
+
+            class B<T, C>::node;
+
+            std::queue<node*> Q;
+            Q.push(root_);
+
+            while (Q.size() > 0)
+            {
+                node* u = Q.front();
+                Q.pop();
+
+                if (u->lesser != nullptr)
+                {
+                    Q.push(u->lesser);
+                }
+
+                for (size_t i = 0; i < u->items.size(); i++)
+                {
+                    if (u->items[i]->second != nullptr)
+                    {
+                        Q.push(u->items[i]->second);
+                    }
+
+                    delete u->items[i];
+                }
+
+                delete u;
+            }
+
+            root_ = nullptr;
+        }
+        B(const B<T,C>& src) = delete;
+        B(B<T,C>&& src) = delete;
+        B<T, C>& operator = (const B<T,C>& src) = delete;
+        B<T, C>& operator = (B<T,C>&& src) = delete;
+
+
+    public:
+        void Insert(const T& new_item);
+        void ListLevelorder() const;
+        
+
+    protected:
+
+
     private:
         class node
         {
-        private:
-
-
-        protected:
-
-
         public:
-            std::vector<std::pair<T, node*>*> items;
-
-            node* lesser = nullptr;
-            node* parent = nullptr;
-
             node() = default;
             ~node() = default;
             node(const node& src) = delete;
@@ -39,121 +83,49 @@ namespace fatpound::tree
                 :
                 parent(new_parent)
             {
-                if (new_item)
+                if (new_item != nullptr)
                 {
                     items.push_back(new_item);
                 }
             }
+
+        public:
+            std::vector<std::pair<T, node*>*> items;
+
+            node* lesser = nullptr;
+            node* parent = nullptr;
+
+        protected:
+
+        private:
         };
 
-        B<T, C>::node* root = nullptr;
 
-        size_t depth = 0;
-
+    private:
         void Insert(B<T, C>::node* node, std::pair<T, B<T, C>::node*>* pair, bool add_first_time);
         void Overflow(B<T, C>::node* node, std::pair<T, B<T, C>::node*>* pair);
 
 
-    protected:
-        
+    private:
+        node* root_ = nullptr;
 
-    public:
-        B() = default;
-        ~B() noexcept;
-        B( const B<T,C>& src ) = delete;
-        B( B<T,C>&& src ) = delete;
-        B& operator = ( const B<T,C>& src ) = delete;
-        B& operator = ( B<T,C>&& src ) = delete;
-
-        void Insert(T new_item);
-        void ListLevelorder() const;
+        size_t depth_ = 0ui64;
     };
 
 
-    template <typename T, size_t C> B<T, C>::~B() noexcept
+    template <typename T, size_t C> void B<T, C>::Insert(const T& new_item)
     {
-        if (root == nullptr)
+        std::pair<T, B<T, C>::node*>* new_pair = new std::pair<T, B<T, C>::node*>{ new_item, nullptr };
+
+        if (root_ == nullptr)
+        {
+            root_ = new B<T, C>::node(new_pair);
+            depth_++;
+
             return;
-
-        std::queue<B<T, C>::node*> Q;
-        Q.push(root);
-
-        while (Q.size() > 0)
-        {
-            B<T, C>::node* u = Q.front();
-            Q.pop();
-
-            if (u->lesser != nullptr)
-                Q.push(u->lesser);
-
-            for (size_t i = 0; i < u->items.size(); i++)
-            {
-                if (u->items[i]->second != nullptr)
-                    Q.push(u->items[i]->second);
-
-                delete u->items[i];
-            }
-
-            delete u;
         }
-
-        root = nullptr;
-    }
-
-    template <typename T, size_t C> void B<T, C>::Overflow(B<T, C>::node* node, std::pair<T, B<T, C>::node*>* pair)
-    {
-        std::vector<std::pair<T, B<T, C>::node*>*> temp_vec;
-
-        temp_vec.push_back(pair);
-
-        for (size_t i = 0; i < C * 2; i++)
-        {
-            temp_vec.push_back(node->items[i]);
-        }
-
-        std::sort
-        (
-            temp_vec.begin(),
-            temp_vec.end(),
-            [] (std::pair<T, B<T, C>::node*>* p1, std::pair<T, B<T, C>::node*>* p2)
-            {
-                return p1->first < p2->first;
-            }
-        );
-
-        size_t center = (C * 2 + 1) / 2;
-
-        std::vector<std::pair<T, B<T, C>::node*>*> temp_vec_less;
-        std::vector<std::pair<T, B<T, C>::node*>*> temp_vec_more;
-
-        for (size_t i = 0; i < center; i++)
-            temp_vec_less.push_back(temp_vec[i]);
-
-        for (size_t i = center + 1; i <= C * 2; i++)
-            temp_vec_more.push_back(temp_vec[i]);
-
-        node->items.clear();
-
-        for (size_t i = 0; i < temp_vec_less.size(); i++)
-            node->items.push_back(temp_vec_less[i]);
-
-        if (node == root)
-        {
-            node->parent = new B<T, C>::node(node);
-            root = node->parent;
-            depth++;
-        }
-
-        Insert(node->parent, temp_vec[center], false);
         
-        B<T, C>::node* new_node = new B<T, C>::node();
-        new_node->parent = node->parent;
-
-        for (size_t i = 0; i < temp_vec_more.size(); i++)
-            new_node->items.push_back(temp_vec_more[i]);
-
-        new_node->lesser = temp_vec[center]->second;
-        temp_vec[center]->second = new_node;
+        Insert(root_, new_pair, true);
     }
     template <typename T, size_t C> void B<T, C>::Insert  (B<T, C>::node* node, std::pair<T, B<T, C>::node*>* pair, bool add_first_time)
     {
@@ -241,14 +213,67 @@ namespace fatpound::tree
             }
         }
     }
+    template <typename T, size_t C> void B<T, C>::Overflow(B<T, C>::node* node, std::pair<T, B<T, C>::node*>* pair)
+    {
+        std::vector<std::pair<T, B<T, C>::node*>*> temp_vec;
 
+        temp_vec.push_back(pair);
+
+        for (size_t i = 0; i < C * 2; i++)
+        {
+            temp_vec.push_back(node->items[i]);
+        }
+
+        std::sort(
+            temp_vec.begin(),
+            temp_vec.end(),
+            [] (std::pair<T, B<T, C>::node*>* p1, std::pair<T, B<T, C>::node*>* p2)
+            {
+                return p1->first < p2->first;
+            }
+        );
+
+        size_t center = (C * 2 + 1) / 2;
+
+        std::vector<std::pair<T, B<T, C>::node*>*> temp_vec_less;
+        std::vector<std::pair<T, B<T, C>::node*>*> temp_vec_more;
+
+        for (size_t i = 0; i < center; i++)
+            temp_vec_less.push_back(temp_vec[i]);
+
+        for (size_t i = center + 1; i <= C * 2; i++)
+            temp_vec_more.push_back(temp_vec[i]);
+
+        node->items.clear();
+
+        for (size_t i = 0; i < temp_vec_less.size(); i++)
+            node->items.push_back(temp_vec_less[i]);
+
+        if (node == root_)
+        {
+            node->parent = new B<T, C>::node(node);
+            root_ = node->parent;
+            depth_++;
+        }
+
+        Insert(node->parent, temp_vec[center], false);
+        
+        B<T, C>::node* new_node = new B<T, C>::node();
+        new_node->parent = node->parent;
+
+        for (size_t i = 0; i < temp_vec_more.size(); i++)
+            new_node->items.push_back(temp_vec_more[i]);
+
+        new_node->lesser = temp_vec[center]->second;
+        temp_vec[center]->second = new_node;
+    }
     template <typename T, size_t C> void B<T, C>::ListLevelorder() const
     {
-        if (root == nullptr)
+        if (root_ == nullptr)
             return;
 
         std::queue<B<T, C>::node*> Q;
-        Q.push(root);
+        Q.push(root_);
 
         while (Q.size() > 0)
         {
@@ -275,19 +300,5 @@ namespace fatpound::tree
         }
 
         std::cout << "\n";
-    }
-    template <typename T, size_t C> void B<T, C>::Insert(T new_item)
-    {
-        std::pair<T, B<T, C>::node*>* new_pair = new std::pair<T, B<T, C>::node*>{ new_item, nullptr };
-
-        if (root == nullptr)
-        {
-            root = new B<T, C>::node(new_pair);
-            depth++;
-
-            return;
-        }
-        
-        Insert(root, new_pair, true);
     }
 }
