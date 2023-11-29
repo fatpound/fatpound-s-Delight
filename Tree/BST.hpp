@@ -33,7 +33,7 @@ namespace fatpound::tree
                 src.nodeCount = 0ull;
             }
         }
-        BST& operator = (const BST<T>& src) noexcept
+        BST<T>& operator = (const BST<T>& src) noexcept
         {
             if (this != std::addressof(src) && src.root != nullptr)
             {
@@ -51,7 +51,7 @@ namespace fatpound::tree
 
             return *this;
         }
-        BST& operator = (BST<T>&& src) noexcept
+        BST<T>& operator = (BST<T>&& src) noexcept
         {
             if (this != std::addressof(src) && src.root != nullptr)
             {
@@ -149,7 +149,9 @@ namespace fatpound::tree
             :
             item(new_item),
                 parent(new_parent)
-            {}
+            {
+
+            }
         };
 
 
