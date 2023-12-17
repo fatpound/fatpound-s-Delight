@@ -18,14 +18,14 @@ namespace fatpound::tree
                 return;
             }
 
-            class B_Plus<T, I, S>::node;
+            class Node;
 
-            std::queue<node*> Q;
+            std::queue<Node*> Q;
             Q.push(root_);
 
-            while (Q.size() > 0)
+            while (Q.size() > 0ui64)
             {
-                node* u = Q.front();
+                Node* u = Q.front();
                 Q.pop();
 
                 if (u->lesser != nullptr)
@@ -33,7 +33,7 @@ namespace fatpound::tree
                     Q.push(u->lesser);
                 }
 
-                for (size_t i = 0; i < u->items.size(); i++)
+                for (size_t i = 0ui64; i < u->items.size(); ++i)
                 {
                     if (u->items[i]->second != nullptr)
                     {
@@ -55,20 +55,47 @@ namespace fatpound::tree
 
 
     public:
-        void Insert(const T& new_item);
-        void ListLevelorder() const;
+		void Insert(const T& new_item)
+		{
+			if (root_ == nullptr)
+			{
+				root_ = new Node(new_item, nullptr, nullptr);
+				root_->lesser = new Node(new_item, nullptr, root_);
+
+				return;
+			}
+
+			Insert(root_, new_item);
+
+			itemCount_++;
+		}
+		void ListLevelorder() const
+		{
+			const int64_t height = GetDepth(root_);
+
+			for (int64_t i = 1i64; i <= height; ++i)
+			{
+				std::cout << "Level " << i << " : ";
+
+				ListLevelorder(root_, i);
+
+				std::cout << '\n';
+			}
+
+			std::cout << '\n';
+		}
 
 
     protected:
 
 
     private:
-        class node
+        class Node
         {
         public:
-            node() = default;
+            Node() = default;
 
-            node(std::vector<std::pair<T, node*>*>& new_items, node* new_lesser, node* new_parent)
+            Node(std::vector<std::pair<T, Node*>*>& new_items, Node* new_lesser, Node* new_parent)
                 :
                 lesser(new_lesser),
                 parent(new_parent),
@@ -76,26 +103,26 @@ namespace fatpound::tree
             {
                 
             }
-            node(std::pair<T, node*>* new_pair, node* new_lesser, node* new_parent)
+            Node(std::pair<T, Node*>* new_pair, Node* new_lesser, Node* new_parent)
                 :
                 lesser(new_lesser),
                 parent(new_parent)
             {
                 items.push_back(new_pair);
             }
-            node(const T& new_item, node* new_lesser, node* new_parent)
+            Node(const T& new_item, Node* new_lesser, Node* new_parent)
                 :
                 lesser(new_lesser),
                 parent(new_parent)
             {
-                items.push_back(new std::pair<T, B_Plus<T, I, S>::node*>(new_item, nullptr));
+                items.push_back(new std::pair<T, Node*>(new_item, nullptr));
             }
 
         public:
-            std::vector<std::pair<T, node*>*> items;
+            std::vector<std::pair<T, Node*>*> items;
 
-            node* lesser = nullptr;
-            node* parent = nullptr;
+            Node* lesser = nullptr;
+            Node* parent = nullptr;
 
         protected:
 
@@ -104,276 +131,239 @@ namespace fatpound::tree
 
 
     private:
-        int64_t GetDepth(B_Plus<T, I, S>::node* node, int64_t depth = 0) const;
+		int64_t GetDepth(Node* node, int64_t depth = 0i64) const
+		{
+			if (node == nullptr)
+			{
+				return depth;
+			}
 
-        void Insert(B_Plus<T, I, S>::node* node, T new_item)
+			return GetDepth(node->lesser, depth + 1i64);
+		}
+
+        void Insert(Node* node, T new_item)
         {
-            Insert(node, new std::pair<T, B_Plus<T, I, S>::node*>(new_item, nullptr), nullptr, false);
+            Insert(node, new std::pair<T, Node*>(new_item, nullptr), nullptr, false);
         }
-        void Insert(B_Plus<T, I, S>::node* node, std::pair<T, B_Plus<T, I, S>::node*>* new_pair, B_Plus<T, I, S>::node* extend_node, bool extend, bool create = true);
-        void Overflow(B_Plus<T, I, S>::node* node, std::pair<T, B_Plus<T, I, S>::node*>* new_pair, B_Plus<T, I, S>::node* extend_node, bool extend);
-        void ListLevelorder(const B_Plus<T, I, S>::node* node, int64_t level) const;
+		void Insert(Node* node, std::pair<T, Node*>* new_pair, Node* extend_node, bool extend, bool create = true)
+		{
+			if (node == nullptr)
+			{
+				return;
+			}
+
+			if (extend)
+			{
+				goto extension;
+			}
+
+			size_t index;
+
+
+		control:
+
+
+			if (node->lesser == nullptr)
+			{
+				goto sequence;
+			}
+
+			if (new_pair->first <= node->items[0]->first)
+			{
+				node = node->lesser;
+				goto control;
+			}
+
+			index = 0ui64;
+
+			for (size_t i = 0ui64; i < node->items.size(); ++i)
+			{
+				if (new_pair->first > node->items[i]->first)
+				{
+					index = i;
+				}
+			}
+
+			if (node->items[index]->second == nullptr)
+			{
+				node->items[index]->second = new Node(new_pair, nullptr, node);
+				return;
+			}
+			else
+			{
+				node = node->items[index]->second;
+				goto control;
+			}
+
+
+		sequence:
+
+
+			if (node->items.size() == S * 2ui64)
+			{
+				Overflow(node, new_pair, nullptr, false);
+			}
+			else
+			{
+				node->items.push_back(new_pair);
+
+				if (node->items.size() > 1ui64)
+				{
+					std::sort(
+						node->items.begin(),
+						node->items.end(),
+						[](const auto p1, const auto p2)
+						{
+							return p1->first < p2->first;
+						}
+					);
+				}
+			}
+
+			return;
+
+
+		extension:
+
+
+			if (node->items.size() == I * 2ui64)
+			{
+				if (create)
+				{
+					Overflow(node, new std::pair<T, Node*>(new_pair->first, nullptr), extend_node, true);
+				}
+				else
+				{
+					Overflow(node, new_pair, extend_node, true);
+				}
+			}
+			else
+			{
+				if (create)
+				{
+					node->items.push_back(new std::pair<T, Node*>(new_pair->first, extend_node));
+				}
+				else
+				{
+					node->items.push_back(new_pair);
+					extend_node->lesser = new_pair->second;
+					new_pair->second = extend_node;
+				}
+
+				if (node->items.size() > 1ui64)
+				{
+					std::sort(
+						node->items.begin(),
+						node->items.end(),
+						[](std::pair<T, Node*>* p1, std::pair<T, Node*>* p2)
+						{
+							return p1->first < p2->first;
+						}
+					);
+				}
+			}
+		}
+		void Overflow(Node* node, std::pair<T, Node*>* new_pair, Node* extend_node, bool extend)
+		{
+			const size_t a = (node->lesser == nullptr ? S : I);
+
+			node->items.push_back(new_pair);
+			new_pair->second = extend_node;
+
+			std::sort(
+				node->items.begin(),
+				node->items.end(),
+				[](const auto p1, const auto p2)
+				{
+					return p1->first < p2->first;
+				}
+			);
+
+			size_t center = (a * 2ui64 + 1ui64) / 2ui64;
+
+			Node* new_node = new Node();
+
+			for (size_t i = center + 1ui64; i <= a * 2ui64; ++i)
+			{
+				new_node->items.push_back(node->items[i]);
+			}
+
+			if (extend)
+			{
+				if (node == root_)
+				{
+					Node* new_parent = new Node();
+
+					new_parent->lesser = root_;
+					root_->parent = new_parent;
+					root_ = new_parent;
+
+					root_->items.push_back(node->items[center]);
+					new_node->lesser = node->items[center]->second;
+					node->items[center]->second = new_node;
+				}
+				else
+				{
+					new_pair->second = extend_node;
+					new_node->lesser = node->items[center]->second;
+					node->items[center]->second->parent = new_node;
+
+					Insert(node->parent, node->items[center], new_node, true, false);
+				}
+
+				extend_node->parent = new_node;
+				//new_pair->second = extend_node;
+				new_node->parent = node->parent;
+
+				for (size_t i = 0ui64; i < new_node->items.size(); ++i)
+				{
+					if (new_node->items[i]->second != nullptr)
+					{
+						new_node->items[i]->second->parent = new_node;
+					}
+				}
+
+				node->items.resize(center);
+			}
+			else
+			{
+				new_node->parent = node->parent;
+				node->items.resize(center + 1ui64);
+				Insert(node->parent, node->items[center], new_node, true);
+			}
+		}
+		void ListLevelorder(const Node* node, int64_t level) const
+		{
+			if (node != nullptr)
+			{
+				if (level == 1ui64)
+				{
+					for (size_t i = 0ui64; i < node->items.size(); ++i)
+					{
+						std::cout << node->items[i]->first << ' ';
+					}
+				}
+				else if (level > 1ui64)
+				{
+					ListLevelorder(node->lesser, level - 1ui64);
+
+					for (size_t i = 0ui64; i < node->items.size(); ++i)
+					{
+						ListLevelorder(node->items[i]->second, level - 1ui64);
+						std::cout << '\t';
+					}
+				}
+			}
+			else if (level == 1ui64)
+			{
+				std::cout << "x ";
+			}
+		}
 
 
     private:
-        node* root_ = nullptr;
+        Node* root_ = nullptr;
 
         size_t itemCount_ = 0ui64;
     };
-
-
-    template <typename T, size_t I, size_t S> int64_t B_Plus<T, I, S>::GetDepth(B_Plus<T, I, S>::node* node, int64_t depth) const
-    {
-        if (node == nullptr)
-        {
-            return depth;
-        }
-
-        return GetDepth(node->lesser, depth + 1LL);
-    }
-
-    template <typename T, size_t I, size_t S> void B_Plus<T, I, S>::ListLevelorder() const
-    {
-        const int64_t height = GetDepth(root_);
-
-        for (int64_t i = 1; i <= height; i++)
-        {
-            std::cout << "Level " << i << " : ";
-
-            ListLevelorder(root_, i);
-
-            std::cout << '\n';
-        }
-
-        std::cout << '\n';
-    }
-    template <typename T, size_t I, size_t S> void B_Plus<T, I, S>::ListLevelorder(const B_Plus<T, I, S>::node* node, int64_t level) const
-    {
-        if (node != nullptr)
-        {
-            if (level == 1)
-            {
-                for (size_t i = 0; i < node->items.size(); i++)
-                {
-                    std::cout << node->items[i]->first << ' ';
-                }
-            }
-            else if (level > 1)
-            {
-                ListLevelorder(node->lesser, level - 1);
-
-                for (size_t i = 0; i < node->items.size(); i++)
-                {
-                    ListLevelorder(node->items[i]->second, level - 1);
-                    std::cout << '\t';
-                }
-            }
-        }
-        else if (level == 1)
-        {
-            std::cout << "x ";
-        }
-    }
-
-    template <typename T, size_t I, size_t S> void B_Plus<T, I, S>::Insert(const T& new_item)
-    {
-        if (root_ == nullptr)
-        {
-            root_         = new B_Plus<T, I, S>::node(new_item, nullptr, nullptr);
-            root_->lesser = new B_Plus<T, I, S>::node(new_item, nullptr, root_);
-
-            return;
-        }
-
-        Insert(root_, new_item);
-
-        itemCount_++;
-    }
-    template <typename T, size_t I, size_t S> void B_Plus<T, I, S>::Insert(B_Plus<T, I, S>::node* node, std::pair<T, B_Plus<T, I, S>::node*>* new_pair, B_Plus<T, I, S>::node* extend_node, bool extend, bool create)
-    {
-        if (node == nullptr)
-        {
-            return;
-        }
-
-        if (extend)
-        {
-            goto extension;
-        }
-
-        size_t index;
-
-
-    control:
-
-
-        if (node->lesser == nullptr)
-        {
-            goto sequence;
-        }
-
-        if (new_pair->first <= node->items[0]->first)
-        {
-            node = node->lesser;
-            goto control;
-        }
-
-        index = 0;
-
-        for (size_t i = 0; i < node->items.size(); i++)
-        {
-            if (new_pair->first > node->items[i]->first)
-            {
-                index = i;
-            }
-        }
-
-        if (node->items[index]->second == nullptr)
-        {
-            node->items[index]->second = new B_Plus<T, I, S>::node(new_pair, nullptr, node);
-            return;
-        }
-        else
-        {
-            node = node->items[index]->second;
-            goto control;
-        }
-
-
-    sequence:
-
-
-        if (node->items.size() == S * 2)
-        {
-            Overflow(node, new_pair, nullptr, false);
-        }
-        else
-        {
-            node->items.push_back(new_pair);
-
-            if (node->items.size() > 1)
-            {
-                std::sort(
-                    node->items.begin(),
-                    node->items.end(),
-                    [](std::pair<T, B_Plus<T, I, S>::node*>* p1, std::pair<T, B_Plus<T, I, S>::node*>* p2)
-                    {
-                        return p1->first < p2->first;
-                    }
-                );
-            }
-        }
-
-        return;
-
-
-    extension:
-
-
-        if (node->items.size() == I * 2)
-        {
-            if (create)
-            {
-                Overflow(node, new std::pair<T, B_Plus<T, I, S>::node*>(new_pair->first, nullptr), extend_node, true);
-            }
-            else
-            {
-                Overflow(node, new_pair, extend_node, true);
-            }
-        }
-        else
-        {
-            if (create)
-            {
-                node->items.push_back(new std::pair<T, B_Plus<T, I, S>::node*>(new_pair->first, extend_node));
-            }
-            else
-            {
-                node->items.push_back(new_pair);
-                extend_node->lesser = new_pair->second;
-                new_pair->second = extend_node;
-            }
-
-            if (node->items.size() > 1)
-            {
-                std::sort(
-                    node->items.begin(),
-                    node->items.end(),
-                    [](std::pair<T, B_Plus<T, I, S>::node*>* p1, std::pair<T, B_Plus<T, I, S>::node*>* p2)
-                    {
-                        return p1->first < p2->first;
-                    }
-                );
-            }
-        }
-    }
-    template <typename T, size_t I, size_t S> void B_Plus<T, I, S>::Overflow(B_Plus<T, I, S>::node* node, std::pair<T, B_Plus<T, I, S>::node*>* new_pair, B_Plus<T, I, S>::node* extend_node, bool extend)
-    {
-        const size_t a = (node->lesser == nullptr ? S : I);
-
-        node->items.push_back(new_pair);
-        new_pair->second = extend_node;
-
-        std::sort(
-            node->items.begin(),
-            node->items.end(),
-            [](std::pair<T, B_Plus<T, I, S>::node*>* p1, std::pair<T, B_Plus<T, I, S>::node*>* p2)
-            {
-                return p1->first < p2->first;
-            }
-        );
-
-        size_t center = (a * 2 + 1) / 2;
-
-        B_Plus<T, I, S>::node* new_node = new B_Plus<T, I, S>::node();
-
-        for (size_t i = center + 1; i <= a * 2; i++)
-        {
-            new_node->items.push_back(node->items[i]);
-        }
-
-        if (extend)
-        {
-            if (node == root_)
-            {
-                B_Plus<T, I, S>::node* new_parent = new B_Plus<T, I, S>::node();
-
-                new_parent->lesser = root_;
-                root_->parent = new_parent;
-                root_ = new_parent;
-
-                root_->items.push_back(node->items[center]);
-                new_node->lesser = node->items[center]->second;
-                node->items[center]->second = new_node;
-            }
-            else
-            {
-                new_pair->second = extend_node;
-                new_node->lesser = node->items[center]->second;
-                node->items[center]->second->parent = new_node;
-
-                Insert(node->parent, node->items[center], new_node, true, false);
-            }
-
-            extend_node->parent = new_node;
-            //new_pair->second = extend_node;
-            new_node->parent = node->parent;
-
-            for (size_t i = 0; i < new_node->items.size(); i++)
-            {
-                if (new_node->items[i]->second != nullptr)
-                {
-                    new_node->items[i]->second->parent = new_node;
-                }
-            }
-
-            node->items.resize(center);
-        }
-        else
-        {
-            new_node->parent = node->parent;
-            node->items.resize(center + 1);
-            Insert(node->parent, node->items[center], new_node, true);
-        }
-    }
 }
