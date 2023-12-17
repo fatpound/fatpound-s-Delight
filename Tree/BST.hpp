@@ -75,10 +75,10 @@ namespace fatpound::tree
 
 
     public:
-		int64_t GetTotalNodeCount() const
-		{
-			return nodeCount_;
-		}
+        int64_t GetTotalNodeCount() const
+        {
+            return nodeCount_;
+        }
 
         void ListPreorder()         const
         {
@@ -120,21 +120,21 @@ namespace fatpound::tree
             ListLeavesReverse(root_);
             std::cout << '\n';
         }
-		void ListLevelorder()       const
-		{
-			const int64_t height = GetDepth(root_, 0i64);
+        void ListLevelorder()       const
+        {
+            const int64_t height = GetDepth(root_, 0i64);
 
-			for (int64_t i = 1; i <= height; i++)
-			{
-				std::cout << "Level " << i << " : ";
+            for (int64_t i = 1; i <= height; i++)
+            {
+                std::cout << "Level " << i << " : ";
 
-				ListLevelorder(root_, i);
+                ListLevelorder(root_, i);
 
-				std::cout << '\n';
-			}
+                std::cout << '\n';
+            }
 
-			std::cout << '\n';
-		}
+            std::cout << '\n';
+        }
 
         virtual void Insert(T new_item)
         {
@@ -173,97 +173,97 @@ namespace fatpound::tree
 
 
     protected:
-		BST<T>::Node* Insert(BST<T>::Node* __restrict parent, BST<T>::Node* __restrict node, T new_item)
-		{
-			if (node == nullptr)
-			{
-				return new BST<T>::Node(new_item, parent);
-			}
+        BST<T>::Node* Insert(BST<T>::Node* __restrict parent, BST<T>::Node* __restrict node, T new_item)
+        {
+            if (node == nullptr)
+            {
+                return new BST<T>::Node(new_item, parent);
+            }
 
-			if (new_item < node->item)
-			{
-				node->left = Insert(node, node->left, new_item);
-			}
-			else if (new_item > node->item)
-			{
-				node->right = Insert(node, node->right, new_item);
-			}
+            if (new_item < node->item)
+            {
+                node->left = Insert(node, node->left, new_item);
+            }
+            else if (new_item > node->item)
+            {
+                node->right = Insert(node, node->right, new_item);
+            }
 
-			return node;
-		}
-		BST<T>::Node* Cloner(BST<T>::Node* node) const
-		{
-			if (node == nullptr)
-			{
-				return nullptr;
-			}
+            return node;
+        }
+        BST<T>::Node* Cloner(BST<T>::Node* node) const
+        {
+            if (node == nullptr)
+            {
+                return nullptr;
+            }
 
-			BST<T>::Node* new_node = new BST<T>::Node(node->item, node->parent);
+            BST<T>::Node* new_node = new BST<T>::Node(node->item, node->parent);
 
-			new_node->left  = Cloner(node->left);
-			new_node->right = Cloner(node->right);
+            new_node->left  = Cloner(node->left);
+            new_node->right = Cloner(node->right);
 
-			return new_node;
-		}
-		BST<T>::Node* Find(BST<T>::Node* root, T item) const
-		{
-			if (root == nullptr)
-			{
-				return nullptr;
-			}
+            return new_node;
+        }
+        BST<T>::Node* Find(BST<T>::Node* root, T item) const
+        {
+            if (root == nullptr)
+            {
+                return nullptr;
+            }
 
-			if (root->item == item)
-			{
-				return root;
-			}
+            if (root->item == item)
+            {
+                return root;
+            }
 
-			BST<T>::Node* left_address = Find(root->left, item);
+            BST<T>::Node* left_address = Find(root->left, item);
 
-			if (left_address != nullptr)
-			{
-				return left_address;
-			}
+            if (left_address != nullptr)
+            {
+                return left_address;
+            }
 
-			BST<T>::Node* right_address = Find(root->right, item);
+            BST<T>::Node* right_address = Find(root->right, item);
 
-			if (right_address != nullptr)
-			{
-				return right_address;
-			}
-		}
+            if (right_address != nullptr)
+            {
+                return right_address;
+            }
+        }
 
-		int64_t GetDepth(BST<T>::Node* node, int64_t depth) const
-		{
-			if (node == nullptr)
-			{
-				return depth;
-			}
+        int64_t GetDepth(BST<T>::Node* node, int64_t depth) const
+        {
+            if (node == nullptr)
+            {
+                return depth;
+            }
 
-			const int64_t  left_val = GetDepth(node->left, depth + 1LL);
-			const int64_t right_val = GetDepth(node->right, depth + 1LL);
+            const int64_t  left_val = GetDepth(node->left, depth + 1LL);
+            const int64_t right_val = GetDepth(node->right, depth + 1LL);
 
-			return std::max(left_val, right_val);
-		}
-		int64_t GetDepthLeft(BST<T>::Node* node, int64_t depth) const
-		{
-			return Node ? GetDepthLeft(node->left, depth + 1LL) : depth;
-		}
-		int64_t GetDepthRight(BST<T>::Node* node, int64_t depth) const
-		{
-			return Node ? GetDepthLeft(node->right, depth + 1LL) : depth;
-		}
-		int64_t GetNodeCount(BST<T>::Node* node) const
-		{
-			if (node == nullptr)
-			{
-				return 0ll;
-			}
+            return std::max(left_val, right_val);
+        }
+        int64_t GetDepthLeft(BST<T>::Node* node, int64_t depth) const
+        {
+            return Node ? GetDepthLeft(node->left, depth + 1LL) : depth;
+        }
+        int64_t GetDepthRight(BST<T>::Node* node, int64_t depth) const
+        {
+            return Node ? GetDepthLeft(node->right, depth + 1LL) : depth;
+        }
+        int64_t GetNodeCount(BST<T>::Node* node) const
+        {
+            if (node == nullptr)
+            {
+                return 0ll;
+            }
 
-			const int64_t  left_val = GetNodeCount(node->left);
-			const int64_t right_val = GetNodeCount(node->right);
+            const int64_t  left_val = GetNodeCount(node->left);
+            const int64_t right_val = GetNodeCount(node->right);
 
-			return 1LL + left_val + right_val;
-		}
+            return 1LL + left_val + right_val;
+        }
         
         void Mirror(BST<T>::Node* node)
         {
@@ -276,107 +276,107 @@ namespace fatpound::tree
             }
         }
 
-		void ListPreorder         (const BST<T>::Node* node) const
-		{
-			if (node != nullptr)
-			{
-				std::cout << node->item << ' ';
-				ListPreorder(node->left);
-				ListPreorder(node->right);
-			}
-		}
-		void ListPreorderReverse  (const BST<T>::Node* node) const
-		{
-			if (node != nullptr)
-			{
-				std::cout << node->item << ' ';
-				ListPreorderReverse(node->right);
-				ListPreorderReverse(node->left);
-			}
-		}
-		void ListInorder          (const BST<T>::Node* node) const
-		{
-			if (node != nullptr)
-			{
-				ListInorder(node->left);
-				std::cout << node->item << ' ';
-				ListInorder(node->right);
-			}
-		}
-		void ListInorderReverse   (const BST<T>::Node* node) const
-		{
-			if (node != nullptr)
-			{
-				ListInorderReverse(node->right);
-				std::cout << node->item << ' ';
-				ListInorderReverse(node->left);
-			}
-		}
-		void ListPostorder        (const BST<T>::Node* node) const
-		{
-			if (node != nullptr)
-			{
-				ListPostorder(node->left);
-				ListPostorder(node->right);
-				std::cout << node->item << ' ';
-			}
-		}
-		void ListPostorderReverse (const BST<T>::Node* node) const
-		{
-			if (node != nullptr)
-			{
-				ListPostorderReverse(node->right);
-				ListPostorderReverse(node->left);
-				std::cout << node->item << ' ';
-			}
-		}
-		void ListLeaves           (const BST<T>::Node* node) const
-		{
-			if (node != nullptr)
-			{
-				if (node->left == nullptr && node->right == nullptr)
-				{
-					std::cout << node->item << ' ';
-					return;
-				}
+        void ListPreorder         (const BST<T>::Node* node) const
+        {
+            if (node != nullptr)
+            {
+                std::cout << node->item << ' ';
+                ListPreorder(node->left);
+                ListPreorder(node->right);
+            }
+        }
+        void ListPreorderReverse  (const BST<T>::Node* node) const
+        {
+            if (node != nullptr)
+            {
+                std::cout << node->item << ' ';
+                ListPreorderReverse(node->right);
+                ListPreorderReverse(node->left);
+            }
+        }
+        void ListInorder          (const BST<T>::Node* node) const
+        {
+            if (node != nullptr)
+            {
+                ListInorder(node->left);
+                std::cout << node->item << ' ';
+                ListInorder(node->right);
+            }
+        }
+        void ListInorderReverse   (const BST<T>::Node* node) const
+        {
+            if (node != nullptr)
+            {
+                ListInorderReverse(node->right);
+                std::cout << node->item << ' ';
+                ListInorderReverse(node->left);
+            }
+        }
+        void ListPostorder        (const BST<T>::Node* node) const
+        {
+            if (node != nullptr)
+            {
+                ListPostorder(node->left);
+                ListPostorder(node->right);
+                std::cout << node->item << ' ';
+            }
+        }
+        void ListPostorderReverse (const BST<T>::Node* node) const
+        {
+            if (node != nullptr)
+            {
+                ListPostorderReverse(node->right);
+                ListPostorderReverse(node->left);
+                std::cout << node->item << ' ';
+            }
+        }
+        void ListLeaves           (const BST<T>::Node* node) const
+        {
+            if (node != nullptr)
+            {
+                if (node->left == nullptr && node->right == nullptr)
+                {
+                    std::cout << node->item << ' ';
+                    return;
+                }
 
-				ListLeaves(root_->left);
-				ListLeaves(root_->right);
-			}
-		}
+                ListLeaves(root_->left);
+                ListLeaves(root_->right);
+            }
+        }
         void ListLeavesReverse    (const BST<T>::Node* node) const
-		{
-			if (node != nullptr)
-			{
-				if (node->left == nullptr && node->right == nullptr)
-				{
-					std::cout << node->item << ' ';
-					return;
-				}
+        {
+            if (node != nullptr)
+            {
+                if (node->left == nullptr && node->right == nullptr)
+                {
+                    std::cout << node->item << ' ';
+                    return;
+                }
 
-				ListLeavesReverse(root_->right);
-				ListLeavesReverse(root_->left);
-			}
-		}
-		void ListLevelorder       (const BST<T>::Node* node, int64_t level) const
-		{
-			if (node != nullptr)
-			{
-				if (level == 1)
-				{
-					std::cout << node->item << ' ';
-				}
-				else if (level > 1)
-				{
-					ListLevelorder(node->left,  level - 1);
-					ListLevelorder(node->right, level - 1);
-				}
-			}
-			else if (level == 1)
-			{
-				std::cout << "x ";
-			}
-		}
+                ListLeavesReverse(root_->right);
+                ListLeavesReverse(root_->left);
+            }
+        }
+        void ListLevelorder       (const BST<T>::Node* node, int64_t level) const
+        {
+            if (node != nullptr)
+            {
+                if (level == 1)
+                {
+                    std::cout << node->item << ' ';
+                }
+                else if (level > 1)
+                {
+                    ListLevelorder(node->left,  level - 1);
+                    ListLevelorder(node->right, level - 1);
+                }
+            }
+            else if (level == 1)
+            {
+                std::cout << "x ";
+            }
+        }
 
 
     protected:
