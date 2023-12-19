@@ -1,10 +1,11 @@
 #pragma once
 
 #include <iostream>
+#include <concepts>
 
 namespace fatpound::tree
 {
-    template <typename T>
+    template <std::totally_ordered T>
     class BST
     {
     public:
@@ -13,6 +14,7 @@ namespace fatpound::tree
         {
             Delete(root_);
             root_ = nullptr;
+            nodeCount_ = 0ui64;
         }
         BST(const BST<T>& src) noexcept
         {
@@ -78,6 +80,14 @@ namespace fatpound::tree
         int64_t GetTotalNodeCount() const
         {
             return nodeCount_;
+        }
+
+        bool Contains(T item)       const
+        {
+			return Find(root_, item) == nullptr
+				? false
+				: true
+				;
         }
 
         void ListPreorder()         const
@@ -147,6 +157,50 @@ namespace fatpound::tree
 
             nodeCount_++;
         }
+		virtual void Delete(T old_item)
+		{
+			// AVL and IPR should implement their own!!!!!!!
+			BST<T>::Node* node = Find(root_, old_item);
+
+			if (node != nullptr)
+			{
+				if (node->right != nullptr)
+				{
+					BST<T>::Node* leftmost = GetMin(node->right);
+
+					if (leftmost != nullptr)
+					{
+						leftmost->left = node->left;
+					}
+					else
+					{
+						node->right->left = node->left;
+					}
+					
+					if (node->parent != nullptr)
+					{
+						node->parent->right = node->right;
+					}
+					else
+					{
+						root_ = node->right;
+					}
+				}
+				else
+				{
+					if (node->parent != nullptr)
+					{
+						node->parent->right = node->left;
+					}
+					else
+					{
+						root_ = node->left;
+					}
+				}
+
+				delete node;
+			}
+		}
         void Mirror()
         {
             Mirror(root_);
@@ -205,32 +259,60 @@ namespace fatpound::tree
 
             return new_node;
         }
-        BST<T>::Node* Find(BST<T>::Node* root, T item) const
+        BST<T>::Node* Find(BST<T>::Node* node, T item) const
         {
-            if (root == nullptr)
+            if (node == nullptr)
             {
                 return nullptr;
             }
 
-            if (root->item == item)
+            if (node->item == item)
             {
-                return root;
+                return node;
             }
 
-            BST<T>::Node* left_address = Find(root->left, item);
+            BST<T>::Node* left_address = Find(node->left, item);
 
             if (left_address != nullptr)
             {
                 return left_address;
             }
 
-            BST<T>::Node* right_address = Find(root->right, item);
+            BST<T>::Node* right_address = Find(node->right, item);
 
             if (right_address != nullptr)
             {
                 return right_address;
             }
         }
+		BST<T>::Node* GetMin(BST<T>::Node* node)
+		{
+			if (node == nullptr)
+			{
+				return nullptr;
+			}
+
+			while (node->left != nullptr)
+			{
+				node = node->left;
+			}
+
+			return node;
+		}
+		BST<T>::Node* GetMax(BST<T>::Node* node)
+		{
+			if (node == nullptr)
+			{
+				return nullptr;
+			}
+
+			while (node->right != nullptr)
+			{
+				node = node->right;
+			}
+
+			return node;
+		}
 
         int64_t GetDepth(BST<T>::Node* node, int64_t depth) const
         {
@@ -239,30 +321,30 @@ namespace fatpound::tree
                 return depth;
             }
 
-            const int64_t  left_val = GetDepth(node->left, depth + 1LL);
-            const int64_t right_val = GetDepth(node->right, depth + 1LL);
+            const int64_t  left_val = GetDepth(node->left, depth + 1i64);
+            const int64_t right_val = GetDepth(node->right, depth + 1i64);
 
             return std::max(left_val, right_val);
         }
         int64_t GetDepthLeft(BST<T>::Node* node, int64_t depth) const
         {
-            return Node ? GetDepthLeft(node->left, depth + 1LL) : depth;
+            return node ? GetDepthLeft(node->left, depth + 1i64) : depth;
         }
         int64_t GetDepthRight(BST<T>::Node* node, int64_t depth) const
         {
-            return Node ? GetDepthLeft(node->right, depth + 1LL) : depth;
+            return node ? GetDepthLeft(node->right, depth + 1i64) : depth;
         }
         int64_t GetNodeCount(BST<T>::Node* node) const
         {
             if (node == nullptr)
             {
-                return 0ll;
+                return 0i64;
             }
 
             const int64_t  left_val = GetNodeCount(node->left);
             const int64_t right_val = GetNodeCount(node->right);
 
-            return 1LL + left_val + right_val;
+            return 1i64 + left_val + right_val;
         }
         
         void Mirror(BST<T>::Node* node)
