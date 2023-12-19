@@ -12,7 +12,7 @@ namespace fatpound::tree
         BST() = default;
         ~BST() noexcept
         {
-            Delete(root_);
+            DeleteTree(root_);
             root_ = nullptr;
             nodeCount_ = 0ui64;
         }
@@ -20,7 +20,7 @@ namespace fatpound::tree
         {
             if (src.root_ != nullptr)
             {
-                root_ = src.Cloner(src.root_);
+                root_ = src.Clone(src.root_);
                 nodeCount_ = src.nodeCount_;
             }
         }
@@ -47,7 +47,7 @@ namespace fatpound::tree
                     nodeCount_ = 0ull;
                 }
 
-                root_ = src.Cloner(src.root_);
+                root_ = src.Clone(src.root_);
                 nodeCount_ = src.nodeCount_;
             }
 
@@ -84,10 +84,10 @@ namespace fatpound::tree
 
         bool Contains(T item)       const
         {
-			return Find(root_, item) == nullptr
-				? false
-				: true
-				;
+            return Find(root_, item) == nullptr
+                ? false
+                : true
+                ;
         }
 
         void ListPreorder()         const
@@ -157,50 +157,15 @@ namespace fatpound::tree
 
             nodeCount_++;
         }
-		virtual void Delete(T old_item)
-		{
-			// AVL and IPR should implement their own!!!!!!!
-			BST<T>::Node* node = Find(root_, old_item);
+        virtual void Delete(T old_item)
+        {
+            BST<T>::Node* node = Find(root_, old_item);
 
-			if (node != nullptr)
-			{
-				if (node->right != nullptr)
-				{
-					BST<T>::Node* leftmost = GetMin(node->right);
-
-					if (leftmost != nullptr)
-					{
-						leftmost->left = node->left;
-					}
-					else
-					{
-						node->right->left = node->left;
-					}
-					
-					if (node->parent != nullptr)
-					{
-						node->parent->right = node->right;
-					}
-					else
-					{
-						root_ = node->right;
-					}
-				}
-				else
-				{
-					if (node->parent != nullptr)
-					{
-						node->parent->right = node->left;
-					}
-					else
-					{
-						root_ = node->left;
-					}
-				}
-
-				delete node;
-			}
-		}
+            if (node != nullptr)
+            {
+                static_cast<void>(Delete(node));
+            }
+        }
         void Mirror()
         {
             Mirror(root_);
@@ -245,7 +210,7 @@ namespace fatpound::tree
 
             return node;
         }
-        BST<T>::Node* Cloner(BST<T>::Node* node) const
+        BST<T>::Node* Clone(BST<T>::Node* node) const
         {
             if (node == nullptr)
             {
@@ -254,8 +219,8 @@ namespace fatpound::tree
 
             BST<T>::Node* new_node = new BST<T>::Node(node->item, node->parent);
 
-            new_node->left  = Cloner(node->left);
-            new_node->right = Cloner(node->right);
+            new_node->left  = Clone(node->left);
+            new_node->right = Clone(node->right);
 
             return new_node;
         }
@@ -285,33 +250,119 @@ namespace fatpound::tree
                 return right_address;
             }
         }
-		BST<T>::Node* GetMin(BST<T>::Node* node)
+        BST<T>::Node* Delete(BST<T>::Node* node)
+        {
+            if (node == nullptr)
+            {
+                return nullptr;
+            }
+
+            BST<T>::Node* latest = nullptr;
+
+			if (node->parent != nullptr)
+			{
+				if (node->right != nullptr)
+				{
+					BST<T>::Node* leftmost = GetMin(node->right);
+
+					if (leftmost != nullptr)
+					{
+						leftmost->left = node->left;
+
+						if (node->left != nullptr)
+						{
+							node->left->parent = leftmost;
+						}
+					}
+					else
+					{
+						node->right->left = node->left;
+
+						if (node->left != nullptr)
+						{
+							node->left->parent = node->right;
+						}
+					}
+
+					node->right->parent = node->parent;
+					latest = node->right;
+				}
+				else
+				{
+					if (node->left != nullptr)
+					{
+						node->left->parent = node->parent;
+						latest = node->left;
+					}
+					else
+					{
+						latest = node->parent;
+					}
+				}
+
+				if (node->parent->item < node->item)
+				{
+					node->parent->right = node->right;
+				}
+				else
+				{
+					node->parent->left = node->right;
+				}
+			}
+			else
+			{
+				root_ = node->right;
+			}
+
+            delete node;
+
+            return latest;
+        }
+
+        BST<T>::Node* GetMin(BST<T>::Node* node)
+        {
+            if (node == nullptr)
+            {
+                return nullptr;
+            }
+
+            while (node->left != nullptr)
+            {
+                node = node->left;
+            }
+
+            return node;
+        }
+        BST<T>::Node* GetMax(BST<T>::Node* node)
+        {
+            if (node == nullptr)
+            {
+                return nullptr;
+            }
+
+            while (node->right != nullptr)
+            {
+                node = node->right;
+            }
+
+            return node;
+        }
+		BST<T>::Node* GetInorderSuccessor(BST<T>::Node* node)
 		{
-			if (node == nullptr)
+			if (node->right != nullptr)
 			{
-				return nullptr;
+				return GetMin(node->right);
 			}
 
-			while (node->left != nullptr)
+			BST<T>::Node* prnt = node->parent;
+
+			while (prnt != nullptr && node == prnt->right)
 			{
-				node = node->left;
+				node = prnt;
+				prnt = prnt->parent;
 			}
 
-			return node;
-		}
-		BST<T>::Node* GetMax(BST<T>::Node* node)
-		{
-			if (node == nullptr)
-			{
-				return nullptr;
-			}
-
-			while (node->right != nullptr)
-			{
-				node = node->right;
-			}
-
-			return node;
+			return prnt;
 		}
 
         int64_t GetDepth(BST<T>::Node* node, int64_t depth) const
@@ -468,14 +519,14 @@ namespace fatpound::tree
 
 
     private:
-        void Delete(BST<T>::Node* node) noexcept
+        void DeleteTree(BST<T>::Node* root) noexcept
         {
-            if (node != nullptr)
+            if (root != nullptr)
             {
-                Delete(node->left);
-                Delete(node->right);
+                DeleteTree(root->left);
+                DeleteTree(root->right);
 
-                delete node;
+                delete root;
             }
         }
     };

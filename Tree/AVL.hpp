@@ -4,7 +4,7 @@
 
 namespace fatpound::tree
 {
-    template <typename T>
+    template <std::totally_ordered T>
     class AVL : public BST<T>
     {
     public:
@@ -23,12 +23,33 @@ namespace fatpound::tree
 
             this->nodeCount_++;
         }
+        virtual void Delete(T old_item) override
+        {
+            typename AVL<T>::Node* node = BST<T>::Find(this->root_, old_item);
+
+            if (node == this->root_)
+            {
+				typename AVL<T>::Node* iosuc = BST<T>::GetInorderSuccessor(node);
+				node->item = iosuc->item;
+
+				Balance(BST<T>::Delete(iosuc));
+            }
+			else
+			{
+				Balance(BST<T>::Delete(node));
+			}
+        }
 
 
     protected:
-        virtual void Balance(AVL<T>::Node* lastInserted)
+        virtual void Balance(AVL<T>::Node* latest)
         {
-            typename AVL<T>::Node* last = lastInserted; // Y
+            if (latest == nullptr)
+            {
+                return;
+            }
+
+            typename AVL<T>::Node* last = latest; // Y
         
             while (last->parent != nullptr) // Going up
             {
@@ -41,24 +62,24 @@ namespace fatpound::tree
                 std::cout << "parent  : " << last->parent->item << '\n';
                 std::cout << "node    : " << last->item << '\n';
                 std::cout << "left    : " << left_val << '\n';
-                std::cout << "rite    : " << right_val << '\n';
+                std::cout << "right   : " << right_val << '\n';
                 std::cout << "Balance : " << balanceFactor << "\n\n";
                 */
 
-                if (balanceFactor >  1 && lastInserted->item > last->item)
+                if (balanceFactor > 1 && latest->item > last->item)
                 {
                     RotateLeft(last->parent, last);
                 }
-                else if (balanceFactor < -1 && lastInserted->item < last->item)
+                else if (balanceFactor < -1 && latest->item < last->item)
                 {
                     RotateRight(last->parent, last);
                 }
-                else if (balanceFactor >  1 && lastInserted->item < last->item)
+                else if (balanceFactor > 1 && latest->item < last->item)
                 {
                     RotateRight(last, last->left);
                     RotateLeft(last->parent->parent, last->parent);
                 }
-                else if (balanceFactor < -1 && lastInserted->item > last->item)
+                else if (balanceFactor < -1 && latest->item > last->item)
                 {
                     RotateLeft(last, last->right);
                     RotateRight(last->parent->parent, last->parent);

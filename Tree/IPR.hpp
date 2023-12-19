@@ -4,7 +4,7 @@
 
 namespace fatpound::tree
 {
-    template <typename T>
+    template <std::totally_ordered T>
     class IPR : public AVL<T>
     {
     public:
@@ -29,9 +29,14 @@ namespace fatpound::tree
 
 
     private:
-        virtual void Balance(IPR<T>::Node* lastInserted) override
+        virtual void Balance(IPR<T>::Node* latest) override
         {
-            typename IPR<T>::Node* last = lastInserted; // Y
+			if (latest == nullptr)
+			{
+				return;
+			}
+
+            typename IPR<T>::Node* last = latest; // Y
 
             while (last->parent != nullptr) // Going up
             {
