@@ -56,6 +56,15 @@ namespace fatpound::linkedlist
 
 
 	public:
+		virtual bool Contains(T item) const
+		{
+			return Find(item) == nullptr
+				? false
+				: true
+				;
+		}
+
+
 		virtual void Add(T new_item)
 		{
 			Node* new_part = new Node(new_item);
@@ -192,10 +201,42 @@ namespace fatpound::linkedlist
 
 
 	protected:
+		virtual SinglyLL<T>::Node* Find(T item) const
+		{
+			if (item_count_ == static_cast<decltype(item_count_)>(0))
+			{
+				return nullptr;
+			}
+
+			if (item_count_ == static_cast<decltype(item_count_)>(1))
+			{
+				return list_->item == item
+					? list_
+					: nullptr
+					;
+			}
+
+			Node* temp = list_;
+
+			for (size_t i = static_cast<size_t>(0); i < item_count_; ++i)
+			{
+				if (temp->item == item)
+				{
+					return temp;
+				}
+
+				temp = temp->next;
+			}
+
+			return nullptr;
+		}
+
+
+	protected:
 		Node* list_ = nullptr;
 		Node* end_  = nullptr;
 
-		size_t item_count_ = static_cast<size_t>(0);
+		size_t item_count_ = static_cast<decltype(item_count_)>(0);
 
 
 	private:
