@@ -134,7 +134,7 @@ namespace fatpound::tree
         {
             const int64_t height = GetDepth(root_, 0i64);
 
-            for (int64_t i = 1; i <= height; i++)
+            for (int64_t i = 1i64; i <= height; i++)
             {
                 std::cout << "Level " << i << " : ";
 
@@ -155,7 +155,7 @@ namespace fatpound::tree
                 root_ = new_root;
             }
 
-            nodeCount_++;
+            ++nodeCount_;
         }
         virtual void Delete(T old_item)
         {
@@ -259,60 +259,60 @@ namespace fatpound::tree
 
             BST<T>::Node* latest = nullptr;
 
-			if (node->parent != nullptr)
-			{
-				if (node->right != nullptr)
-				{
-					BST<T>::Node* leftmost = GetMin(node->right);
+            if (node->parent != nullptr)
+            {
+                if (node->right != nullptr)
+                {
+                    BST<T>::Node* leftmost = GetMin(node->right);
 
-					if (leftmost != nullptr)
-					{
-						leftmost->left = node->left;
+                    if (leftmost != nullptr)
+                    {
+                        leftmost->left = node->left;
 
-						if (node->left != nullptr)
-						{
-							node->left->parent = leftmost;
-						}
-					}
-					else
-					{
-						node->right->left = node->left;
+                        if (node->left != nullptr)
+                        {
+                            node->left->parent = leftmost;
+                        }
+                    }
+                    else
+                    {
+                        node->right->left = node->left;
 
-						if (node->left != nullptr)
-						{
-							node->left->parent = node->right;
-						}
-					}
+                        if (node->left != nullptr)
+                        {
+                            node->left->parent = node->right;
+                        }
+                    }
 
-					node->right->parent = node->parent;
-					latest = node->right;
-				}
-				else
-				{
-					if (node->left != nullptr)
-					{
-						node->left->parent = node->parent;
-						latest = node->left;
-					}
-					else
-					{
-						latest = node->parent;
-					}
-				}
+                    node->right->parent = node->parent;
+                    latest = node->right;
+                }
+                else
+                {
+                    if (node->left != nullptr)
+                    {
+                        node->left->parent = node->parent;
+                        latest = node->left;
+                    }
+                    else
+                    {
+                        latest = node->parent;
+                    }
+                }
 
-				if (node->parent->item < node->item)
-				{
-					node->parent->right = node->right;
-				}
-				else
-				{
-					node->parent->left = node->right;
-				}
-			}
-			else
-			{
-				root_ = node->right;
-			}
+                if (node->parent->item < node->item)
+                {
+                    node->parent->right = node->right;
+                }
+                else
+                {
+                    node->parent->left = node->right;
+                }
+            }
+            else
+            {
+                root_ = node->right;
+            }
 
             delete node;
 
@@ -347,23 +347,23 @@ namespace fatpound::tree
 
             return node;
         }
-		BST<T>::Node* GetInorderSuccessor(BST<T>::Node* node)
-		{
-			if (node->right != nullptr)
-			{
-				return GetMin(node->right);
-			}
+        BST<T>::Node* GetInorderSuccessor(BST<T>::Node* node)
+        {
+            if (node->right != nullptr)
+            {
+                return GetMin(node->right);
+            }
 
-			BST<T>::Node* prnt = node->parent;
+            BST<T>::Node* prnt = node->parent;
 
-			while (prnt != nullptr && node == prnt->right)
-			{
-				node = prnt;
-				prnt = prnt->parent;
-			}
+            while (prnt != nullptr && node == prnt->right)
+            {
+                node = prnt;
+                prnt = prnt->parent;
+            }
 
-			return prnt;
-		}
+            return prnt;
+        }
 
         int64_t GetDepth(BST<T>::Node* node, int64_t depth) const
         {
@@ -515,7 +515,7 @@ namespace fatpound::tree
     protected:
         Node* root_ = nullptr;
 
-        size_t nodeCount_ = 0ui64;
+        size_t nodeCount_ = static_cast<decltype(nodeCount_)>(0);
 
 
     private:

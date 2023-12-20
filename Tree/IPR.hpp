@@ -10,7 +10,7 @@ namespace fatpound::tree
     public:
         virtual void Insert(T new_item) override
         {
-            typename IPR<T>::Node* new_root = BST<T>::Insert(nullptr, this->root_, new_item);
+            typename BST<T>::Node* new_root = BST<T>::Insert(nullptr, this->root_, new_item);
 
             if (this->root_ == nullptr)
             {
@@ -29,14 +29,14 @@ namespace fatpound::tree
 
 
     private:
-        virtual void Balance(IPR<T>::Node* latest) override
+        virtual void Balance(BST<T>::Node* latest) override
         {
-			if (latest == nullptr)
-			{
-				return;
-			}
+            if (latest == nullptr)
+            {
+                return;
+            }
 
-            typename IPR<T>::Node* last = latest; // Y
+            typename BST<T>::Node* last = latest; // Y
 
             while (last->parent != nullptr) // Going up
             {
