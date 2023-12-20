@@ -1,24 +1,24 @@
 #pragma once
 
-#include <iostream>
+#include "DoublyLL.hpp"
 
 namespace fatpound::linkedlist
 {
-    template <typename T>
-    class DoublyCircularLL
+    template <std::totally_ordered T>
+    class DoublyCircularLL : public DoublyLL<T>
     {
     public:
         DoublyCircularLL() = default;
-        ~DoublyCircularLL()
+		virtual ~DoublyCircularLL() noexcept override
         {
-            if (list_ == nullptr)
+            if (this->list_ == nullptr)
             {
                 return;
             }
 
-            node* start = list_;
-            node* ex = list_;
-            node* temp;
+            typename DoublyLL<T>::Node* start = this->list_;
+            typename DoublyLL<T>::Node* ex = this->list_;
+            typename DoublyLL<T>::Node* temp;
 
             do
             {
@@ -28,80 +28,85 @@ namespace fatpound::linkedlist
                 ex = temp;
             }
             while (ex != start);
+
+			this->list_ = nullptr;
+			this->end_  = nullptr;
+
+			this->item_count_ = static_cast<decltype(this->item_count_)>(0);
         }
         DoublyCircularLL(const DoublyCircularLL& src) = delete;
-        DoublyCircularLL(DoublyCircularLL&& src)
+        DoublyCircularLL(DoublyCircularLL&& src) noexcept
             :
-            list_{ std::move(src.list_) },
-            end_{ std::move(src.end_) },
-            item_count_{ std::exchange(src.item_count_, 0ui64) }
+			DoublyLL<T>(std::move(src))
         {
 
         }
-        DoublyCircularLL& operator = (const DoublyCircularLL& src) = delete;
-        DoublyCircularLL& operator = (DoublyCircularLL&& src)
+        DoublyCircularLL<T>& operator = (const DoublyCircularLL& src) = delete;
+        DoublyCircularLL<T>& operator = (DoublyCircularLL&& src) noexcept
         {
-            list_ = std::move(src.list_);
-            end_ = std::move(src.end_);
-            item_count_ = std::exchange(src.item_count_, 0ui64);
+			this->list_ = std::exchange(src.list_, nullptr);
+			this->end_  = std::exchange(src.end_,  nullptr);
+			
+			this->item_count_ = std::exchange(src.item_count_, static_cast<decltype(this->item_count_)>(0));
 
-            return *this;
+			return *this;
         }
 
 
     public:
-        void Add(T new_item)
+        virtual void Add(T new_item) override
         {
-            node* new_part = new node(new_item);
+            typename DoublyLL<T>::Node* new_part = new DoublyLL<T>::Node(new_item);
 
-            item_count_++;
+            this->item_count_++;
 
-            if (list_ == nullptr)
+            if (this->list_ == nullptr)
             {
                 new_part->next = new_part;
                 new_part->prev = new_part;
 
-                list_ = new_part;
-                end_ = new_part;
+                this->list_ = new_part;
+                this->end_ = new_part;
 
                 return;
             }
 
-            end_->next = new_part;
-            new_part->prev = end_;
-            new_part->next = list_;
-            list_->prev = new_part;
+            this->end_->next = new_part;
+            new_part->prev = this->end_;
+            new_part->next = this->list_;
+            this->list_->prev = new_part;
 
-            end_ = new_part;
+            this->end_ = new_part;
         }
-        void AddOrdered(T new_item)
+        virtual void AddOrdered(T new_item) override
         {
-            node* new_part = new node(new_item);
-            item_count_++;
+            typename DoublyLL<T>::Node* new_part = new DoublyLL<T>::Node(new_item);
 
-            if (list_ == nullptr)
+            this->item_count_++;
+
+            if (this->list_ == nullptr)
             {
                 new_part->prev = new_part;
                 new_part->next = new_part;
-                list_ = new_part;
+                this->list_ = new_part;
 
                 return;
             }
 
-            if (new_item < list_->item)
+            if (new_item < this->list_->item)
             {
-                new_part->next = list_;
-                list_->prev = new_part;
-                list_ = new_part;
+                new_part->next = this->list_;
+                this->list_->prev = new_part;
+                this->list_ = new_part;
 
-                end_->next = list_;
-                list_->prev = end_;
+                this->end_->next = this->list_;
+                this->list_->prev = this->end_;
 
                 return;
             }
 
-            node* temp = list_;
-            node* start = temp;
+            typename DoublyLL<T>::Node* temp = this->list_;
+            typename DoublyLL<T>::Node* start = temp;
 
             while (temp->next != start)
             {
@@ -124,15 +129,15 @@ namespace fatpound::linkedlist
             new_part->next = start;
             start->prev = new_part;
         }
-        void Reverse()
+        virtual void Reverse() override
         {
-            if (list_ == nullptr)
+            if (this->list_ == nullptr)
             {
                 return;
             }
 
-            node* temp = list_;
-            node* start = list_;
+            typename DoublyLL<T>::Node* temp = this->list_;
+            typename DoublyLL<T>::Node* start = this->list_;
 
             while (temp->next != start)
             {
@@ -141,12 +146,12 @@ namespace fatpound::linkedlist
             }
 
             std::swap(temp->prev, temp->next);
-            list_ = temp;
+            this->list_ = temp;
         }
-        void Print() const
+        virtual void Print() const override
         {
-            node* temp = list_;
-            node* start = temp;
+            typename DoublyLL<T>::Node* temp = this->list_;
+            typename DoublyLL<T>::Node* start = temp;
 
             do
             {
@@ -159,29 +164,9 @@ namespace fatpound::linkedlist
         }
 
 
-    protected:
+	protected:
 
 
     private:
-        struct node
-        {
-            node* prev = nullptr;
-            node* next = nullptr;
-            T item;
-
-            node(T new_item)
-                :
-                item(new_item)
-            {
-
-            }
-        };
-
-
-    private:
-        node* list_ = nullptr;
-        node* end_  = nullptr;
-
-        size_t item_count_ = 0ui64;
     };
 }
