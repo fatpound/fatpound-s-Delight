@@ -6,36 +6,36 @@ namespace fatpound::graph
 {
     BFS::BFS(BFS&& src) noexcept
     {
-        G = std::move(src.G);
-        output = std::move(src.output);
+        graph_ = std::move(src.graph_);
+        output_ = std::move(src.output_);
     }
     BFS& BFS::operator = (BFS&& src) noexcept
     {
-        G = std::move(src.G);
-        output = std::move(src.output);
+        graph_ = std::move(src.graph_);
+        output_ = std::move(src.output_);
 
         return *this;
     }
 
-    BFS::BFS(const std::string& input_filename)
+    BFS::BFS(const std::string& inputFilename)
         :
-        G{ std::make_unique<Graph>(input_filename) }
+        graph_(std::make_unique<Graph>(inputFilename))
     {
-        std::vector<fatpound::color::Color> colors(G->GetNodeCount());
+        std::vector<fatpound::color::Color> colors(graph_->GetNodeCount());
 
         std::queue<size_t> queue;
-        queue.push(0ull);
+        queue.push(0);
 
         std::stringstream ss;
 
-        while (queue.size() > 0ull)
+        while (queue.size() > 0)
         {
             size_t u = queue.front();
             queue.pop();
 
-            for (size_t i = 0; i < G->GetNodeAt(u)->next.size(); i++)
+            for (size_t i = 0; i < graph_->GetNextList(u).size(); i++)
             {
-                const size_t v = G->GetNodeAt(u)->next[i];
+                const size_t v = graph_->GetNextList(u)[i];
 
                 if (colors[v] == fatpound::color::White)
                 {
@@ -46,15 +46,15 @@ namespace fatpound::graph
 
             colors[u] = fatpound::color::Black;
 
-            ss << (char)('a' + u);
+            ss << static_cast<char>('a' + u);
         }
 
-        output = std::move(ss.str());
-        output += "\n\n";
+        output_  = std::move(ss.str());
+        output_ += '\n';
     }
 
     void BFS::PrintResults() const
     {
-        std::cout << output;
+        std::cout << output_;
     }
 }

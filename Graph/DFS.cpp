@@ -4,24 +4,24 @@ namespace fatpound::graph
 {
     DFS::DFS(DFS&& src) noexcept
     {
-        G = std::move(src.G);
-        output = std::move(src.output);
+        graph_ = std::move(src.graph_);
+        output_ = std::move(src.output_);
     }
     DFS& DFS::operator = (DFS&& src) noexcept
     {
-        G = std::move(src.G);
-        output = std::move(src.output);
+        graph_ = std::move(src.graph_);
+        output_ = std::move(src.output_);
 
         return *this;
     }
 
     DFS::DFS(const std::string& input_filename)
         :
-        G{ std::make_unique<Graph>(input_filename) }
+        graph_(std::make_unique<Graph>(input_filename))
     {
-        std::vector<fatpound::color::Color> colors(G->GetNodeCount());
+        std::vector<fatpound::color::Color> colors(graph_->GetNodeCount());
 
-        for (size_t i = 0; i < G->GetNodeCount(); i++)
+        for (size_t i = 0u; i < graph_->GetNodeCount(); ++i)
         {
             if (colors[i] == fatpound::color::White)
             {
@@ -29,36 +29,33 @@ namespace fatpound::graph
             }
         }
 
-        output += '\n';
+        output_ += '\n';
     }
     
-    void DFS::Visit(std::vector<fatpound::color::Color>& colors, const size_t index)
+    void DFS::Visit(std::vector<fatpound::color::Color>& colors, const size_t& index)
     {
         colors[index] = fatpound::color::Gray;
 
+        std::stringstream ss;
+        
+        ss << index << '\n';
+
+        output_ += std::move(ss.str());
+
+        for (size_t i = 0; i < graph_->GetNextList(index).size(); ++i)
         {
-            std::stringstream ss;
+            const size_t nextIndex = graph_->GetNextList(index)[i];
 
-            ss << G->GetNodeAt(index) << '\t' << G->GetNodeAt(index)->n << '\n';
-
-            output += std::move(ss.str());
-        }
-
-        for (size_t i = 0; i < G->GetNodeAt(index)->next.size(); i++)
-        {
-            const size_t next_index = G->GetNodeAt(index)->next[i];
-
-            if (colors[next_index] == fatpound::color::White)
+            if (colors[nextIndex] == fatpound::color::White)
             {
-                Visit(colors, next_index);
+                Visit(colors, nextIndex);
             }
         }
 
         colors[index] = fatpound::color::Black;
     }
-
     void DFS::PrintResults() const
     {
-        std::cout << output;
+        std::cout << output_;
     }
 }

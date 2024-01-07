@@ -16,7 +16,7 @@ namespace fatpound::graph
         BFS& operator = (const BFS& src) = delete;
         BFS& operator = (BFS&& src) noexcept;
 
-        BFS(const std::string& input_filename);
+        BFS(const std::string& inputFilename);
 
 
     public:
@@ -27,8 +27,8 @@ namespace fatpound::graph
 
 
     private:
-        std::unique_ptr<Graph> G = nullptr;
+        std::unique_ptr<Graph> graph_ = nullptr;
 
-        std::string output;
+        std::string output_;
     };
 }

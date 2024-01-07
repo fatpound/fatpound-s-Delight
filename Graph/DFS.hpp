@@ -3,7 +3,6 @@
 #include "Graph.hpp"
 
 #include <memory>
-#include <vector>
 
 namespace fatpound::graph
 {
@@ -28,12 +27,12 @@ namespace fatpound::graph
 
 
     private:
-        void Visit(std::vector<fatpound::color::Color>& colors, const size_t index);
+        void Visit(std::vector<fatpound::color::Color>& colors, const size_t& index);
 
 
     private:
-        std::unique_ptr<Graph> G = nullptr;
+        std::unique_ptr<Graph> graph_ = nullptr;
 
-        std::string output;
+        std::string output_;
     };
 }
