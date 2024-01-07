@@ -5,35 +5,37 @@
 namespace fatpound::graph
 {
     Prim::Prim(Prim&& src) noexcept
+        :
+        graph_(std::move(src.graph_)),
+        output_(std::move(src.output_))
     {
-        G = std::move(src.G);
-        output = std::move(src.output);
+        
     }
     Prim& Prim::operator = (Prim&& src) noexcept
     {
-        G = std::move(src.G);
-        output = std::move(src.output);
+        graph_  = std::move(src.graph_);
+        output_ = std::move(src.output_);
 
         return *this;
     }
 
     Prim::Prim(const std::string& input_filename)
         :
-        G{ std::make_unique<Graph>(input_filename) }
+        graph_(std::make_unique<Graph>(input_filename))
     {
         std::vector<int64_t> key;
         std::vector<int64_t> pi;
 
         std::deque<int64_t> deque;
 
-        size_t item_count = G->GetNodeCount();
+        size_t item_count = graph_->GetNodeCount();
 
-        for (size_t i = 0; i < item_count; i++)
+        for (size_t i = 0; i < item_count; ++i)
         {
-            key.push_back(INT64_MAX);
-            pi.push_back(-1ll);
+            key.push_back(std::numeric_limits<int64_t>::max());
+            pi.push_back(-1);
 
-            deque.push_back(int64_t(i));
+            deque.push_back(static_cast<int64_t>(i));
         }
 
         key[0] = 0;
@@ -44,9 +46,9 @@ namespace fatpound::graph
 
             bool flag = true; // does min_index need to be initialized ?
 
-            for (size_t i = 0; i < deque.size(); i++)
+            for (size_t i = 0; i < deque.size(); ++i)
             {
-                if (deque[i] == int64_t(i))
+                if (deque[i] == static_cast<int64_t>(i))
                 {
                     if (flag)
                     {
@@ -61,20 +63,21 @@ namespace fatpound::graph
                 }
             }
 
-            const size_t u = size_t(deque[min_index]);
+            const size_t u = static_cast<size_t>(deque[min_index]);
 
-            deque[min_index] = -1LL;
-            item_count--;
+            deque[min_index] = -1;
 
-            for (size_t i = 0; i < G->GetNodeAt(u)->next.size(); i++)
+            --item_count;
+
+            for (size_t i = 0; i < graph_->GetNextList(u).size(); ++i)
             {
-                const size_t v = G->GetNodeAt(u)->next[i];
-                const int64_t next_val = G->GetNodeAt(v)->n;
+                const size_t v = graph_->GetNextList(u)[i];
+                const int64_t next_val = graph_->GetAdjAt(u, v);
 
-                if (deque[v] == int64_t(v) && key[v] > next_val)
+                if (deque[v] == static_cast<int64_t>(v) && key[v] > next_val)
                 {
                     key[v] = next_val;
-                    pi[v] = int64_t(u);
+                    pi[v] = static_cast<int64_t>(u);
                 }
             }
         }
@@ -92,7 +95,7 @@ namespace fatpound::graph
         {
             if (pi[i] != -1)
             {
-                ss << (char)('a' + pi[i]) << ' ';
+                ss << static_cast<char>('a' + pi[i]) << ' ';
             }
             else
             {
@@ -102,11 +105,12 @@ namespace fatpound::graph
 
         ss << "\n\n";
 
-        output += std::move(ss.str());
+        output_ += std::move(ss.str());
     }
+
 
     void Prim::PrintResults() const
     {
-        std::cout << output;
+        std::cout << output_;
     }
 }

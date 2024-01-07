@@ -2,7 +2,7 @@
 
 namespace fatpound::graph
 {
-    Graph::Graph(const std::string input_filename)
+    Graph::Graph(const std::string& input_filename)
     {
         std::ifstream my_file(input_filename, std::ios_base::binary);
 

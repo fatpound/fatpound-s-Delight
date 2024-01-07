@@ -1,30 +1,35 @@
 #include "BellmanFord.hpp"
 
+#include <array>
+#include <stdexcept>
+
 namespace fatpound::graph
 {
     BellmanFord::BellmanFord(BellmanFord&& src) noexcept
         :
-        G{ std::move(src.G) },
-        output{ std::move(src.output) }
-    {}
+        graph_(std::move(src.graph_)),
+        output_(std::move(src.output_))
+    {
+
+    }
     BellmanFord& BellmanFord::operator = (BellmanFord&& src) noexcept
     {
-        G = std::move(src.G);
-        output = std::move(src.output);
+        graph_ = std::move(src.graph_);
+        output_ = std::move(src.output_);
 
         return *this;
     }
 
     BellmanFord::BellmanFord(const std::string& input_filename, size_t source_index)
         :
-        G{ std::make_unique<Graph>(input_filename) }
+        graph_(std::make_unique<Graph>(input_filename))
     {
         std::array<std::vector<std::array<size_t, 2>>, 3> edges = {};
 
         std::vector<int64_t> d;
         std::vector<int64_t> p;
 
-        for (size_t i = 0; i < G->GetNodeCount(); i++)
+        for (size_t i = 0; i < graph_->GetNodeCount(); i++)
         {
             d.push_back(std::numeric_limits<int64_t>::max()); // INT64_MAX
             p.push_back(-1);
@@ -36,11 +41,11 @@ namespace fatpound::graph
         std::vector<std::array<size_t, 2>> new_vec2 = {};
         std::vector<std::array<size_t, 2>> new_vec3 = {};
 
-        for (size_t i = 0; i < G->GetNodeCount(); i++)
+        for (size_t i = 0; i < graph_->GetNodeCount(); i++)
         {
-            for (size_t j = 0; j < G->GetNodeAt(i)->GetNextIndexesListSize(); j++)
+            for (size_t j = 0; j < graph_->GetNextList(i).size(); j++)
             {
-                const size_t dest_index = G->GetNodeAt(i)->GetNextIndexesList()[j];
+                const size_t dest_index = graph_->GetNextList(i)[j];
 
                 if (i == source_index)
                 {
@@ -64,7 +69,7 @@ namespace fatpound::graph
         edges[1] = std::move(new_vec2);
         edges[2] = std::move(new_vec3);
 
-        for (size_t i = 0; i < G->GetNodeCount() - 1; i++)
+        for (size_t i = 0; i < graph_->GetNodeCount() - 1; i++)
         {
             for (size_t j = 0; j < edges.size(); j++)
             {
@@ -90,50 +95,50 @@ namespace fatpound::graph
                 if (d.at(v) > d.at(u) + w_val)
                 {
                     throw std::runtime_error("The given graph is cannot be processed by Bellman-Ford Algorithm");
-                    return;
                 }
             }
         }
 
         for (size_t i = 0; i < d.size(); i++)
         {
-            output += std::to_string(d[i]);
-            output += ' ';
+            output_ += std::to_string(d[i]);
+            output_ += ' ';
         }
 
-        output += '\n';
+        output_ += '\n';
 
         for (size_t i = 0; i < p.size(); i++)
         {
             if (p[i] > -1)
             {
-                output += (char)('A' + p[i]);
+                output_ += static_cast<char>('A' + p[i]);
             }
             else
             {
-                output += 'N';
+                output_ += 'N';
             }
         }
 
-        output += "\n\n";
+        output_ += "\n\n";
     }
 
-    inline void BellmanFord::relax(std::vector<int64_t>& d, std::vector<int64_t>& p, const size_t u, const size_t v)
+
+    int64_t BellmanFord::w(const size_t& u, const size_t& v)
+    {
+        return graph_->GetAdjAt(u, v);
+    }
+
+    void BellmanFord::relax(std::vector<int64_t>& d, std::vector<int64_t>& p, const size_t& u, const size_t& v)
     {
         if (d.at(v) > d.at(u) + w(u, v))
         {
             d.at(v) = d.at(u) + w(u, v);
-            p.at(v) = (int64_t)u;
+            p.at(v) = static_cast<int64_t>(u);
         }
-    }
-
-    inline int64_t BellmanFord::w(const size_t u, const size_t v)
-    {
-        return G->GetAdjAt(u, v);
     }
 
     void BellmanFord::PrintResults() const
     {
-        std::cout << output;
+        std::cout << output_;
     }
 }

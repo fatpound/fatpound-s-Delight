@@ -5,21 +5,23 @@
 namespace fatpound::graph
 {
     BFS::BFS(BFS&& src) noexcept
+        :
+        graph_(std::move(src.graph_)),
+        output_(std::move(src.output_))
     {
-        graph_ = std::move(src.graph_);
-        output_ = std::move(src.output_);
+
     }
     BFS& BFS::operator = (BFS&& src) noexcept
     {
-        graph_ = std::move(src.graph_);
+        graph_  = std::move(src.graph_);
         output_ = std::move(src.output_);
 
         return *this;
     }
 
-    BFS::BFS(const std::string& inputFilename)
+    BFS::BFS(const std::string& input_filename)
         :
-        graph_(std::make_unique<Graph>(inputFilename))
+        graph_(std::make_unique<Graph>(input_filename))
     {
         std::vector<fatpound::color::Color> colors(graph_->GetNodeCount());
 
@@ -52,6 +54,7 @@ namespace fatpound::graph
         output_  = std::move(ss.str());
         output_ += '\n';
     }
+
 
     void BFS::PrintResults() const
     {

@@ -28,8 +28,8 @@ namespace fatpound::graph
 
 
     private:
-        std::unique_ptr<Graph> G = nullptr;
+        std::unique_ptr<Graph> graph_ = nullptr;
 
-        std::string output;
+        std::string output_;
     };
 }

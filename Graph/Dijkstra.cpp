@@ -6,26 +6,29 @@ namespace fatpound::graph
 {
     Dijkstra::Dijkstra(Dijkstra&& src) noexcept
         :
-        G{ std::move(src.G) },
-        output{ std::move(src.output) }
-    {}
-    Dijkstra& Dijkstra::operator = (Dijkstra && src) noexcept
+        graph_(std::move(src.graph_)),
+        output_(std::move(src.output_))
     {
-        G = std::move(src.G);
-        output = std::move(src.output);
 
+    }
+    Dijkstra& Dijkstra::operator = (Dijkstra&& src) noexcept
+    {
+        graph_  = std::move(src.graph_);
+        output_ = std::move(src.output_);
+        
         return *this;
     }
 
     Dijkstra::Dijkstra(const std::string& input_filename, size_t source_index)
         :
-        G{ std::make_unique<Graph>(input_filename) }
+        graph_(std::make_unique<Graph>(input_filename))
     {
         std::deque<int64_t> deque;
+
         std::vector<int64_t> d;
         std::vector<int64_t> p;
 
-        for (size_t i = 0; i < G->GetNodeCount(); i++)
+        for (size_t i = 0; i < graph_->GetNodeCount(); i++)
         {
             d.push_back(std::numeric_limits<int64_t>::max());
             p.push_back(-1);
@@ -33,7 +36,7 @@ namespace fatpound::graph
             deque.push_back((int64_t)i);
         }
 
-        size_t item_count = G->GetNodeCount();
+        size_t item_count = graph_->GetNodeCount();
 
         d[source_index] = 0;
 
@@ -60,12 +63,12 @@ namespace fatpound::graph
                 }
             }
 
-            const size_t u = (size_t)deque[min_index];
+            const size_t u = static_cast<size_t>(deque[min_index]);
 
             deque[min_index] = -1;
             item_count--;
 
-            auto& nextindexes = G->GetNodeAt(u)->GetNextIndexesList();
+            auto& nextindexes = graph_->GetNextList(u);
 
             for (size_t i = 0; i < nextindexes.size(); i++)
             {
@@ -75,43 +78,44 @@ namespace fatpound::graph
 
         for (size_t i = 0; i < d.size(); i++)
         {
-            output += std::to_string(d[i]) + ' ';
+            output_ += std::to_string(d[i]) + ' ';
         }
 
-        output += '\n';
+        output_ += '\n';
 
         for (size_t i = 0; i < p.size(); i++)
         {
             if (p[i] > -1)
             {
-                output += (char)('A' + p[i]);
-                output += ' ';
+                output_ += static_cast<char>('A' + p[i]);
+                output_ += ' ';
             }
             else
             {
-                output += "N ";
+                output_ += "N ";
             }
         }
 
-        output += "\n\n";
+        output_ += "\n\n";
     }
 
-    void Dijkstra::PrintResults() const
+
+    int64_t Dijkstra::w(const size_t& u, const size_t& v) const
     {
-        std::cout << output;
+        return graph_->GetAdjAt(u, v);
     }
 
-    inline void Dijkstra::relax(std::vector<int64_t>& d, std::vector<int64_t>& p, const size_t u, const size_t v)
+    void Dijkstra::relax(std::vector<int64_t>& d, std::vector<int64_t>& p, const size_t& u, const size_t& v)
     {
         if (d[v] > d[u] + w(u, v))
         {
             d[v] = d[u] + w(u, v);
-            p[v] = (int64_t)u;
+            p[v] = static_cast<int64_t>(u);
         }
     }
 
-    inline int64_t Dijkstra::w(const size_t u, const size_t v) const
+    void Dijkstra::PrintResults() const
     {
-        return G->GetAdjAt(u, v);
+        std::cout << output_;
     }
 }

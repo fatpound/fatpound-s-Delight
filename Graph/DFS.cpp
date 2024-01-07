@@ -3,13 +3,15 @@
 namespace fatpound::graph
 {
     DFS::DFS(DFS&& src) noexcept
+        :
+        graph_(std::move(src.graph_)),
+        output_(std::move(src.output_))
     {
-        graph_ = std::move(src.graph_);
-        output_ = std::move(src.output_);
+        
     }
     DFS& DFS::operator = (DFS&& src) noexcept
     {
-        graph_ = std::move(src.graph_);
+        graph_  = std::move(src.graph_);
         output_ = std::move(src.output_);
 
         return *this;
@@ -32,6 +34,7 @@ namespace fatpound::graph
         output_ += '\n';
     }
     
+
     void DFS::Visit(std::vector<fatpound::color::Color>& colors, const size_t& index)
     {
         colors[index] = fatpound::color::Gray;

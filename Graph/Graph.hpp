@@ -15,7 +15,7 @@ namespace fatpound::graph
     public:
         Graph() = delete;
 
-        Graph(const std::string input_filename);
+        Graph(const std::string& input_filename);
 
 
     public:
