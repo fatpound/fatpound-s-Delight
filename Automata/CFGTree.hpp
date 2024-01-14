@@ -1,0 +1,183 @@
+#pragma once
+
+#include <iostream>
+#include <vector>
+#include <string>
+#include <deque>
+#include <memory>
+#include <algorithm>
+
+namespace fatpound::automata
+{
+    class CFGTree
+    {
+    public:
+        CFGTree() = delete;
+        ~CFGTree() noexcept
+        {
+            std::deque<Node*> nodes;
+
+            for (auto& tree : trees_)
+            {
+                if (tree != nullptr)
+                {
+                    nodes.push_back(tree);
+                }
+                else
+                {
+                    continue;
+                }
+
+                while (nodes.size() > 0)
+                {
+                    Node* node = nodes.back();
+
+                    nodes.pop_back();
+
+                    for (auto& leaf : node->leaves_)
+                    {
+                        nodes.push_back(leaf);
+                    }
+
+                    delete node;
+                }
+            }
+        }
+        CFGTree(const CFGTree& src) = delete;
+        CFGTree(CFGTree&& src) = delete;
+        CFGTree& operator = (const CFGTree& src) = delete;
+        CFGTree& operator = (CFGTree&& src) = delete;
+
+        CFGTree(const std::vector<std::pair<std::string, std::vector<std::string>>>& trees)
+        {
+            trees_.reserve(trees.size());
+
+            for (const auto& tree : trees)
+            {
+                trees_.push_back(new Node(tree));
+            }
+        }
+
+
+    public:
+        struct Node
+        {
+            std::vector<Node*> leaves_;
+
+            std::string item_;
+
+            Node(const std::pair<std::string, std::vector<std::string>>& tree)
+                :
+                item_(tree.first)
+            {
+                leaves_.reserve(tree.second.size());
+
+                for (const auto& str : tree.second)
+                {
+                    leaves_.push_back(new Node(str));
+                }
+            }
+            Node(const std::string& str)
+                :
+                item_(str)
+            {
+
+            }
+        };
+
+
+    public:
+        std::vector<std::pair<std::string, bool>> Generate(std::string init_str = "", size_t index = 0u, size_t recursed = 0u) const
+        {
+            std::vector<std::pair<std::string, bool>> strings;
+
+            for (const auto& node : trees_[index]->leaves_)
+            {
+                std::vector<std::pair<std::string, bool>> tempstrings;
+
+                tempstrings.emplace_back(init_str, false);
+
+                for (const auto& ch : node->item_)
+                {
+                    std::vector<std::pair<std::string, bool>> newTempStrings;
+
+                    for (const auto& strPair : tempstrings)
+                    {
+                        std::string& str = newTempStrings.emplace_back(strPair).first;
+                        const size_t insertedindex = newTempStrings.size() - 1;
+
+                        const auto it = std::find_if(trees_.cbegin() + index, trees_.cend(), [&](const auto& tree) -> bool { return ch == tree->item_[0]; });
+
+                        if (it == trees_.cend())
+                        {
+                            str += ch;
+                        }
+                        else
+                        {
+                            const size_t tree_index = it - trees_.cbegin();
+                            const size_t will_recurse = ((tree_index == index) ? 1 : 0);
+
+                            if (recursed < recurse_limit_)
+                            {
+                                const size_t size = tempstrings.size();
+
+                                bool deleted = false;
+
+                                std::string tempstr = strPair.first;
+
+                                if (tempstr == "")
+                                {
+                                    continue;
+                                }
+
+                                const auto vec = Generate(tempstr, tree_index, recursed + will_recurse);
+
+                                for (const auto& pair : vec)
+                                {
+                                    newTempStrings.emplace_back(pair);
+                                }
+
+                                newTempStrings.erase(newTempStrings.begin() + insertedindex);
+                            }
+                            else
+                            {
+                                str += ch;
+                            }
+                        }
+                    }
+
+                    tempstrings = std::move(newTempStrings);
+                }
+
+                for (const auto& strPair : tempstrings)
+                {
+                    strings.emplace_back(strPair.first, IsTerminal(strPair.first));
+                }
+            }
+
+            return strings;
+        }
+
+        bool IsTerminal(const std::string& str) const
+        {
+            for (const auto& tree : trees_)
+            {
+                if (std::any_of(str.cbegin(), str.cend(), [&](const auto& ch) -> bool { return ch == (tree->item_[0]); }))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+
+    protected:
+
+
+    private:
+        std::vector<Node*> trees_;
+
+        static constexpr const size_t recurse_limit_ = 1u;
+    };
+}
