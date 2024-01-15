@@ -29,10 +29,10 @@ namespace fatpound::linkedlist
             }
             while (ex != nullptr);
 
-			list_ = nullptr;
-			end_  = nullptr;
+            list_ = nullptr;
+            end_  = nullptr;
 
-			item_count_ = static_cast<decltype(item_count_)>(0);
+            item_count_ = static_cast<decltype(item_count_)>(0);
         }
         DoublyLL(const DoublyLL<T>& src) = delete;
         DoublyLL(DoublyLL<T>&& src) noexcept
@@ -47,8 +47,8 @@ namespace fatpound::linkedlist
         DoublyLL<T>& operator = (DoublyLL<T>&& src) noexcept
         {
 
-			list_ = std::exchange(src.list_, nullptr);
-			end_  = std::exchange(src.end_,  nullptr);
+            list_ = std::exchange(src.list_, nullptr);
+            end_  = std::exchange(src.end_,  nullptr);
 
             item_count_ = std::exchange(src.item_count_, static_cast<decltype(item_count_)>(0));
 
@@ -57,14 +57,13 @@ namespace fatpound::linkedlist
 
 
     public:
-		virtual bool Contains(T item) const
-		{
-			return Find(item) == nullptr
-				? false
-				: true
-				;
-		}
-
+        virtual bool Contains(T item) const
+        {
+            return Find(item) == nullptr
+                ? false
+                : true
+                ;
+        }
 
         virtual void Add(T new_item)
         {
@@ -160,38 +159,6 @@ namespace fatpound::linkedlist
 
 
     protected:
-		virtual DoublyLL<T>::Node* Find(T item) const
-		{
-			if (item_count_ == static_cast<decltype(item_count_)>(0))
-			{
-				return nullptr;
-			}
-
-			if (item_count_ == static_cast<decltype(item_count_)>(1))
-			{
-				return list_->item == item
-					? list_
-					: nullptr
-					;
-			}
-
-			Node* temp = list_;
-
-			for (size_t i = static_cast<size_t>(0); i < item_count_; ++i)
-			{
-				if (temp->item == item)
-				{
-					return temp;
-				}
-
-				temp = temp->next;
-			}
-
-			return nullptr;
-		}
-
-
-    protected:
         struct Node
         {
             Node* prev = nullptr;
@@ -204,6 +171,38 @@ namespace fatpound::linkedlist
                 item{ new_item }
             {}
         };
+
+
+    protected:
+        virtual DoublyLL<T>::Node* Find(T item) const
+        {
+            if (item_count_ == static_cast<decltype(item_count_)>(0))
+            {
+                return nullptr;
+            }
+
+            if (item_count_ == static_cast<decltype(item_count_)>(1))
+            {
+                return list_->item == item
+                    ? list_
+                    : nullptr
+                    ;
+            }
+
+            Node* temp = list_;
+
+            for (size_t i = static_cast<size_t>(0); i < item_count_; ++i)
+            {
+                if (temp->item == item)
+                {
+                    return temp;
+                }
+
+                temp = temp->next;
+            }
+
+            return nullptr;
+        }
 
 
     protected:

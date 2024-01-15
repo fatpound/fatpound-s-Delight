@@ -9,13 +9,13 @@ namespace fatpound::linkedlist
     {
     public:
         SinglyCircularLL() = default;
-        virtual ~SinglyCircularLL() noexcept override
+        virtual ~SinglyCircularLL() noexcept
         {
             if (this->list_ == nullptr)
             {
                 return;
             }
-			
+            
             typename SinglyLL<T>::Node* start = this->list_;
             typename SinglyLL<T>::Node* ex = this->list_;
             typename SinglyLL<T>::Node* temp;
@@ -29,60 +29,60 @@ namespace fatpound::linkedlist
             }
             while (ex != start);
 
-			this->list_ = nullptr;
-			this->end_  = nullptr;
+            this->list_ = nullptr;
+            this->end_  = nullptr;
 
-			this->item_count_ = static_cast<decltype(this->item_count_)>(0);
+            this->item_count_ = static_cast<decltype(this->item_count_)>(0);
         }
-		SinglyCircularLL(const SinglyCircularLL<T>& src) = delete;
-		SinglyCircularLL(SinglyCircularLL<T>&& src) noexcept
-			:
-			SinglyLL<T>(std::move(src))
-		{
+        SinglyCircularLL(const SinglyCircularLL<T>& src) = delete;
+        SinglyCircularLL(SinglyCircularLL<T>&& src) noexcept
+            :
+            SinglyLL<T>(std::move(src))
+        {
 
-		}
-		SinglyCircularLL<T>& operator = (const SinglyCircularLL<T>& src) = delete;
-		SinglyCircularLL<T>& operator = (SinglyCircularLL<T>&& src) noexcept
-		{
-			this->list_ = std::exchange(src.list_, nullptr);
-			this->end_  = std::exchange(src.end_,  nullptr);
+        }
+        SinglyCircularLL<T>& operator = (const SinglyCircularLL<T>& src) = delete;
+        SinglyCircularLL<T>& operator = (SinglyCircularLL<T>&& src) noexcept
+        {
+            this->list_ = std::exchange(src.list_, nullptr);
+            this->end_  = std::exchange(src.end_,  nullptr);
 
-			this->item_count_ = std::exchange(src.item_count_, static_cast<decltype(this->item_count_)>(0));
+            this->item_count_ = std::exchange(src.item_count_, static_cast<decltype(this->item_count_)>(0));
 
-			return *this;
-		}
+            return *this;
+        }
 
 
     public:
         virtual void Add(T new_item) override
         {
-			typename SinglyLL<T>::Node* new_part = new SinglyLL<T>::Node(new_item);
+            typename SinglyLL<T>::Node* new_part = new SinglyLL<T>::Node(new_item);
 
-			this->item_count_++;
+            this->item_count_++;
 
             if (this->list_ == nullptr)
             {
-				this->list_ = new_part;
-				this->end_ = new_part;
-				this->list_->next = this->list_;
+                this->list_ = new_part;
+                this->end_ = new_part;
+                this->list_->next = this->list_;
 
                 return;
             }
 
-			this->end_->next = new_part;
+            this->end_->next = new_part;
             new_part->next = this->list_;
 
-			this->end_ = new_part;
+            this->end_ = new_part;
         }
         virtual void AddOrdered(T new_item) override
         {
-			typename SinglyLL<T>::Node* new_part = new SinglyLL<T>::Node(new_item);
+            typename SinglyLL<T>::Node* new_part = new SinglyLL<T>::Node(new_item);
 
-			this->item_count_++;
+            this->item_count_++;
 
             if (this->list_ == nullptr)
             {
-				this->list_ = new_part;
+                this->list_ = new_part;
                 new_part->next = this->list_;
 
                 return;
@@ -91,15 +91,15 @@ namespace fatpound::linkedlist
             if (new_item < this->list_->item)
             {
                 new_part->next = this->list_;
-				this->list_ = new_part;
+                this->list_ = new_part;
 
-				this->end_->next = new_part;
+                this->end_->next = new_part;
 
                 return;
             }
 
-			typename SinglyLL<T>::Node* temp = this->list_;
-			typename SinglyLL<T>::Node* start = temp;
+            typename SinglyLL<T>::Node* temp = this->list_;
+            typename SinglyLL<T>::Node* start = temp;
 
             while (temp->next != start)
             {
@@ -124,16 +124,12 @@ namespace fatpound::linkedlist
                 return;
             }
 
-            // this should resolve the C6011 error but the compiler is still not smart enough for this ("t can be null")
-            // why? because if the linked list does not have at least 2 elements in it, there should be a runtime error
-            // at that time which will obviously display an error on the user's screen
-            // so i am going to add an if (t != nullptr) check to the while loop.
-            if (this->item_count_ < static_cast<size_t>(2))
+            if (this->item_count_ < static_cast<decltype(this->item_count_)>(2))
             {
                 return;
             }
 
-			typename SinglyLL<T>::Node* start_backup = this->list_;
+            typename SinglyLL<T>::Node* start_backup = this->list_;
 
             typename SinglyLL<T>::Node* t;
             typename SinglyLL<T>::Node* a = nullptr;
@@ -149,7 +145,7 @@ namespace fatpound::linkedlist
                 a = t;
                 x = temp;
 
-                if (t->next) // C6011
+                if (t->next) // C6011, I think its gone
                 {
                     temp = t->next;
                     t->next = x;
@@ -159,7 +155,7 @@ namespace fatpound::linkedlist
                 {
                     start->next = t;
 
-					this->list_ = t;
+                    this->list_ = t;
 
                     return;
                 }
@@ -169,7 +165,7 @@ namespace fatpound::linkedlist
                     start->next = temp;
 
                     temp->next = t;
-					this->list_ = temp;
+                    this->list_ = temp;
 
                     return;
                 }

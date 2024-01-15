@@ -5,240 +5,239 @@
 
 namespace fatpound::linkedlist
 {
-	template <std::totally_ordered T>
-	class SinglyLL
-	{
-	public:
-		SinglyLL() = default;
-		virtual ~SinglyLL() noexcept
-		{
-			if (list_ == nullptr)
-			{
-				return;
-			}
+    template <std::totally_ordered T>
+    class SinglyLL
+    {
+    public:
+        SinglyLL() = default;
+        virtual ~SinglyLL() noexcept
+        {
+            if (list_ == nullptr)
+            {
+                return;
+            }
 
-			Node* ex = list_;
-			Node* temp;
+            Node* ex = list_;
+            Node* temp;
 
-			do
-			{
-				temp = ex->next;
-				delete ex;
+            do
+            {
+                temp = ex->next;
+                delete ex;
 
-				ex = temp;
-			}
-			while (ex != nullptr);
+                ex = temp;
+            }
+            while (ex != nullptr);
 
-			list_ = nullptr;
-			end_  = nullptr;
+            list_ = nullptr;
+            end_  = nullptr;
 
-			item_count_ = static_cast<decltype(item_count_)>(0);
-		}
-		SinglyLL(const SinglyLL<T>& src) = delete;
-		SinglyLL(SinglyLL<T>&& src) noexcept
-			:
-			list_(std::exchange(src.list_, nullptr)),
-			end_(std::exchange(src.end_, nullptr)),
-			item_count_( std::exchange(src.item_count_, static_cast<decltype(item_count_)>(0)))
-		{
+            item_count_ = static_cast<decltype(item_count_)>(0);
+        }
+        SinglyLL(const SinglyLL<T>& src) = delete;
+        SinglyLL(SinglyLL<T>&& src) noexcept
+            :
+            list_(std::exchange(src.list_, nullptr)),
+            end_(std::exchange(src.end_, nullptr)),
+            item_count_( std::exchange(src.item_count_, static_cast<decltype(item_count_)>(0)))
+        {
 
-		}
-		SinglyLL<T>& operator = (const SinglyLL<T>& src) = delete;
-		SinglyLL<T>& operator = (SinglyLL<T>&& src) noexcept
-		{
-			list_ = std::exchange(src.list_, nullptr);
-			end_  = std::exchange(src.end_,  nullptr);
+        }
+        SinglyLL<T>& operator = (const SinglyLL<T>& src) = delete;
+        SinglyLL<T>& operator = (SinglyLL<T>&& src) noexcept
+        {
+            list_ = std::exchange(src.list_, nullptr);
+            end_  = std::exchange(src.end_,  nullptr);
 
-			item_count_ = std::exchange(src.item_count_, static_cast<decltype(item_count_)>(0));
+            item_count_ = std::exchange(src.item_count_, static_cast<decltype(item_count_)>(0));
 
-			return *this;
-		}
-
-
-	public:
-		virtual bool Contains(T item) const
-		{
-			return Find(item) == nullptr
-				? false
-				: true
-				;
-		}
+            return *this;
+        }
 
 
-		virtual void Add(T new_item)
-		{
-			Node* new_part = new Node(new_item);
+    public:
+        virtual bool Contains(T item) const
+        {
+            return Find(item) == nullptr
+                ? false
+                : true
+                ;
+        }
 
-			++item_count_;
+        virtual void Add(T new_item)
+        {
+            Node* new_part = new Node(new_item);
 
-			if (list_ == nullptr)
-			{
-				list_ = new_part;
-			}
-			else
-			{
-				end_->next = new_part;
-			}
+            ++item_count_;
 
-			end_ = new_part;
-		}
-		virtual void AddOrdered(T new_item)
-		{
-			Node* new_part = new Node(new_item);
+            if (list_ == nullptr)
+            {
+                list_ = new_part;
+            }
+            else
+            {
+                end_->next = new_part;
+            }
 
-			++item_count_;
+            end_ = new_part;
+        }
+        virtual void AddOrdered(T new_item)
+        {
+            Node* new_part = new Node(new_item);
 
-			if (list_ == nullptr)
-			{
-				list_ = new_part;
-				end_ = new_part;
+            ++item_count_;
 
-				return;
-			}
+            if (list_ == nullptr)
+            {
+                list_ = new_part;
+                end_ = new_part;
 
-			if (new_item < list_->item)
-			{
-				new_part->next = list_;
-				list_ = new_part;
+                return;
+            }
 
-				return;
-			}
+            if (new_item < list_->item)
+            {
+                new_part->next = list_;
+                list_ = new_part;
 
-			Node* temp = list_;
+                return;
+            }
 
-			while (temp->next != nullptr)
-			{
-				if (temp->item <= new_item && new_item <= temp->next->item)
-				{
-					new_part->next = temp->next;
-					temp->next = new_part;
+            Node* temp = list_;
 
-					return;
-				}
+            while (temp->next != nullptr)
+            {
+                if (temp->item <= new_item && new_item <= temp->next->item)
+                {
+                    new_part->next = temp->next;
+                    temp->next = new_part;
 
-				temp = temp->next;
-			}
+                    return;
+                }
 
-			temp->next = new_part;
-			end_ = new_part;
-		}
-		virtual void Reverse()
-		{
-			if (list_ == nullptr)
-			{
-				return;
-			}
+                temp = temp->next;
+            }
 
-			Node* start_backup = list_;
+            temp->next = new_part;
+            end_ = new_part;
+        }
+        virtual void Reverse()
+        {
+            if (list_ == nullptr)
+            {
+                return;
+            }
 
-			Node* t;
-			Node* a = nullptr;
-			Node* x;
+            Node* start_backup = list_;
 
-			Node* temp = list_;
+            Node* t;
+            Node* a = nullptr;
+            Node* x;
 
-			while (true)
-			{
-				t = temp->next;
-				temp->next = a;
-				a = t;
-				x = temp;
+            Node* temp = list_;
 
-				temp = t->next;
-				t->next = x;
+            while (true)
+            {
+                t = temp->next;
+                temp->next = a;
+                a = t;
+                x = temp;
 
-				if (temp == nullptr)
-				{
-					list_ = t;
-					return;
-				}
+                temp = t->next;
+                t->next = x;
 
-				if (temp->next == nullptr)
-				{
-					temp->next = t;
-					list_ = temp;
+                if (temp == nullptr)
+                {
+                    list_ = t;
+                    return;
+                }
 
-					return;
-				}
-			}
+                if (temp->next == nullptr)
+                {
+                    temp->next = t;
+                    list_ = temp;
 
-			end_ = start_backup;
-		}
-		virtual void Print() const
-		{
-			if (list_ == nullptr)
-			{
-				return;
-			}
+                    return;
+                }
+            }
 
-			Node* temp = list_;
+            end_ = start_backup;
+        }
+        virtual void Print() const
+        {
+            if (list_ == nullptr)
+            {
+                return;
+            }
 
-			do
-			{
-				std::cout << temp << '\t' << temp->item << '\t' << temp->next << '\n';
-				temp = temp->next;
-			}
-			while (temp != nullptr);
+            Node* temp = list_;
 
-			std::cout << '\n';
-		}
+            do
+            {
+                std::cout << temp << '\t' << temp->item << '\t' << temp->next << '\n';
+                temp = temp->next;
+            }
+            while (temp != nullptr);
 
-
-	protected:
-		struct Node
-		{
-			Node* next = nullptr;
-
-			T item;
-
-			Node(T new_item)
-				:
-				item( new_item )
-			{
-
-			}
-		};
+            std::cout << '\n';
+        }
 
 
-	protected:
-		virtual SinglyLL<T>::Node* Find(T item) const
-		{
-			if (item_count_ == static_cast<decltype(item_count_)>(0))
-			{
-				return nullptr;
-			}
+    protected:
+        struct Node
+        {
+            Node* next = nullptr;
 
-			if (item_count_ == static_cast<decltype(item_count_)>(1))
-			{
-				return list_->item == item
-					? list_
-					: nullptr
-					;
-			}
+            T item;
 
-			Node* temp = list_;
+            Node(T new_item)
+                :
+                item( new_item )
+            {
 
-			for (size_t i = static_cast<size_t>(0); i < item_count_; ++i)
-			{
-				if (temp->item == item)
-				{
-					return temp;
-				}
-
-				temp = temp->next;
-			}
-
-			return nullptr;
-		}
+            }
+        };
 
 
-	protected:
-		Node* list_ = nullptr;
-		Node* end_  = nullptr;
+    protected:
+        virtual SinglyLL<T>::Node* Find(T item) const
+        {
+            if (item_count_ == static_cast<decltype(item_count_)>(0))
+            {
+                return nullptr;
+            }
 
-		size_t item_count_ = static_cast<decltype(item_count_)>(0);
+            if (item_count_ == static_cast<decltype(item_count_)>(1))
+            {
+                return list_->item == item
+                    ? list_
+                    : nullptr
+                    ;
+            }
+
+            Node* temp = list_;
+
+            for (size_t i = static_cast<size_t>(0); i < item_count_; ++i)
+            {
+                if (temp->item == item)
+                {
+                    return temp;
+                }
+
+                temp = temp->next;
+            }
+
+            return nullptr;
+        }
 
 
-	private:
-	};
+    protected:
+        Node* list_ = nullptr;
+        Node* end_  = nullptr;
+
+        size_t item_count_ = static_cast<decltype(item_count_)>(0);
+
+
+    private:
+    };
 }

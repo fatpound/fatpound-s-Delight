@@ -9,7 +9,7 @@ namespace fatpound::linkedlist
     {
     public:
         DoublyCircularLL() = default;
-		virtual ~DoublyCircularLL() noexcept override
+        virtual ~DoublyCircularLL() noexcept override
         {
             if (this->list_ == nullptr)
             {
@@ -29,27 +29,27 @@ namespace fatpound::linkedlist
             }
             while (ex != start);
 
-			this->list_ = nullptr;
-			this->end_  = nullptr;
+            this->list_ = nullptr;
+            this->end_  = nullptr;
 
-			this->item_count_ = static_cast<decltype(this->item_count_)>(0);
+            this->item_count_ = static_cast<decltype(this->item_count_)>(0);
         }
         DoublyCircularLL(const DoublyCircularLL& src) = delete;
         DoublyCircularLL(DoublyCircularLL&& src) noexcept
             :
-			DoublyLL<T>(std::move(src))
+            DoublyLL<T>(std::move(src))
         {
 
         }
         DoublyCircularLL<T>& operator = (const DoublyCircularLL& src) = delete;
         DoublyCircularLL<T>& operator = (DoublyCircularLL&& src) noexcept
         {
-			this->list_ = std::exchange(src.list_, nullptr);
-			this->end_  = std::exchange(src.end_,  nullptr);
-			
-			this->item_count_ = std::exchange(src.item_count_, static_cast<decltype(this->item_count_)>(0));
+            this->list_ = std::exchange(src.list_, nullptr);
+            this->end_  = std::exchange(src.end_,  nullptr);
+            
+            this->item_count_ = std::exchange(src.item_count_, static_cast<decltype(this->item_count_)>(0));
 
-			return *this;
+            return *this;
         }
 
 
@@ -164,7 +164,7 @@ namespace fatpound::linkedlist
         }
 
 
-	protected:
+    protected:
 
 
     private:
