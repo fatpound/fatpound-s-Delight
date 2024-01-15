@@ -1,41 +1,48 @@
 #include "Kruskal.hpp"
 
+#include <vector>
+#include <array>
 #include <algorithm>
+#include <ranges>
+
+namespace rn = std::ranges;
 
 namespace fatpound::graph
 {
     Kruskal::Kruskal(Kruskal&& src) noexcept
         :
-        G{ std::move(src.G) }
-    {}
+        graph_(std::move(src.graph_))
+    {
+
+    }
     Kruskal& Kruskal::operator = (Kruskal&& src) noexcept
     {
-        G = std::move(src.G);
+        graph_ = std::move(src.graph_);
 
         return *this;
     }
 
     Kruskal::Kruskal(const std::string& input_filename)
         :
-        G{ std::make_unique<Graph>(input_filename) }
+        graph_(std::make_unique<Graph>(input_filename))
     {
         std::vector<int64_t> weighs;
         std::vector<int64_t> weighs_counts;
-        std::vector<std::vector<int64_t>> result;
-        std::vector<std::vector<std::vector<int64_t>>> edges;
 
         int64_t last = -1;
+
+        const size_t nodeCount = graph_->GetNodeCount();
 
         //////////////
         // Set different weighs
 
-        for (int64_t i = 0; i < G->GetNodeCount(); i++)
+        for (int64_t i = 0; i < nodeCount; i++)
         {
-            for (int64_t j = 0; j < G->GetNodeCount(); j++)
+            for (int64_t j = 0; j < nodeCount; j++)
             {
-                int64_t n = G->GetAdjAt(i, j);
+                int64_t n = graph_->GetAdjAt(i, j);
 
-                if (n != 0 && !std::any_of(weighs.cbegin(), weighs.cend(), [&](auto& num) {return num == n;}))
+                if (n != 0 && !rn::any_of(weighs, [&](const auto& num) {return num == n;}))
                 {
                     weighs.push_back(n);
                     weighs_counts.push_back(0);
@@ -43,20 +50,22 @@ namespace fatpound::graph
             }
         }
 
-        std::sort(weighs.begin(), weighs.end());
+        rn::sort(weighs);
+
+        std::vector<std::vector<std::vector<int64_t>>> edges;
         edges.resize(weighs.size());
 
-        for (int64_t i = 0; i < G->GetNodeCount(); i++)
+        for (int64_t i = 0; i < nodeCount; i++)
         {
-            for (int64_t j = 0; j < G->GetNodeCount(); j++)
+            for (int64_t j = 0; j < nodeCount; j++)
             {
-                int64_t n = G->GetAdjAt(i, j);
+                const int64_t n = graph_->GetAdjAt(i, j);
 
                 if (n != 0 && IsNotInEdges(weighs, edges, n, i, j))
                 {
-                    const size_t index = std::find(weighs.cbegin(), weighs.cend(), n) - weighs.cbegin();
+                    const size_t index = rn::find(weighs, n) - weighs.cbegin();
 
-                    weighs_counts[index]++;
+                    ++weighs_counts[index];
 
                     edges[index].push_back(std::vector<int64_t>{ i, j });
                 }
@@ -70,11 +79,12 @@ namespace fatpound::graph
 
         //////////////
 
-        result.resize(G->GetEdgeCount());
+        std::vector<std::vector<int64_t>> result;
+        result.resize(graph_->GetEdgeCount());
 
         for (int64_t i = 0; i < result.size(); i++)
         {
-            result[i] = std::vector<int64_t>{i};
+            result[i].push_back(i);
         }
 
         for (int64_t i = 0; i < edges.size(); i++)
@@ -87,15 +97,17 @@ namespace fatpound::graph
                 }
             }
         }
+
         for (int64_t i = 0; i < result[last].size(); i++)
         {
-            std::cout << "abcdefghijk"[result[last][i]];
+            output_ += "abcdefghijk"[result[last][i]];
         }
 
-        std::cout << '\n';
+        output_ += '\n';
     }
 
-    int64_t Kruskal::GetIndexFromResult(std::vector<std::vector<int64_t>>& result, int64_t value)
+
+    int64_t Kruskal::GetIndexFromResult(std::vector<std::vector<int64_t>>& result, const int64_t& value)
     {
         for (int64_t i = 0; i < result.size(); i++)
         {
@@ -210,6 +222,6 @@ namespace fatpound::graph
 
     void Kruskal::PrintResults() const
     {
-        std::cout << output;
+        std::cout << output_;
     }
 }
