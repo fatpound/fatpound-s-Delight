@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../Math/Arithmetic.hpp"
+#include "../Math/FatMath.hpp"
 
-#include <print>
 #include <random>
+#include <print>
 
 using namespace fatpound::math;
 
@@ -23,27 +23,27 @@ namespace fatpound::cryptography
         do
         {
             r1 = idist(drng);
-            P = NextPrime(r1);
+            P = NextPrime<int64_t>(r1);
 
             r2 = idist(drng);
-            Q = NextPrime(r2);
+            Q = NextPrime<int64_t>(r2);
         }
         while (P == Q);
 
         int64_t    N =  P * Q;
         int64_t fi_N = (P - 1) * (Q - 1);
 
-        std::uniform_int_distribution<int> idist1(0, fi_N - 3);
+        std::uniform_int_distribution<int64_t> idist1(0i64, fi_N - 3i64);
 
         int64_t E;
 
         do
         {
-            E = rand() % (fi_N - 2);
+            E = idist1(drng);
         }
-        while (GCD(E + 2, fi_N) != 1);
+        while (GCD<int64_t>(E + 2, fi_N) != 1);
 
-        int64_t D = MMI(E, fi_N, 1, 0);
+        int64_t D = MMI<int64_t>(E, fi_N, 1, 0);
 
         std::println("r1 = {}", r1);
         std::println("r2 = {}", r2);
@@ -70,7 +70,9 @@ namespace fatpound::cryptography
             {
                 product *= temp;
 
-                if (flag = !flag)
+                flag = !flag;
+
+                if (flag)
                 {
                     product %= N;
                 }
@@ -91,7 +93,9 @@ namespace fatpound::cryptography
             {
                 product *= temp;
 
-                if (flag = !flag)
+                flag = !flag;
+
+                if (flag)
                 {
                     product %= N;
                 }
