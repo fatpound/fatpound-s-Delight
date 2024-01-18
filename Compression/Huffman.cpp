@@ -1,11 +1,14 @@
 #include "Huffman.hpp"
 
-#include <sstream>
+#include "../File/FatFile.hpp"
+
+#include <fstream>
 #include <iostream>
 #include <vector>
 #include <deque>
 #include <string>
 #include <algorithm>
+#include <bitset>
 #include <stdexcept>
 #include <ranges>
 
@@ -13,60 +16,73 @@ namespace rn = std::ranges;
 
 namespace fatpound::compression
 {
-    Huffman::~Huffman() noexcept
+    void Huffman::Compress(const std::string& input_filename)
     {
-        Delete_(root_);
-    }
+        std::ifstream input_file(input_filename, std::ios::binary);
 
-    Huffman::Huffman(const std::string& input)
-    {
-        if (input.length() == 0)
+        if ( ! input_file.is_open() )
         {
-            return;
+            throw std::runtime_error("Input file cannot be opened for [Compressing]!");
         }
 
-        std::vector<std::pair<int64_t, char>> pairs;
+        input_file.seekg(0, std::ios::end);
+        const size_t file_size = input_file.tellg();
 
-        for (const auto& ch : input)
+        if (file_size < 1u)
         {
-            int64_t index = -1;
-
-            for (size_t i = 0u; i < pairs.size(); ++i)
-            {
-                if (pairs[i].second == ch)
-                {
-                    index = i;
-                }
-            }
-
-            if (index == -1)
-            {
-                pairs.emplace_back(1, ch);
-            }
-            else
-            {
-                pairs[index].first++;
-            }
+            throw std::runtime_error("Input file is empty for [Compressing]!");
         }
 
-        rn::sort(pairs, [](const auto& a, const auto& b) -> bool { return a.first < b.first; });
+        // input_file.clear();
+        input_file.seekg(0, std::ios::beg);
+
+        const auto& name_ext = fatpound::file::GetNameAndExtensionFromFilename(input_filename);
+
+        std::ofstream output_file(name_ext.first + "_compressed" + "." + name_ext.second, std::ios::binary);
+
+        if ( ! output_file.is_open() )
+        {
+            throw std::runtime_error("Compressed file cannot be created!");
+        }
+
+        std::vector<std::pair<unsigned char, size_t>> pairs;
+        pairs.reserve(256);
+
+        for (size_t i = 0u; i < 256u; ++i)
+        {
+            pairs.emplace_back(static_cast<unsigned char>(i), 0u);
+        }
+
+        int ch = input_file.get();
+
+        while ( ! input_file.eof() )
+        {
+            pairs[ch].second++;
+
+            ch = input_file.get();
+        }
+
+        pairs.erase(rn::remove_if(pairs, [](const auto& pair) -> bool { return pair.second == 0u; }).begin(), pairs.end());
+        rn::sort(pairs, [](const auto& pair1, const auto& pair2) -> bool { return pair1.second < pair2.second; });
 
         std::deque<Node*> deque;
         deque.resize(pairs.size());
 
-        for (size_t i = 0; i < pairs.size(); ++i)
+        for (size_t i = 0u; i < pairs.size(); ++i)
         {
-            deque[i] = new Node(pairs[i].first, pairs[i].second);
+            deque[i] = new Node(static_cast<int64_t>(pairs[i].first), pairs[i].second);
         }
 
         const size_t first_size = deque.size();
 
+        // Generating Huffman Tree
+
         for (size_t i = 0u; i < first_size - 1u; ++i)
         {
-            Node* const left = deque[0];
+            Node* const left  = deque[0];
             Node* const right = deque[1];
 
-            Node* newnode = new Node(left, right);
+            Node* const newnode = new Node(left, right);
 
             deque.pop_front();
             deque.pop_front();
@@ -84,149 +100,255 @@ namespace fatpound::compression
                     break;
                 }
             }
-
+            
             deque.insert(deque.begin() + index, newnode);
         }
 
-        root_ = deque[0];
-        node_count_ = first_size * 2 - 1;
+        // const size_t node_count = first_size * 2 - 1; // unused
 
-        SetBinaryValues_(root_);
-    }
+        auto tree_results = GenerateBinaryWords_(deque[0], "");
+        DeleteTree_(deque[0]);
 
+        const size_t tree_result_len = tree_results.length();
 
-    std::string Huffman::GetDecompressed(const std::string& bin)
-    {
-        std::string decompressed;
+        output_file << tree_result_len << ' ';
 
-        for (size_t i = 0u; i < bin.size(); ++i)
+        auto tree_results_pairs = GenerateTreeResultPairs_(tree_results);
+
+        output_file << tree_results << ' ';
+
+        // rn::sort(tree_results_pairs, [](const auto& pair1, const auto& pair2) -> bool { return pair1.first < pair2.first; });
+
+        size_t bit_mod = 0u;
+
+        for (const auto& pair : pairs)
         {
-            std::string temp = "";
+            bit_mod += rn::find_if(tree_results_pairs, [&](const auto& pair1) -> bool { return pair1.first == pair.first; })->second.length() * pair.second;
+        }
 
-            int64_t index = -1;
+        bit_mod %= 8u;
 
-            for (size_t j = i; j < bin.size() && temp.size() <= max_depth_; ++j)
+        output_file << bit_mod << ' ';
+
+        input_file.clear();
+        input_file.seekg(std::ios::beg);
+
+        std::string final_str;
+
+        const auto lambda = [&](const auto& pair) -> bool { return pair.first == ch; };
+
+        ch = input_file.get();
+
+        while ( ! input_file.eof() )
+        {
+            final_str += rn::find_if(tree_results_pairs, lambda)->second;
+
+            if (final_str.length() >= 8u)
             {
-                temp += bin[j];
+                const std::string temp_str(final_str.cbegin(), final_str.cbegin() + 8u);
 
-                if (temp.size() < min_depth_)
+                final_str.erase(final_str.cbegin(), final_str.cbegin() + 8u);
+
+                output_file.put(std::stoi(temp_str, nullptr, 2));
+            }
+
+            ch = input_file.get();
+        }
+
+        while (final_str.length() >= 8u)
+        {
+            const std::string temp_str(final_str.cbegin(), final_str.cbegin() + 8u);
+
+            final_str.erase(final_str.cbegin(), final_str.cbegin() + 8u);
+
+            output_file.put(std::stoi(temp_str, nullptr, 2));
+        }
+        
+        if (bit_mod != 0u)
+        {
+            final_str += std::string(8u - bit_mod, '0');
+
+            output_file.put(std::stoi(final_str, nullptr, 2));
+        }
+    }
+    void Huffman::Decompress(const std::string& input_filename)
+    {
+        std::ifstream input_file(input_filename, std::ios::binary);
+
+        if ( ! input_file.is_open() )
+        {
+            throw std::runtime_error("Input file cannot be opened for [Decompressing]!");
+        }
+
+        input_file.seekg(0, std::ios::end);
+
+        if (input_file.tellg() < 1u)
+        {
+            throw std::runtime_error("Input file is empty for [Compressing]!");
+        }
+
+        // input_file.clear();
+        input_file.seekg(0, std::ios::beg);
+
+        const auto& name_ext = fatpound::file::GetNameAndExtensionFromFilename(input_filename);
+
+        std::ofstream output_file(name_ext.first + "_decompressed" + "." + name_ext.second, std::ios::binary);
+
+        if (!output_file.is_open())
+        {
+            throw std::runtime_error("Compressed file cannot be created!");
+        }
+
+        int byte_count;
+        input_file >> byte_count;
+        
+        if (byte_count == -1 || input_file.get() != ' ')
+        {
+            throw std::runtime_error("Unknown compression format for [Decompressing]!");
+        }
+
+        std::string tree_str(byte_count, ' ');
+
+        input_file.read(tree_str.data(), byte_count);
+        auto tree_results_pairs = GenerateTreeResultPairs_(tree_str);
+
+        int bit_mod;
+        input_file >> bit_mod;
+
+        if (bit_mod == -1 || input_file.get() != ' ')
+        {
+            throw std::runtime_error("Unknown compression format for [Decompressing]!");
+        }
+
+        unsigned int ch;
+        ch = input_file.get();
+
+        std::string final_str;
+
+        while ( ! input_file.eof() )
+        {
+            std::bitset<8> bitset(ch);
+
+            final_str += bitset.to_string();
+
+            if (final_str.length() > 32u)
+            {
+                if ( ! DecompressToFile_(output_file, tree_results_pairs, final_str) )
                 {
-                    continue;
-                }
-
-                for (size_t k = 0; k < results_binary_.size(); ++k)
-                {
-                    if (temp == results_binary_[k])
-                    {
-                        index = k;
-
-                        break;
-                    }
-                }
-
-                if (index != -1)
-                {
-                    decompressed += results_chars_[index];
-
-                    i += temp.size() - 1;
-
-                    break;
+                    throw std::runtime_error("Unknown compression format for [Decompressing]!");
                 }
             }
 
-            if (index == -1)
+            ch = input_file.get();
+        }
+        
+        if (bit_mod != 0u)
+        {
+            final_str.erase(final_str.cend() - (8u - bit_mod), final_str.cend());
+        }
+
+        while (final_str.length() > 0)
+        {
+            if ( ! DecompressToFile_(output_file, tree_results_pairs, final_str) )
             {
-                throw std::runtime_error("Incorrect Format!");
+                throw std::runtime_error("Unknown compression format for [Decompressing]!");
+            }
+        }
+    }
+
+    
+    std::vector<std::pair<unsigned char, std::string>> Huffman::GenerateTreeResultPairs_(const std::string& tree_results)
+    {
+        std::vector<std::pair<unsigned char, std::string>> tree_results_pairs;
+
+        for (size_t i = 0u; i < tree_results.length(); ++i)
+        {
+            std::string tempstr;
+
+            unsigned char ch = static_cast<unsigned char>(tree_results[i]);
+
+            tempstr += ch;
+
+            size_t j = i + 1u;
+
+            ch = tree_results[j];
+
+            while (j < tree_results.length() && std::isdigit(ch))
+            {
+                tempstr += ch;
+
+                ++j;
+
+                ch = tree_results[j];
+            }
+
+            i = j;
+
+            tree_results_pairs.emplace_back(tempstr[0], std::string(tempstr.cbegin() + 1u, tempstr.cend()));
+        }
+
+        return tree_results_pairs;
+    }
+
+    std::string Huffman::GenerateBinaryWords_(Node* node, const std::string& str)
+    {
+        if (node == nullptr)
+        {
+            return str;
+        }
+
+        if (node->ch_ != -1)
+        {
+            std::string s;
+            s += static_cast<unsigned char>(node->ch_);
+
+            return s + str;
+        }
+
+        return GenerateBinaryWords_(node->left_, str + "0") + "-" + GenerateBinaryWords_(node->right_, str + "1");
+    }
+
+    bool Huffman::DecompressToFile_(std::ofstream& output_file, const std::vector<std::pair<unsigned char, std::string>>& tree_results_pairs, std::string& final_str)
+    {
+        if (final_str.length() == 0u)
+        {
+            return true;
+        }
+
+        bool found = false;
+        
+        size_t max = final_str.length() >= 16u ? 16u : final_str.length();
+        
+        for (size_t i = 1u; i <= max; ++i)
+        {
+            std::string str(final_str.cbegin(), final_str.cbegin() + i);
+
+            const auto it = rn::find_if(tree_results_pairs, [&](const auto& pair) -> bool { return pair.second == str; });
+
+            if (it != tree_results_pairs.cend())
+            {
+                found = true;
+
+                output_file << it->first;
+
+                final_str = std::string(final_str.cbegin() + i, final_str.cend());
+
+                break;
             }
         }
 
-        std::ostringstream oss;
-
-        oss << "Decompressed: " << decompressed << '\n';
-
-        size_t size = bin.size();
-
-        double numerator = static_cast<double>(size / 8);
-
-        if (size % 8u != 0)
-        {
-            ++numerator;
-        }
-
-        const double denominator = static_cast<double>(decompressed.size());
-        const double rate = numerator * 100 / denominator;
-
-        oss << "Package count: " << numerator << '\n';
-        oss << "Compression rate: %" << rate << " ~= " << numerator << '/' << denominator << '\n';
-
-        return oss.str();
+        return found;
     }
 
-    void Huffman::ListTreePreorder() const
-    {
-        std::cout << "Output : ";
-
-        ListTreePreorder_(root_);
-
-        std::cout << '\n';
-    }
-
-    void Huffman::SetBinaryValues_(Node* node, const std::string& str)
+    void Huffman::DeleteTree_(Node* node)
     {
         if (node == nullptr)
         {
             return;
         }
 
-        if (node->left_ == nullptr && node->right_ == nullptr)
-        {
-            results_chars_.push_back(node->k_);
-            results_binary_.push_back(str);
-
-            if (max_depth_ < str.size())
-            {
-                max_depth_ = str.size();
-            }
-
-            if (min_depth_ > str.size())
-            {
-                min_depth_ = str.size();
-            }
-
-            return;
-        }
-
-        SetBinaryValues_(node->left_,  str + "0");
-        SetBinaryValues_(node->right_, str + "1");
-    }
-    void Huffman::ListTreePreorder_(Node* node) const
-    {
-        if (node == nullptr)
-        {
-            return;
-        }
-
-        if (node->left_ == nullptr && node->right_ == nullptr)
-        {
-            std::cout << node->k_ << '*' << node->num_ << ' ';
-
-            return;
-        }
-
-        std::cout << node->num_ << ' ';
-
-        ListTreePreorder_(node->left_);
-        ListTreePreorder_(node->right_);
-    }
-    void Huffman::Delete_(Node* node)
-    {
-        if (node == nullptr)
-        {
-            return;
-        }
-
-        Delete_(node->left_);
-        Delete_(node->right_);
+        DeleteTree_(node->left_);
+        DeleteTree_(node->right_);
 
         delete node;
     }
@@ -240,10 +362,10 @@ namespace fatpound::compression
     {
 
     }
-    Huffman::Node::Node(int64_t num, char k)
+    Huffman::Node::Node(const int64_t& ch, const int64_t& num)
         :
-        num_(num),
-        k_(k)
+        ch_(ch),
+        num_(num)
     {
 
     }
