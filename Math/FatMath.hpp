@@ -30,11 +30,6 @@ namespace fatpound::math
     {
         return (x * y) / GCD<T>(y, x % y);
     }
-    template <std::signed_integral T>
-    T MMI(T a, T b, T s0, T s1)
-    {
-        return (b ? MMI<T>(b, a % b, s1, s0 - s1 * (a / b)) : s0);
-    }
 
     template <typename T>
     inline auto sq(const T& x)
