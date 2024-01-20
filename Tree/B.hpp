@@ -3,10 +3,13 @@
 #include <iostream>
 #include <vector>
 #include <queue>
+#include <ranges>
+
+namespace rn = std::ranges;
 
 namespace fatpound::tree
 {
-    template <typename T, size_t C>
+    template <std::totally_ordered T, size_t C>
     class B
     {
     public:
@@ -23,7 +26,7 @@ namespace fatpound::tree
             std::queue<Node*> Q;
             Q.push(root_);
 
-            while (Q.size() > 0ui64)
+            while (Q.size() > 0u)
             {
                 Node* u = Q.front();
                 Q.pop();
@@ -33,7 +36,7 @@ namespace fatpound::tree
                     Q.push(u->lesser);
                 }
 
-                for (size_t i = 0ui64; i < u->items.size(); ++i)
+                for (size_t i = 0u; i < u->items.size(); ++i)
                 {
                     if (u->items[i]->second != nullptr)
                     {
@@ -48,10 +51,10 @@ namespace fatpound::tree
 
             root_ = nullptr;
         }
-        B(const B<T,C>& src) = delete;
-        B(B<T,C>&& src) = delete;
-        B<T, C>& operator = (const B<T,C>& src) = delete;
-        B<T, C>& operator = (B<T,C>&& src) = delete;
+        B(const B<T, C>& src) = delete;
+        B(B<T, C>&& src) = delete;
+        B<T, C>& operator = (const B<T, C>& src) = delete;
+        B<T, C>& operator = (B<T, C>&& src) = delete;
 
 
     public:
@@ -79,7 +82,7 @@ namespace fatpound::tree
             std::queue<B<T, C>::Node*> Q;
             Q.push(root_);
 
-            while (Q.size() > 0ui64)
+            while (Q.size() > 0u)
             {
                 B<T, C>::Node* u = Q.front();
                 Q.pop();
@@ -90,7 +93,7 @@ namespace fatpound::tree
                     Q.push(u->lesser);
                 }
 
-                for (size_t i = 0ui64; i < u->items.size(); ++i)
+                for (size_t i = 0u; i < u->items.size(); ++i)
                 {
                     std::cout << u->items[i]->first << ' ';
 
@@ -111,9 +114,8 @@ namespace fatpound::tree
 
 
     private:
-        class Node
+        struct Node
         {
-        public:
             Node() = default;
 
             Node(B<T, C>::Node* new_lesser)
@@ -132,20 +134,15 @@ namespace fatpound::tree
                 }
             }
 
-        public:
             std::vector<std::pair<T, Node*>*> items;
 
             Node* lesser = nullptr;
             Node* parent = nullptr;
-
-        protected:
-
-        private:
         };
 
 
     private:
-        void Insert  (B<T, C>::Node* node, std::pair<T, B<T, C>::Node*>* pair, bool add_first_time)
+        void Insert(B<T, C>::Node* node, std::pair<T, B<T, C>::Node*>* pair, bool add_first_time)
         {
             if (node == nullptr)
             {
@@ -154,14 +151,14 @@ namespace fatpound::tree
 
         label:
 
-            if (node->items.size() == C * 2ui64)
+            if (node->items.size() == C * 2u)
             {
                 if (add_first_time)
                 {
-                    size_t idx = 0ui64;
+                    size_t idx = 0u;
                     bool flag = false;
 
-                    for (size_t i = 0ui64; i < node->items.size(); ++i)
+                    for (size_t i = 0u; i < node->items.size(); ++i)
                     {
                         if (pair->first > node->items[i]->first && node->items[i]->second != nullptr)
                         {
@@ -190,17 +187,17 @@ namespace fatpound::tree
             }
             else
             {
-                if (node->items.size() != 0ui64 && add_first_time)
+                if (node->items.size() != 0u && add_first_time)
                 {
-                    if (pair->first < node->items[0ui64]->first && node->lesser != nullptr)
+                    if (pair->first < node->items[0u]->first && node->lesser != nullptr)
                     {
                         node = node->lesser;
                         goto label;
                     }
 
-                    size_t index = 0ui64;
+                    size_t index = 0u;
 
-                    for (size_t i = 0ui64; i < node->items.size(); ++i)
+                    for (size_t i = 0u; i < node->items.size(); ++i)
                     {
                         if (pair->first > node->items[i]->first)
                         {
@@ -217,16 +214,9 @@ namespace fatpound::tree
 
                 node->items.push_back(pair);
 
-                if (node->items.size() > 1ui64)
+                if (node->items.size() > 1u)
                 {
-                    std::sort(
-                        node->items.begin(),
-                        node->items.end(),
-                        [](const auto p1, const auto p2)
-                        {
-                            return p1->first < p2->first;
-                        }
-                    );
+                    rn::sort(node->items, [](const auto& p1, const auto& p2) -> bool { return p1->first < p2->first; });
                 }
             }
         }
@@ -236,38 +226,31 @@ namespace fatpound::tree
 
             temp_vec.push_back(pair);
 
-            for (size_t i = 0ui64; i < C * 2ui64; ++i)
+            for (size_t i = 0u; i < C * 2u; ++i)
             {
                 temp_vec.push_back(node->items[i]);
             }
 
-            std::sort(
-                temp_vec.begin(),
-                temp_vec.end(),
-                [](const auto p1, const auto p2)
-                {
-                    return p1->first < p2->first;
-                }
-            );
+            rn::sort(temp_vec, [](const auto& p1, const auto& p2) -> bool { return p1->first < p2->first; });
 
-            size_t center = (C * 2ui64 + 1ui64) / 2ui64;
+            size_t center = (C * 2u + 1u) / 2u;
 
             std::vector<std::pair<T, B<T, C>::Node*>*> temp_vec_less;
             std::vector<std::pair<T, B<T, C>::Node*>*> temp_vec_more;
 
-            for (size_t i = 0ui64; i < center; ++i)
+            for (size_t i = 0u; i < center; ++i)
             {
                 temp_vec_less.push_back(temp_vec[i]);
             }
 
-            for (size_t i = center + 1ui64; i <= C * 2ui64; ++i)
+            for (size_t i = center + 1u; i <= C * 2u; ++i)
             {
                 temp_vec_more.push_back(temp_vec[i]);
             }
 
             node->items.clear();
 
-            for (size_t i = 0ui64; i < temp_vec_less.size(); ++i)
+            for (size_t i = 0u; i < temp_vec_less.size(); ++i)
             {
                 node->items.push_back(temp_vec_less[i]);
             }
@@ -284,7 +267,7 @@ namespace fatpound::tree
             B<T, C>::Node* new_node = new B<T, C>::Node();
             new_node->parent = node->parent;
 
-            for (size_t i = 0ui64; i < temp_vec_more.size(); ++i)
+            for (size_t i = 0u; i < temp_vec_more.size(); ++i)
             {
                 new_node->items.push_back(temp_vec_more[i]);
             }
@@ -297,6 +280,6 @@ namespace fatpound::tree
     private:
         Node* root_ = nullptr;
 
-        size_t depth_ = 0ui64;
+        size_t depth_ = 0;
     };
 }
