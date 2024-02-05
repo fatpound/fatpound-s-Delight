@@ -2,6 +2,9 @@
 
 #include <iostream>
 #include <concepts>
+#include <typeinfo>
+#include <exception>
+#include <stdexcept>
 
 namespace fatpound::linkedlist
 {
@@ -12,45 +15,29 @@ namespace fatpound::linkedlist
         DoublyLL() = default;
         virtual ~DoublyLL() noexcept
         {
-            if (list_ == nullptr)
-            {
-                return;
-            }
-
-            Node* ex = list_;
-            Node* temp;
-
-            do
-            {
-                temp = ex->next;
-                delete ex;
-
-                ex = temp;
-            }
-            while (ex != nullptr);
-
-            list_ = nullptr;
-            end_  = nullptr;
-
-            item_count_ = static_cast<decltype(item_count_)>(0);
+            Delete_();
         }
         DoublyLL(const DoublyLL<T>& src) = delete;
         DoublyLL(DoublyLL<T>&& src) noexcept
             :
             list_(std::exchange(src.list_, nullptr)),
             end_(std::exchange(src.end_, nullptr)),
-            item_count_(std::exchange(src.item_count_, static_cast<decltype(item_count_)>(0)))
+            item_count_(std::exchange(src.item_count_, 0u))
         {
 
         }
         DoublyLL<T>& operator = (const DoublyLL<T>& src) = delete;
         DoublyLL<T>& operator = (DoublyLL<T>&& src) noexcept
         {
+            Delete_();
 
-            list_ = std::exchange(src.list_, nullptr);
-            end_  = std::exchange(src.end_,  nullptr);
+            if (this != std::addressof(src) && typeid(src) == typeid(*this) && src.list_ != nullptr)
+            {
+                list_ = std::exchange(src.list_, nullptr);
+                end_ = std::exchange(src.end_, nullptr);
 
-            item_count_ = std::exchange(src.item_count_, static_cast<decltype(item_count_)>(0));
+                item_count_ = std::exchange(src.item_count_, 0u);
+            }
 
             return *this;
         }
@@ -59,7 +46,7 @@ namespace fatpound::linkedlist
     public:
         virtual bool Contains(T item) const
         {
-            return Find(item) == nullptr
+            return Find_(item) == nullptr
                 ? false
                 : true
                 ;
@@ -132,6 +119,11 @@ namespace fatpound::linkedlist
                 return;
             }
 
+            if (this->item_count_ < 2u)
+            {
+                return;
+            }
+
             Node* temp = list_;
 
             while (temp->next != nullptr)
@@ -145,6 +137,11 @@ namespace fatpound::linkedlist
         }
         virtual void Print() const
         {
+            if (list_ == nullptr)
+            {
+                throw std::runtime_error("Tried to Print an empty DoublyLL!");
+            }
+
             Node* temp = list_;
 
             do
@@ -174,14 +171,14 @@ namespace fatpound::linkedlist
 
 
     protected:
-        virtual DoublyLL<T>::Node* Find(T item) const
+        virtual DoublyLL<T>::Node* Find_(T item) const
         {
-            if (item_count_ == static_cast<decltype(item_count_)>(0))
+            if (item_count_ == 0u)
             {
                 return nullptr;
             }
 
-            if (item_count_ == static_cast<decltype(item_count_)>(1))
+            if (item_count_ == 1u)
             {
                 return list_->item == item
                     ? list_
@@ -191,7 +188,7 @@ namespace fatpound::linkedlist
 
             Node* temp = list_;
 
-            for (size_t i = static_cast<size_t>(0); i < item_count_; ++i)
+            for (size_t i = 0u; i < item_count_; ++i)
             {
                 if (temp->item == item)
                 {
@@ -204,11 +201,39 @@ namespace fatpound::linkedlist
             return nullptr;
         }
 
+        virtual void Delete_()
+        {
+            if (list_ == nullptr)
+            {
+                return;
+            }
+
+            Node* ex = list_;
+            Node* temp;
+
+            do
+            {
+                temp = ex->next;
+                delete ex;
+
+                ex = temp;
+            }
+            while (ex != nullptr);
+
+            list_ = nullptr;
+            end_ = nullptr;
+
+            item_count_ = 0u;
+        }
+
 
     protected:
         Node* list_ = nullptr;
         Node* end_  = nullptr;
         
-        size_t item_count_ = static_cast<size_t>(0);
+        size_t item_count_ = 0u;
+
+
+    private:
     };
 }

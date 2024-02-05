@@ -5,60 +5,44 @@
 namespace fatpound::linkedlist
 {
     template <std::totally_ordered T>
-    class DoublyCircularLL : public DoublyLL<T>
+    class DoublyCircularLL final : public DoublyLL<T>
     {
     public:
         DoublyCircularLL() = default;
         virtual ~DoublyCircularLL() noexcept override
         {
-            if (this->list_ == nullptr)
-            {
-                return;
-            }
-
-            typename DoublyLL<T>::Node* start = this->list_;
-            typename DoublyLL<T>::Node* ex = this->list_;
-            typename DoublyLL<T>::Node* temp;
-
-            do
-            {
-                temp = ex->next;
-                delete ex;
-
-                ex = temp;
-            }
-            while (ex != start);
-
-            this->list_ = nullptr;
-            this->end_  = nullptr;
-
-            this->item_count_ = static_cast<decltype(this->item_count_)>(0);
+            Delete_();
         }
         DoublyCircularLL(const DoublyCircularLL& src) = delete;
         DoublyCircularLL(DoublyCircularLL&& src) noexcept
             :
             DoublyLL<T>(std::move(src))
         {
-
+            
         }
         DoublyCircularLL<T>& operator = (const DoublyCircularLL& src) = delete;
         DoublyCircularLL<T>& operator = (DoublyCircularLL&& src) noexcept
         {
-            this->list_ = std::exchange(src.list_, nullptr);
-            this->end_  = std::exchange(src.end_,  nullptr);
-            
-            this->item_count_ = std::exchange(src.item_count_, static_cast<decltype(this->item_count_)>(0));
+            Delete_();
 
-            return *this;
+            if (this != std::addressof(src) && typeid(src) == typeid(*this) && src.list_ != nullptr)
+            {
+                this->list_ = std::exchange(src.list_, nullptr);
+                this->end_ = std::exchange(src.end_, nullptr);
+
+                this->item_count_ = std::exchange(src.item_count_, 0u);
+
+                return *this;
+            }
         }
 
 
     public:
-        virtual void Add(T new_item) override
+        void Add(T new_item) override
         {
             typename DoublyLL<T>::Node* new_part = new DoublyLL<T>::Node(new_item);
 
-            this->item_count_++;
+            ++(this->item_count_);
 
             if (this->list_ == nullptr)
             {
@@ -78,11 +62,11 @@ namespace fatpound::linkedlist
 
             this->end_ = new_part;
         }
-        virtual void AddOrdered(T new_item) override
+        void AddOrdered(T new_item) override
         {
             typename DoublyLL<T>::Node* new_part = new DoublyLL<T>::Node(new_item);
 
-            this->item_count_++;
+            ++(this->item_count_);
 
             if (this->list_ == nullptr)
             {
@@ -129,9 +113,14 @@ namespace fatpound::linkedlist
             new_part->next = start;
             start->prev = new_part;
         }
-        virtual void Reverse() override
+        void Reverse() override
         {
             if (this->list_ == nullptr)
+            {
+                return;
+            }
+
+            if (this->item_count_ < 2u)
             {
                 return;
             }
@@ -148,8 +137,13 @@ namespace fatpound::linkedlist
             std::swap(temp->prev, temp->next);
             this->list_ = temp;
         }
-        virtual void Print() const override
+        void Print() const override
         {
+            if (this->list_ == nullptr)
+            {
+                throw std::runtime_error("Tried to Print an empty DoublyCircularLL!");
+            }
+
             typename DoublyLL<T>::Node* temp = this->list_;
             typename DoublyLL<T>::Node* start = temp;
 
@@ -165,6 +159,31 @@ namespace fatpound::linkedlist
 
 
     protected:
+        void Delete_() override
+        {
+            if (this->list_ == nullptr)
+            {
+                return;
+            }
+
+            typename DoublyLL<T>::Node* start = this->list_;
+            typename DoublyLL<T>::Node* ex = this->list_;
+            typename DoublyLL<T>::Node* temp;
+
+            do
+            {
+                temp = ex->next;
+                delete ex;
+
+                ex = temp;
+            }
+            while (ex != start);
+
+            this->list_ = nullptr;
+            this->end_ = nullptr;
+
+            this->item_count_ = 0u;
+        }
 
 
     private:

@@ -2,6 +2,9 @@
 
 #include <iostream>
 #include <concepts>
+#include <typeinfo>
+#include <exception>
+#include <stdexcept>
 
 namespace fatpound::linkedlist
 {
@@ -12,44 +15,29 @@ namespace fatpound::linkedlist
         SinglyLL() = default;
         virtual ~SinglyLL() noexcept
         {
-            if (list_ == nullptr)
-            {
-                return;
-            }
-
-            Node* ex = list_;
-            Node* temp;
-
-            do
-            {
-                temp = ex->next;
-                delete ex;
-
-                ex = temp;
-            }
-            while (ex != nullptr);
-
-            list_ = nullptr;
-            end_  = nullptr;
-
-            item_count_ = static_cast<decltype(item_count_)>(0);
+            Delete_();
         }
         SinglyLL(const SinglyLL<T>& src) = delete;
         SinglyLL(SinglyLL<T>&& src) noexcept
             :
             list_(std::exchange(src.list_, nullptr)),
             end_(std::exchange(src.end_, nullptr)),
-            item_count_( std::exchange(src.item_count_, static_cast<decltype(item_count_)>(0)))
+            item_count_(std::exchange(src.item_count_, 0u))
         {
 
         }
         SinglyLL<T>& operator = (const SinglyLL<T>& src) = delete;
         SinglyLL<T>& operator = (SinglyLL<T>&& src) noexcept
         {
-            list_ = std::exchange(src.list_, nullptr);
-            end_  = std::exchange(src.end_,  nullptr);
+            if (this != std::addressof(src) && typeid(src) == typeid(*this) && src.list_ != nullptr)
+            {
+                Delete_();
 
-            item_count_ = std::exchange(src.item_count_, static_cast<decltype(item_count_)>(0));
+                list_ = std::exchange(src.list_, nullptr);
+                end_ = std::exchange(src.end_, nullptr);
+
+                item_count_ = std::exchange(src.item_count_, 0u);
+            }
 
             return *this;
         }
@@ -58,7 +46,7 @@ namespace fatpound::linkedlist
     public:
         virtual bool Contains(T item) const
         {
-            return Find(item) == nullptr
+            return Find_(item) == nullptr
                 ? false
                 : true
                 ;
@@ -128,6 +116,11 @@ namespace fatpound::linkedlist
                 return;
             }
 
+            if (this->item_count_ < 2u)
+            {
+                return;
+            }
+
             Node* start_backup = list_;
 
             Node* t;
@@ -167,7 +160,7 @@ namespace fatpound::linkedlist
         {
             if (list_ == nullptr)
             {
-                return;
+                throw std::runtime_error("Tried to Print an empty SinglyLL!");
             }
 
             Node* temp = list_;
@@ -200,14 +193,14 @@ namespace fatpound::linkedlist
 
 
     protected:
-        virtual SinglyLL<T>::Node* Find(T item) const
+        virtual SinglyLL<T>::Node* Find_(T item) const
         {
-            if (item_count_ == static_cast<decltype(item_count_)>(0))
+            if (item_count_ == 0u)
             {
                 return nullptr;
             }
 
-            if (item_count_ == static_cast<decltype(item_count_)>(1))
+            if (item_count_ == 1u)
             {
                 return list_->item == item
                     ? list_
@@ -230,12 +223,37 @@ namespace fatpound::linkedlist
             return nullptr;
         }
 
+        virtual void Delete_()
+        {
+            if (list_ == nullptr)
+            {
+                return;
+            }
+
+            Node* ex = list_;
+            Node* temp;
+
+            do
+            {
+                temp = ex->next;
+                delete ex;
+
+                ex = temp;
+            }
+            while (ex != nullptr);
+
+            list_ = nullptr;
+            end_ = nullptr;
+
+            item_count_ = 0u;
+        }
+
 
     protected:
         Node* list_ = nullptr;
         Node* end_  = nullptr;
 
-        size_t item_count_ = static_cast<decltype(item_count_)>(0);
+        size_t item_count_ = 0u;
 
 
     private:
