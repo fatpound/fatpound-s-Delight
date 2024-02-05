@@ -18,9 +18,9 @@ namespace fatpound::math
         ~Matrix() = default;
         Matrix(const Matrix<T>& src)
             :
-            row_count_( src.row_count_ ),
-            col_count_( src.col_count_ ),
-            matrix_( std::make_unique<T[]>(row_count_ * col_count_) )
+            row_count_(src.row_count_),
+            col_count_(src.col_count_),
+            matrix_(std::make_unique<T[]>(row_count_ * col_count_))
         {
             std::copy(src.matrix_.get(), src.matrix_.get() + row_count_ * col_count_, matrix_.get());
         }
@@ -34,11 +34,14 @@ namespace fatpound::math
         }
         Matrix<T>& operator = (const Matrix<T>& src)
         {
-            row_count_ = src.row_count_;
-            col_count_ = src.col_count_;
-            matrix_ = std::make_unique<T[]>(row_count_ * col_count_);
+            if (this != std::addressof(src))
+            {
+                row_count_ = src.row_count_;
+                col_count_ = src.col_count_;
+                matrix_ = std::make_unique<T[]>(row_count_ * col_count_);
 
-            std::copy(src.matrix_.get(), src.matrix_.get() + row_count_ * col_count_, matrix_.get());
+                std::copy(src.matrix_.get(), src.matrix_.get() + row_count_ * col_count_, matrix_.get());
+            }
 
             return *this;
         }
@@ -56,9 +59,9 @@ namespace fatpound::math
 
         Matrix(int64_t row, int64_t col)
             :
-            row_count_{ (assert(row > 0), static_cast<size_t>(row)) },
-            col_count_{ (assert(col > 0), static_cast<size_t>(col)) },
-            matrix_{ std::make_unique<T[]>(row_count_ * col_count_) }
+            row_count_((assert(row > 0), static_cast<size_t>(row))),
+            col_count_((assert(col > 0), static_cast<size_t>(col))),
+            matrix_(std::make_unique<T[]>(row_count_ * col_count_))
         {
             
         }
