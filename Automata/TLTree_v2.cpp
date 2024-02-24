@@ -2,6 +2,17 @@
 
 namespace fatpound::automata
 {
+    TLTree_v2::TLTree_v2(const std::vector<std::pair<std::string, std::vector<std::string>>>& trees)
+    {
+        trees_.reserve(trees.size());
+
+        for (const auto& tree : trees)
+        {
+            trees_.push_back(new Node(tree));
+        }
+
+        results_ = Generate_("", 0u, 0u);
+    }
     TLTree_v2::~TLTree_v2() noexcept
     {
         std::deque<Node*> nodes;
@@ -33,24 +44,10 @@ namespace fatpound::automata
         }
     }
 
-    TLTree_v2::TLTree_v2(const std::vector<std::pair<std::string, std::vector<std::string>>>& trees)
-    {
-        trees_.reserve(trees.size());
-
-        for (const auto& tree : trees)
-        {
-            trees_.push_back(new Node(tree));
-        }
-
-        results_ = Generate_("", 0u, 0u);
-    }
-
-
     std::vector<std::pair<std::string, bool>> TLTree_v2::GetWords()
     {
         return results_;
     }
-
 
     std::vector<std::pair<std::string, bool>> TLTree_v2::Generate_(std::string init_str, size_t index, size_t recursed) const
     {

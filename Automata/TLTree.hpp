@@ -16,13 +16,14 @@ namespace fatpound::automata
     {
     public:
         TLTree() = delete;
-        ~TLTree() noexcept;
+
+        TLTree(const std::vector<std::pair<std::string, std::vector<std::string>>>& cfgs);
+
         TLTree(const TLTree& src) = delete;
         TLTree(TLTree&& src) = delete;
         TLTree& operator = (const TLTree& src) = delete;
         TLTree& operator = (TLTree&& src) = delete;
-
-        TLTree(const std::vector<std::pair<std::string, std::vector<std::string>>>& cfgs);
+        ~TLTree() noexcept;
 
 
     public:
@@ -44,10 +45,10 @@ namespace fatpound::automata
 
 
     private:
-        bool IsTerminal(const std::string& word) const;
+        bool IsTerminal_(const std::string& word) const;
 
-        void CreateTree(Node* node);
-        void CreateInnerTree(Node* node);
+        void CreateTree_(Node* node);
+        void CreateInnerTree_(Node* node);
 
 
     private:

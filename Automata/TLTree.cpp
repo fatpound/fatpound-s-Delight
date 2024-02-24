@@ -2,6 +2,25 @@
 
 namespace fatpound::automata
 {
+    TLTree::TLTree(const std::vector<std::pair<std::string, std::vector<std::string>>>& cfgs)
+        :
+        cfgs_(cfgs),
+        recurse_(cfgs_.size(), 0)
+    {
+        if (cfgs_.size() < 1)
+        {
+            throw std::runtime_error("There is no input!");
+        }
+
+        tree_ = new Node(cfgs_[0].first);
+
+        for (const auto& leaf_str : cfgs_[0].second)
+        {
+            tree_->leaves_.push_back(new Node(leaf_str));
+        }
+
+        CreateTree_(tree_);
+    }
     TLTree::~TLTree() noexcept
     {
         std::deque<Node*> nodes;
@@ -26,54 +45,33 @@ namespace fatpound::automata
         }
     }
 
-    TLTree::TLTree(const std::vector<std::pair<std::string, std::vector<std::string>>>& cfgs)
-        :
-        cfgs_(cfgs),
-        recurse_(cfgs_.size(), 0)
-    {
-        if (cfgs_.size() < 1)
-        {
-            throw std::runtime_error("There is no input!");
-        }
-
-        tree_ = new Node(cfgs_[0].first);
-
-        for (const auto& leaf_str : cfgs_[0].second)
-        {
-            tree_->leaves_.push_back(new Node(leaf_str));
-        }
-
-        CreateTree(tree_);
-    }
-
-
     const std::vector<std::string>& TLTree::GetWords() const
     {
         return results_;
     }
 
-    bool TLTree::IsTerminal(const std::string& word) const
+    bool TLTree::IsTerminal_(const std::string& word) const
     {
         return rn::all_of(word, [](const auto& ch) -> bool { return std::islower(ch); });
     }
 
-    void TLTree::CreateTree(Node* node)
+    void TLTree::CreateTree_(Node* node)
     {
         results_.reserve(node->leaves_.size());
 
         for (auto& node : node->leaves_)
         {
-            if (IsTerminal(node->item_))
+            if (IsTerminal_(node->item_))
             {
                 results_.push_back(node->item_);
 
                 continue;
             }
 
-            CreateInnerTree(node);
+            CreateInnerTree_(node);
         }
     }
-    void TLTree::CreateInnerTree(Node* node)
+    void TLTree::CreateInnerTree_(Node* node)
     {
         for (size_t i = 0u; i < node->item_.size(); ++i)
         {
@@ -118,9 +116,9 @@ namespace fatpound::automata
 
                     node->leaves_.push_back(newnode);
 
-                    if (recursed || !IsTerminal(newstr))
+                    if (recursed || !IsTerminal_(newstr))
                     {
-                        CreateInnerTree(newnode);
+                        CreateInnerTree_(newnode);
                     }
                     else
                     {

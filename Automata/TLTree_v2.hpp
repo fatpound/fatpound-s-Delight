@@ -13,13 +13,14 @@ namespace fatpound::automata
     {
     public:
         TLTree_v2() = delete;
-        ~TLTree_v2() noexcept;
+
+        TLTree_v2(const std::vector<std::pair<std::string, std::vector<std::string>>>& trees);
+
         TLTree_v2(const TLTree_v2& src) = delete;
         TLTree_v2(TLTree_v2&& src) = delete;
         TLTree_v2& operator = (const TLTree_v2& src) = delete;
         TLTree_v2& operator = (TLTree_v2&& src) = delete;
-
-        TLTree_v2(const std::vector<std::pair<std::string, std::vector<std::string>>>& trees);
+        ~TLTree_v2() noexcept;
 
 
     public:
