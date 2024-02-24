@@ -9,7 +9,6 @@ namespace fatpound::time
         last = steady_clock::now();
     }
 
-
     float FatTimer::Mark() noexcept
     {
         const auto old = last;
