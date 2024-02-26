@@ -49,8 +49,8 @@ namespace fatpound::cuda
 
     private:
     };
-}
 
-template <typename T>
-using CudaPtr = std::unique_ptr<T, FatCuda>;
+    template <typename T>
+    using CudaPtr = std::unique_ptr<T, FatCuda>;
+}
 #endif // defined(__DEVICE_LAUNCH_PARAMETERS_H__) || defined(__CUDA_RUNTIME_API_H__) || defined(__CUDA_RUNTIME_H__) || define (__cuda_cuda_h__)
