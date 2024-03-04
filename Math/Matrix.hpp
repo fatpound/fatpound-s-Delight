@@ -15,7 +15,16 @@ namespace fatpound::math
     {
     public:
         Matrix() = delete;
-        ~Matrix() = default;
+
+        Matrix(int64_t row, int64_t col)
+            :
+            row_count_((assert(row > 0), static_cast<size_t>(row))),
+            col_count_((assert(col > 0), static_cast<size_t>(col))),
+            matrix_(std::make_unique<T[]>(row_count_ * col_count_))
+        {
+            
+        }
+
         Matrix(const Matrix<T>& src)
             :
             row_count_(src.row_count_),
@@ -56,15 +65,7 @@ namespace fatpound::math
 
             return *this;
         }
-
-        Matrix(int64_t row, int64_t col)
-            :
-            row_count_((assert(row > 0), static_cast<size_t>(row))),
-            col_count_((assert(col > 0), static_cast<size_t>(col))),
-            matrix_(std::make_unique<T[]>(row_count_ * col_count_))
-        {
-            
-        }
+        ~Matrix() = default;
 
 
     public:
@@ -414,8 +415,8 @@ namespace fatpound::math
 
 
     private:
-        size_t row_count_ = 0u;
-        size_t col_count_ = 0u;
+        const size_t row_count_;
+        const size_t col_count_;
 
         std::unique_ptr<T[]> matrix_ = nullptr;
     };
