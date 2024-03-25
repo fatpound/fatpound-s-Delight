@@ -7,6 +7,8 @@
 #include <memory>
 #include <algorithm>
 
+// Generates and prints the Total Language Tree from CFG without repeating words.
+
 namespace fatpound::automata
 {
     class TLTree_v2
