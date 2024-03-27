@@ -383,7 +383,7 @@ namespace fatpound::tree
         }
         int64_t GetDepthRight(BST<T>::Node* node, int64_t depth) const
         {
-            return node ? GetDepthLeft(node->right, depth + 1i64) : depth;
+            return node ? GetDepthRight(node->right, depth + 1i64) : depth;
         }
         int64_t GetNodeCount(BST<T>::Node* node) const
         {
