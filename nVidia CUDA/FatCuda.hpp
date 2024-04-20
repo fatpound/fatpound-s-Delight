@@ -1,44 +1,28 @@
 #pragma once
 
-#if (defined(__DEVICE_LAUNCH_PARAMETERS_H__) || \
-     defined(__CUDA_RUNTIME_API_H__)         || \
-     defined(__CUDA_RUNTIME_H__)             || \
-     defined(__cuda_cuda_h__))
-
-#ifndef __DEVICE_LAUNCH_PARAMETERS_H__
 #include "device_launch_parameters.h"
-#endif // ! __DEVICE_LAUNCH_PARAMETERS_H__
-
-#ifndef __CUDA_RUNTIME_API_H__
-#include <cuda_runtime_api.h>
-#endif // ! __CUDA_RUNTIME_API_H__
-
-#ifndef __CUDA_RUNTIME_H__
 #include "cuda_runtime.h"
-#endif // ! __CUDA_RUNTIME_H__
 
-#ifndef __cuda_cuda_h__
+#include <cuda_runtime_api.h>
 #include <cuda.h>
-#endif // ! __cuda_cuda_h__
 
+#include <cstdint>
 
-#ifndef _MEMORY_
 #include <memory>
-#endif // ! _MEMORY_
 
 namespace fatpound::cuda
 {
-    class FatCuda
+    class CudaPtr final
     {
     public:
         template <typename T>
-        static std::unique_ptr<T, FatCuda> make_unique_cuda(size_t count)
+        static std::unique_ptr<T, CudaPtr> make_unique_cuda(std::size_t count)
         {
             T* ptr = nullptr;
 
             cudaMalloc(&ptr, sizeof(T) * count);
 
-            return std::unique_ptr<T, FatCuda>(ptr);
+            return std::unique_ptr<T, CudaPtr>(ptr);
         }
 
         template <typename T>
@@ -56,6 +40,5 @@ namespace fatpound::cuda
     };
 
     template <typename T>
-    using CudaPtr = std::unique_ptr<T, FatCuda>;
+    using UniqueCudaPtr = std::unique_ptr<T, CudaPtr>;
 }
-#endif // defined(__DEVICE_LAUNCH_PARAMETERS_H__) || defined(__CUDA_RUNTIME_API_H__) || defined(__CUDA_RUNTIME_H__) || define (__cuda_cuda_h__)
