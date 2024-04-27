@@ -17,7 +17,7 @@ namespace fatpound::util
         std::cout << '\n';
     }
 
-    void PrintCombinations(const std::string& str, size_t n, const std::string& first = "")
+    void PrintCombinations(const std::string& str, std::size_t n, const std::string& first = "")
     {
         if (n == 0)
         {
@@ -25,12 +25,12 @@ namespace fatpound::util
             return;
         }
 
-        for (size_t i = 0u; i < str.length(); ++i)
+        for (std::size_t i = 0u; i < str.length(); ++i)
         {
             PrintCombinations(str.substr(i + 1, str.length()), n - 1, first + str[i]);
         }
     }
-    void PrintPermutations(const std::string& str, size_t n, const std::string& first = "")
+    void PrintPermutations(const std::string& str, std::size_t n, const std::string& first = "")
     {
         if (n == 0)
         {
@@ -38,7 +38,7 @@ namespace fatpound::util
             return;
         }
 
-        for (size_t i = 0u; i < str.length(); ++i)
+        for (std::size_t i = 0u; i < str.length(); ++i)
         {
             PrintPermutations(str.substr(0, i) + str.substr(i + 1, str.length()), n - 1, first + str[i]);
         }
