@@ -6,18 +6,18 @@
 
 namespace fatpound::graph
 {
-    class Prim
+    class Prim final
     {
     
     public:
-        Prim() = delete;
-        ~Prim() = default;
-        Prim(const Prim& src) = delete;
-        Prim(Prim&& src) noexcept;
-        Prim& operator = (const Prim& src) = delete;
-        Prim& operator = (Prim&& src) noexcept;
-
         Prim(const std::string& input_filename);
+
+        Prim() = delete;
+        Prim(const Prim& src) = delete;
+        Prim& operator = (const Prim& src) = delete;
+        Prim(Prim&& src) noexcept;
+        Prim& operator = (Prim&& src) noexcept;
+        ~Prim() = default;
 
 
     public:

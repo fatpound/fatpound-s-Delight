@@ -6,35 +6,40 @@
 #include <iostream>
 #include <exception>
 
-#include "../Color/Color.hpp"
+#include "../Util/FatColor.hpp"
 
 namespace fatpound::graph
 {
-    class Graph
+    class Graph final
     {
     public:
-        Graph() = delete;
-
         Graph(const std::string& input_filename);
+
+        Graph() = delete;
+        Graph(const Graph& src) = delete;
+        Graph& operator = (const Graph& src) = delete;
+        Graph(Graph&& src) = delete;
+        Graph& operator = (Graph&& src) = delete;
+        ~Graph() = default;
 
 
     public:
-        const std::vector<int64_t>& const GetNextList(size_t index) const;
+        const std::vector<std::int64_t>& GetNextList(std::size_t index) const;
 
-        const int64_t GetAdjAt(const int64_t u, const int64_t v) const;
+        const std::int64_t GetAdjAt(const std::int64_t u, const std::int64_t v) const;
 
-        const size_t GetNodeCount() const;
-        const size_t GetEdgeCount() const;
+        const std::size_t GetNodeCount() const;
+        const std::size_t GetEdgeCount() const;
 
 
     protected:
 
 
     private:
-        std::vector<std::vector<int64_t>> adj_;
-        std::vector<std::vector<int64_t>> nexts_;
+        std::vector<std::vector<std::int64_t>> adj_;
+        std::vector<std::vector<std::int64_t>> nexts_;
 
-        size_t node_count_ = 0;
-        size_t edge_count_ = 0;
+        std::size_t node_count_ = 0u;
+        std::size_t edge_count_ = 0u;
     };
 }

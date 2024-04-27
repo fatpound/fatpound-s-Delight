@@ -19,34 +19,34 @@ namespace fatpound::graph
         return *this;
     }
 
-    Dijkstra::Dijkstra(const std::string& input_filename, size_t source_index)
+    Dijkstra::Dijkstra(const std::string& input_filename, std::size_t source_index)
         :
         graph_(std::make_unique<Graph>(input_filename))
     {
-        std::deque<int64_t> deque;
+        std::deque<std::int64_t> deque;
 
-        std::vector<int64_t> d;
-        std::vector<int64_t> p;
+        std::vector<std::int64_t> d;
+        std::vector<std::int64_t> p;
 
-        for (size_t i = 0; i < graph_->GetNodeCount(); i++)
+        for (std::size_t i = 0; i < graph_->GetNodeCount(); i++)
         {
-            d.push_back(std::numeric_limits<int64_t>::max());
+            d.push_back(std::numeric_limits<std::int64_t>::max());
             p.push_back(-1);
 
-            deque.push_back((int64_t)i);
+            deque.push_back((std::int64_t)i);
         }
 
-        size_t item_count = graph_->GetNodeCount();
+        std::size_t item_count = graph_->GetNodeCount();
 
         d[source_index] = 0;
 
         while (item_count > 0)
         {
-            size_t min_index = 0;
+            std::size_t min_index = 0;
 
             bool flag = true; // does min_index need to be initialized ?
 
-            for (size_t i = 0; i < d.size(); i++)
+            for (std::size_t i = 0; i < d.size(); i++)
             {
                 if (deque[i] >= 0)
                 {
@@ -63,27 +63,27 @@ namespace fatpound::graph
                 }
             }
 
-            const size_t u = static_cast<size_t>(deque[min_index]);
+            const std::size_t u = static_cast<std::size_t>(deque[min_index]);
 
             deque[min_index] = -1;
             item_count--;
 
             auto& nextindexes = graph_->GetNextList(u);
 
-            for (size_t i = 0; i < nextindexes.size(); i++)
+            for (std::size_t i = 0; i < nextindexes.size(); i++)
             {
-                relax(d, p, u, nextindexes[i]);
+                relax_(d, p, u, nextindexes[i]);
             }
         }
 
-        for (size_t i = 0; i < d.size(); i++)
+        for (std::size_t i = 0; i < d.size(); i++)
         {
             output_ += std::to_string(d[i]) + ' ';
         }
 
         output_ += '\n';
 
-        for (size_t i = 0; i < p.size(); i++)
+        for (std::size_t i = 0; i < p.size(); i++)
         {
             if (p[i] > -1)
             {
@@ -100,17 +100,17 @@ namespace fatpound::graph
     }
 
 
-    int64_t Dijkstra::w(const size_t& u, const size_t& v) const
+    std::int64_t Dijkstra::w_(const std::size_t& u, const std::size_t& v) const
     {
         return graph_->GetAdjAt(u, v);
     }
 
-    void Dijkstra::relax(std::vector<int64_t>& d, std::vector<int64_t>& p, const size_t& u, const size_t& v)
+    void Dijkstra::relax_(std::vector<std::int64_t>& d, std::vector<std::int64_t>& p, const std::size_t& u, const std::size_t& v)
     {
-        if (d[v] > d[u] + w(u, v))
+        if (d[v] > d[u] + w_(u, v))
         {
-            d[v] = d[u] + w(u, v);
-            p[v] = static_cast<int64_t>(u);
+            d[v] = d[u] + w_(u, v);
+            p[v] = static_cast<std::int64_t>(u);
         }
     }
 

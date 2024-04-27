@@ -23,30 +23,30 @@ namespace fatpound::graph
         :
         graph_(std::make_unique<Graph>(input_filename))
     {
-        std::vector<fatpound::color::Color> colors(graph_->GetNodeCount());
+        std::vector<fatpound::util::Color> colors(graph_->GetNodeCount());
 
-        std::queue<size_t> queue;
+        std::queue<std::size_t> queue;
         queue.push(0);
 
         std::stringstream ss;
 
         while (queue.size() > 0)
         {
-            size_t u = queue.front();
+            std::size_t u = queue.front();
             queue.pop();
 
-            for (size_t i = 0; i < graph_->GetNextList(u).size(); i++)
+            for (std::size_t i = 0; i < graph_->GetNextList(u).size(); i++)
             {
-                const size_t v = graph_->GetNextList(u)[i];
+                const std::size_t v = graph_->GetNextList(u)[i];
 
-                if (colors[v] == fatpound::color::White)
+                if (colors[v] == fatpound::colors::White)
                 {
-                    colors[v] = fatpound::color::Gray;
+                    colors[v] = fatpound::colors::Gray;
                     queue.push(v);
                 }
             }
 
-            colors[u] = fatpound::color::Black;
+            colors[u] = fatpound::colors::Black;
 
             ss << static_cast<char>('a' + u);
         }

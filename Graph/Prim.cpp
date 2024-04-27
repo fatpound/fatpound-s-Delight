@@ -23,32 +23,32 @@ namespace fatpound::graph
         :
         graph_(std::make_unique<Graph>(input_filename))
     {
-        std::vector<int64_t> key;
-        std::vector<int64_t> pi;
+        std::vector<std::int64_t> key;
+        std::vector<std::int64_t> pi;
 
-        std::deque<int64_t> deque;
+        std::deque<std::int64_t> deque;
 
-        size_t item_count = graph_->GetNodeCount();
+        std::size_t item_count = graph_->GetNodeCount();
 
-        for (size_t i = 0; i < item_count; ++i)
+        for (std::size_t i = 0; i < item_count; ++i)
         {
-            key.push_back(std::numeric_limits<int64_t>::max());
+            key.push_back(std::numeric_limits<std::int64_t>::max());
             pi.push_back(-1);
 
-            deque.push_back(static_cast<int64_t>(i));
+            deque.push_back(static_cast<std::int64_t>(i));
         }
 
         key[0] = 0;
 
         while (item_count > 0)
         {
-            size_t min_index = 0;
+            std::size_t min_index = 0;
 
             bool flag = true; // does min_index need to be initialized ?
 
-            for (size_t i = 0; i < deque.size(); ++i)
+            for (std::size_t i = 0; i < deque.size(); ++i)
             {
-                if (deque[i] == static_cast<int64_t>(i))
+                if (deque[i] == static_cast<std::int64_t>(i))
                 {
                     if (flag)
                     {
@@ -63,35 +63,35 @@ namespace fatpound::graph
                 }
             }
 
-            const size_t u = static_cast<size_t>(deque[min_index]);
+            const std::size_t u = static_cast<std::size_t>(deque[min_index]);
 
             deque[min_index] = -1;
 
             --item_count;
 
-            for (size_t i = 0; i < graph_->GetNextList(u).size(); ++i)
+            for (std::size_t i = 0; i < graph_->GetNextList(u).size(); ++i)
             {
-                const size_t v = graph_->GetNextList(u)[i];
-                const int64_t next_val = graph_->GetAdjAt(u, v);
+                const std::size_t v = graph_->GetNextList(u)[i];
+                const std::int64_t next_val = graph_->GetAdjAt(u, v);
 
-                if (deque[v] == static_cast<int64_t>(v) && key[v] > next_val)
+                if (deque[v] == static_cast<std::int64_t>(v) && key[v] > next_val)
                 {
                     key[v] = next_val;
-                    pi[v] = static_cast<int64_t>(u);
+                    pi[v] = static_cast<std::int64_t>(u);
                 }
             }
         }
 
         std::stringstream ss;
 
-        for (size_t i = 0; i < key.size(); i++)
+        for (std::size_t i = 0; i < key.size(); i++)
         {
             ss << key[i] << ' ';
         }
 
         ss << '\n';
 
-        for (size_t i = 0; i < pi.size(); i++)
+        for (std::size_t i = 0; i < pi.size(); i++)
         {
             if (pi[i] != -1)
             {

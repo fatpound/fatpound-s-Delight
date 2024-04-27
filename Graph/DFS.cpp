@@ -21,13 +21,13 @@ namespace fatpound::graph
         :
         graph_(std::make_unique<Graph>(input_filename))
     {
-        std::vector<fatpound::color::Color> colors(graph_->GetNodeCount());
+        std::vector<fatpound::util::Color> colors(graph_->GetNodeCount());
 
-        for (size_t i = 0u; i < graph_->GetNodeCount(); ++i)
+        for (std::size_t i = 0u; i < graph_->GetNodeCount(); ++i)
         {
-            if (colors[i] == fatpound::color::White)
+            if (colors[i] == fatpound::colors::White)
             {
-                Visit(colors, i);
+                Visit_(colors, i);
             }
         }
 
@@ -35,9 +35,9 @@ namespace fatpound::graph
     }
     
 
-    void DFS::Visit(std::vector<fatpound::color::Color>& colors, const size_t& index)
+    void DFS::Visit_(std::vector<fatpound::util::Color>& colors, const std::size_t& index)
     {
-        colors[index] = fatpound::color::Gray;
+        colors[index] = fatpound::colors::Gray;
 
         std::stringstream ss;
         
@@ -45,17 +45,17 @@ namespace fatpound::graph
 
         output_ += std::move(ss.str());
 
-        for (size_t i = 0; i < graph_->GetNextList(index).size(); ++i)
+        for (std::size_t i = 0; i < graph_->GetNextList(index).size(); ++i)
         {
-            const size_t nextIndex = graph_->GetNextList(index)[i];
+            const std::size_t nextIndex = graph_->GetNextList(index)[i];
 
-            if (colors[nextIndex] == fatpound::color::White)
+            if (colors[nextIndex] == fatpound::colors::White)
             {
-                Visit(colors, nextIndex);
+                Visit_(colors, nextIndex);
             }
         }
 
-        colors[index] = fatpound::color::Black;
+        colors[index] = fatpound::colors::Black;
     }
     void DFS::PrintResults() const
     {

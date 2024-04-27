@@ -9,14 +9,15 @@ namespace fatpound::graph
     class BellmanFord
     {
     public:
-        BellmanFord() = delete;
-        ~BellmanFord() = default;
-        BellmanFord(const BellmanFord& src) = delete;
-        BellmanFord(BellmanFord&& src) noexcept;
-        BellmanFord& operator = (const BellmanFord& src) = delete;
-        BellmanFord& operator = (BellmanFord&& src) noexcept;
+        BellmanFord(const std::string& input_filename, std::size_t source_index = 0u);
 
-        BellmanFord(const std::string& input_filename, size_t source_index = 0u);
+        BellmanFord() = delete;
+        BellmanFord(const BellmanFord& src) = delete;
+        BellmanFord& operator = (const BellmanFord& src) = delete;
+        BellmanFord(BellmanFord&& src) noexcept;
+        BellmanFord& operator = (BellmanFord&& src) noexcept;
+        ~BellmanFord() = default;
+
 
 
     public:
@@ -27,9 +28,9 @@ namespace fatpound::graph
 
 
     private:
-        int64_t w(const size_t& u, const size_t& v);
+        std::int64_t w_(const std::size_t& u, const std::size_t& v);
 
-        void relax(std::vector<int64_t>& d, std::vector<int64_t>& p, const size_t& u, const size_t& v);
+        void relax_(std::vector<std::int64_t>& d, std::vector<std::int64_t>& p, const std::size_t& u, const std::size_t& v);
 
 
     private:

@@ -6,17 +6,17 @@
 
 namespace fatpound::graph
 {
-    class BFS
+    class BFS final
     {
     public:
-        BFS() = delete;
-        ~BFS() = default;
-        BFS(const BFS& src) = delete;
-        BFS(BFS&& src) noexcept;
-        BFS& operator = (const BFS& src) = delete;
-        BFS& operator = (BFS&& src) noexcept;
-
         BFS(const std::string& input_filename);
+
+        BFS() = delete;
+        BFS(const BFS& src) = delete;
+        BFS& operator = (const BFS& src) = delete;
+        BFS(BFS&& src) noexcept;
+        BFS& operator = (BFS&& src) noexcept;
+        ~BFS() = default;
 
 
     public:

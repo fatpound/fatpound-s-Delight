@@ -6,17 +6,17 @@
 
 namespace fatpound::graph
 {
-    class DFS
+    class DFS final
     {
     public:
-        DFS() = delete;
-        ~DFS() = default;
-        DFS(const DFS& src) = delete;
-        DFS(DFS&& src) noexcept;
-        DFS& operator = (const DFS& src) = delete;
-        DFS& operator = (DFS&& src) noexcept;
-
         DFS(const std::string& input_filename);
+
+        DFS() = delete;
+        DFS(const DFS& src) = delete;
+        DFS& operator = (const DFS& src) = delete;
+        DFS(DFS&& src) noexcept;
+        DFS& operator = (DFS&& src) noexcept;
+        ~DFS() = default;
 
 
     public:
@@ -27,7 +27,7 @@ namespace fatpound::graph
 
 
     private:
-        void Visit(std::vector<fatpound::color::Color>& colors, const size_t& index);
+        void Visit_(std::vector<fatpound::util::Color>& colors, const std::size_t& index);
 
 
     private:

@@ -19,11 +19,11 @@ namespace fatpound::graph
             std::stringstream ss;
             ss << line;
 
-            std::vector<int64_t> vec;
+            std::vector<std::int64_t> vec;
 
             while ( ! ss.eof() )
             {
-                int64_t x;
+                std::int64_t x;
                 ss >> x >> std::ws;
 
                 vec.push_back(x);
@@ -37,9 +37,9 @@ namespace fatpound::graph
 
         node_count_ = adj_.size();
 
-        for (size_t i = 0; i < node_count_; i++)
+        for (std::size_t i = 0; i < node_count_; i++)
         {
-            for (size_t j = 0; j < node_count_; j++)
+            for (std::size_t j = 0; j < node_count_; j++)
             {
                 if (adj_[i][j] != 0)
                 {
@@ -52,21 +52,21 @@ namespace fatpound::graph
     }
 
 
-    const std::vector<int64_t>& const Graph::GetNextList(size_t index) const
+    const std::vector<std::int64_t>& Graph::GetNextList(std::size_t index) const
     {
         return nexts_[index];
     }
 
-    const int64_t Graph::GetAdjAt(const int64_t u, const int64_t v) const
+    const std::int64_t Graph::GetAdjAt(const std::int64_t u, const std::int64_t v) const
     {
         return adj_[u][v];
     }
 
-    const size_t Graph::GetNodeCount() const
+    const std::size_t Graph::GetNodeCount() const
     {
         return node_count_;
     }
-    const size_t Graph::GetEdgeCount() const
+    const std::size_t Graph::GetEdgeCount() const
     {
         return edge_count_;
     }
