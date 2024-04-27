@@ -7,12 +7,12 @@
 
 namespace fatpound::file
 {
-    static std::pair<std::string, std::string> GetNameAndExtensionFromFilename(const std::string& filename)
+    static std::pair<std::string, std::string> GetNameAndExtension(const std::string& filename)
     {
         if (std::filesystem::is_regular_file(filename))
         {
             const auto it = std::find(filename.rbegin(), filename.rend(), '.');
-            size_t dot_index = 0u;
+            std::size_t dot_index = 0u;
 
             if (it != filename.rend())
             {
@@ -21,7 +21,7 @@ namespace fatpound::file
 
             return {
                 std::string(filename.cbegin(), filename.cend() - dot_index),
-                std::string(_strrev(const_cast<char*>(std::string(filename.rbegin(), it).c_str())))
+                std::string(::_strrev(const_cast<char*>(std::string(filename.rbegin(), it).c_str())))
             };
         }
         else
