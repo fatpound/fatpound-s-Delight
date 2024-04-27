@@ -32,7 +32,7 @@ namespace fatpound::math
     }
 
     template <typename T>
-    inline auto sq(const T& x)
+    inline auto Square(const T& x)
     {
         return x * x;
     }
@@ -58,7 +58,7 @@ namespace fatpound::math
 
         const T m = n + 1;
 
-        for (T i = 5; sq(i) < m; i += 6)
+        for (T i = 5; Square(i) < m; i += 6)
         {
             if ((n % i == 0) || (n % (i + 2) == 0))
             {
@@ -128,15 +128,28 @@ namespace fatpound::math
     }
 
     template <std::floating_point T>
-    inline T wrap_angle(T theta)
-    {
-        const T twoPi = 2 * std::numbers::pi_v<T>;
+    inline constexpr T twoPi = 2.0f * std::numbers::pi_v<T>;
 
-        const T modded = std::fmod(theta, twoPi);
+    template <std::floating_point T>
+    T WrapAngle(T theta)
+    {
+        const T modded = std::fmod(theta, twoPi<T>);
 
         return modded > std::numbers::pi_v<T>
-            ? modded - twoPi
+            ? modded - twoPi<T>
             : modded
             ;
+    }
+
+    template <typename T>
+    T Interpolate(const T& src, const T& dst, float splitRatio)
+    {
+        return src + (dst - src) * splitRatio;
+    }
+
+    template <std::floating_point F>
+    constexpr F ToRadians(F deg)
+    {
+        return deg * std::numbers::pi_v<F> / static_cast<F>(180.0);
     }
 }

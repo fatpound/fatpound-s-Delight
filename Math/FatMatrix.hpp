@@ -11,21 +11,20 @@
 namespace fatpound::math
 {
     template <Number T>
-    class Matrix
+    class Matrix final
     {
     public:
-        Matrix() = delete;
-
-        Matrix(int64_t row, int64_t col)
+        Matrix(std::int64_t row, std::int64_t col)
             :
-            row_count_((assert(row > 0), static_cast<size_t>(row))),
-            col_count_((assert(col > 0), static_cast<size_t>(col))),
+            row_count_((assert(row > 0), static_cast<std::size_t>(row))),
+            col_count_((assert(col > 0), static_cast<std::size_t>(col))),
             matrix_(std::make_unique<T[]>(row_count_ * col_count_))
         {
             
         }
 
-        Matrix(const Matrix<T>& src)
+        Matrix() = delete;
+        Matrix(const Matrix& src)
             :
             row_count_(src.row_count_),
             col_count_(src.col_count_),
@@ -33,15 +32,7 @@ namespace fatpound::math
         {
             std::copy(src.matrix_.get(), src.matrix_.get() + row_count_ * col_count_, matrix_.get());
         }
-        Matrix(Matrix<T>&& src) noexcept
-            :
-            row_count_(std::exchange(src.row_count_, 0)),
-            col_count_(std::exchange(src.col_count_, 0)),
-            matrix_(std::exchange(src.matrix_, nullptr))
-        {
-
-        }
-        Matrix<T>& operator = (const Matrix<T>& src)
+        Matrix& operator = (const Matrix& src)
         {
             if (this != std::addressof(src))
             {
@@ -54,7 +45,15 @@ namespace fatpound::math
 
             return *this;
         }
-        Matrix<T>& operator = (Matrix<T>&& src) noexcept
+        Matrix(Matrix&& src) noexcept
+            :
+            row_count_(std::exchange(src.row_count_, 0)),
+            col_count_(std::exchange(src.col_count_, 0)),
+            matrix_(std::exchange(src.matrix_, nullptr))
+        {
+
+        }
+        Matrix& operator = (Matrix&& src) noexcept
         {
             if (this != std::addressof(src))
             {
@@ -71,31 +70,31 @@ namespace fatpound::math
     public:
         void Print() const
         {
-            for (size_t i = 0; i < row_count_; ++i)
+            for (std::size_t i = 0; i < row_count_; ++i)
             {
                 PrintRow(i);
             }
 
             std::cout << '\n';
         }
-        void PrintRow(size_t row) const
+        void PrintRow(std::size_t row) const
         {
-            for (size_t i = 0; i < col_count_; ++i)
+            for (std::size_t i = 0; i < col_count_; ++i)
             {
                 std::cout << matrix_[row * col_count_ + i] << ' ';
             }
 
             std::cout << '\n';
         }
-        void PrintColumn(size_t col) const
+        void PrintColumn(std::size_t col) const
         {
-            for (size_t j = 0; j < row_count_; ++j)
+            for (std::size_t j = 0; j < row_count_; ++j)
             {
                 std::cout << matrix_[j * row_count_ + col] << '\n';
             }
         }
 
-        void SetRand(size_t row, size_t col, size_t max_included)
+        void SetRand(std::size_t row, std::size_t col, std::size_t max_included)
         {
             std::minstd_rand mrnd(std::random_device{}());
             std::uniform_real_distribution<double> ddist(0.0, static_cast<double>(max_included));
@@ -127,9 +126,9 @@ namespace fatpound::math
 
             Matrix<T> copy(*this);
 
-            for (size_t i = 0; i < row_count_; ++i)
+            for (std::size_t i = 0; i < row_count_; ++i)
             {
-                for (size_t j = 0; j < col_count_; ++j)
+                for (std::size_t j = 0; j < col_count_; ++j)
                 {
                     matrix_[i * col_count_ + j] = copy.matrix_[j * row_count_ + i];
                 }
@@ -141,7 +140,7 @@ namespace fatpound::math
         {
             assert(row_count_ > 0 && row_count_ == col_count_);
 
-            for (size_t i = 0; i < row_count_ * col_count_; i += row_count_)
+            for (std::size_t i = 0; i < row_count_ * col_count_; i += row_count_)
             {
                 matrix_[i] = 1;
                 ++i;
@@ -151,7 +150,7 @@ namespace fatpound::math
         {
             assert(row_count_ == second.row_count_ && col_count_ == second.col_count_);
 
-            for (size_t i = 0; i < row_count_ * col_count_; ++i)
+            for (std::size_t i = 0; i < row_count_ * col_count_; ++i)
             {
                 matrix_[i] += second.matrix_[i];
             }
@@ -160,7 +159,7 @@ namespace fatpound::math
         {
             assert(row_count_ == second.row_count_ && col_count_ == second.col_count_);
 
-            for (size_t i = 0; i < row_count_ * col_count_; ++i)
+            for (std::size_t i = 0; i < row_count_ * col_count_; ++i)
             {
                 matrix_[i] -= second.matrix_[i];
             }
@@ -171,13 +170,13 @@ namespace fatpound::math
 
             Matrix<T> temp(row_count_, second.col_count_);
 
-            for (size_t i = 0; i < row_count_; ++i)
+            for (std::size_t i = 0; i < row_count_; ++i)
             {
-                for (size_t k = 0; k < second.col_count_; ++k)
+                for (std::size_t k = 0; k < second.col_count_; ++k)
                 {
                     T sum = 0;
 
-                    for (size_t j = 0; j < col_count_; ++j)
+                    for (std::size_t j = 0; j < col_count_; ++j)
                     {
                         if (matrix_[i * col_count_ + j] != 0 && second.matrix_[j * second.col_count_ + k] != 0)
                         {
@@ -198,7 +197,7 @@ namespace fatpound::math
                 return;
             }
             
-            for (size_t i = 0; i < row_count_ * col_count_; ++i)
+            for (std::size_t i = 0; i < row_count_ * col_count_; ++i)
             {
                 matrix_[i] *= k;
             }
@@ -234,13 +233,13 @@ namespace fatpound::math
 
             case 3:
             {
-                for (size_t k = 0; k < 2; ++k)
+                for (std::size_t k = 0; k < 2; ++k)
                 {
-                    for (size_t i = 0; i < 3; ++i)
+                    for (std::size_t i = 0; i < 3; ++i)
                     {
                         T prod = 1;
 
-                        for (size_t j = 0; j < 3; ++j)
+                        for (std::size_t j = 0; j < 3; ++j)
                         {
                             prod *= matrix_[((i + (k == 0 ? j : 2 - j)) % 3) * col_count_ + j];
                         }
@@ -253,7 +252,7 @@ namespace fatpound::math
 
             default:
             {
-                for (size_t i = 0; i < row_count_; ++i)
+                for (std::size_t i = 0; i < row_count_; ++i)
                 {
                     Matrix<T> newm = MinorMatrix_(i, 0);
 
@@ -265,12 +264,12 @@ namespace fatpound::math
 
             return determinant;
         }
-        T  GetValue(size_t row, size_t col) const
+        T  GetValue(std::size_t row, std::size_t col) const
         {
             return matrix_[row * col_count_ + col];
         }
         
-        T operator [] (const size_t index)
+        T operator [] (const std::size_t index)
         {
             return matrix_[index % (row_count_ * col_count_)];
         }
@@ -337,9 +336,9 @@ namespace fatpound::math
         {
             Matrix<T> newm(col_count_, row_count_);
 
-            for (size_t j = 0; j < col_count_; ++j)
+            for (std::size_t j = 0; j < col_count_; ++j)
             {
-                for (size_t i = 0; i < row_count_; ++i)
+                for (std::size_t i = 0; i < row_count_; ++i)
                 {
                     newm.matrix_[j * row_count_ + i] = matrix_[i * col_count_ + j];
                 }
@@ -347,14 +346,14 @@ namespace fatpound::math
 
             return newm;
         }
-        Matrix<T> MinorMatrix_(size_t row, size_t col) const
+        Matrix<T> MinorMatrix_(std::size_t row, std::size_t col) const
         {
             Matrix<T> newm(row_count_ - 1, col_count_ - 1);
 
             T x = 0;
             T y;
 
-            for (size_t i = 0; i < row_count_; ++i)
+            for (std::size_t i = 0; i < row_count_; ++i)
             {
                 if (i == row)
                 {
@@ -364,7 +363,7 @@ namespace fatpound::math
 
                 y = 0;
 
-                for (size_t j = 0; j < col_count_; ++j)
+                for (std::size_t j = 0; j < col_count_; ++j)
                 {
                     if (j == col)
                     {
@@ -383,9 +382,9 @@ namespace fatpound::math
         {
             Matrix<T> newm(row_count_, col_count_);
 
-            for (size_t i = 0; i < row_count_; ++i)
+            for (std::size_t i = 0; i < row_count_; ++i)
             {
-                for (size_t j = 0; j < col_count_; ++j)
+                for (std::size_t j = 0; j < col_count_; ++j)
                 {
                     Matrix<T> minor = MinorMatrix_(i, j);
 
@@ -401,7 +400,7 @@ namespace fatpound::math
         {
             T det = GetDeterminant();
 
-            if (det != 0 && det != std::numeric_limits<int64_t>::min())
+            if (det != 0 && det != std::numeric_limits<std::int64_t>::min())
             {
                 Matrix<T> newm = AdjacentMatrix_();
 
@@ -415,8 +414,8 @@ namespace fatpound::math
 
 
     private:
-        const size_t row_count_;
-        const size_t col_count_;
+        const std::size_t row_count_;
+        const std::size_t col_count_;
 
         std::unique_ptr<T[]> matrix_ = nullptr;
     };
