@@ -5,7 +5,7 @@
 
 namespace fatpound::automata
 {
-    class CFG
+    class CFG final
     {
     public:
         /*

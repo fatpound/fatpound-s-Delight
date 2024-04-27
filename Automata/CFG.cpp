@@ -59,7 +59,7 @@ namespace fatpound::automata
 
                 str.erase(it.begin(), it.end());
 
-                const size_t index = str.find(arrow);
+                const std::size_t index = str.find(arrow);
 
                 if (index != std::string::npos)
                 {

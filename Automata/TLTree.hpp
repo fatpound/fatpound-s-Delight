@@ -8,20 +8,17 @@
 #include <algorithm>
 #include <stdexcept>
 
-namespace rn = std::ranges;
-
 namespace fatpound::automata
 {
-    class TLTree
+    class TLTree final
     {
     public:
-        TLTree() = delete;
-
         TLTree(const std::vector<std::pair<std::string, std::vector<std::string>>>& cfgs);
 
+        TLTree() = delete;
         TLTree(const TLTree& src) = delete;
-        TLTree(TLTree&& src) = delete;
         TLTree& operator = (const TLTree& src) = delete;
+        TLTree(TLTree&& src) = delete;
         TLTree& operator = (TLTree&& src) = delete;
         ~TLTree() noexcept;
 
@@ -34,30 +31,30 @@ namespace fatpound::automata
 
 
     private:
-        struct Node
+        struct Node_ final
         {
-            std::vector<Node*> leaves_;
+            std::vector<Node_*> leaves_;
 
             std::string item_;
 
-            Node(const std::string& item);
+            Node_(const std::string& item);
         };
 
 
     private:
         bool IsTerminal_(const std::string& word) const;
 
-        void CreateTree_(Node* node);
-        void CreateInnerTree_(Node* node);
+        void CreateTree_(Node_* node);
+        void CreateInnerTree_(Node_* node);
 
 
     private:
         const std::vector<std::pair<std::string, std::vector<std::string>>>& cfgs_;
         std::vector<std::string> results_;
-        std::vector<size_t> recurse_;
+        std::vector<std::size_t> recurse_;
 
-        Node* tree_ = nullptr;
+        Node_* tree_ = nullptr;
 
-        static constexpr const size_t recurse_limit_ = 1u;
+        static constexpr const std::size_t recurse_limit_ = 1u;
     };
 }

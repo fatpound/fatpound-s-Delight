@@ -8,14 +8,14 @@ namespace fatpound::automata
 
         for (const auto& tree : trees)
         {
-            trees_.push_back(new Node(tree));
+            trees_.push_back(new Node_(tree));
         }
 
         results_ = Generate_("", 0u, 0u);
     }
     TLTree_v2::~TLTree_v2() noexcept
     {
-        std::deque<Node*> nodes;
+        std::deque<Node_*> nodes;
 
         for (auto& tree : trees_)
         {
@@ -30,7 +30,7 @@ namespace fatpound::automata
 
             while (nodes.size() > 0)
             {
-                Node* node = nodes.back();
+                Node_* node = nodes.back();
 
                 nodes.pop_back();
 
@@ -49,7 +49,7 @@ namespace fatpound::automata
         return results_;
     }
 
-    std::vector<std::pair<std::string, bool>> TLTree_v2::Generate_(std::string init_str, size_t index, size_t recursed) const
+    std::vector<std::pair<std::string, bool>> TLTree_v2::Generate_(std::string init_str, std::size_t index, std::size_t recursed) const
     {
         std::vector<std::pair<std::string, bool>> strings;
 
@@ -66,7 +66,7 @@ namespace fatpound::automata
                 for (const auto& strPair : tempstrings)
                 {
                     std::string& str = newTempStrings.emplace_back(strPair).first;
-                    const size_t insertedindex = newTempStrings.size() - 1;
+                    const std::size_t insertedindex = newTempStrings.size() - 1;
 
                     const auto it = std::find_if(trees_.cbegin() + index, trees_.cend(), [&](const auto& tree) -> bool { return ch == tree->item_[0]; });
 
@@ -76,12 +76,12 @@ namespace fatpound::automata
                     }
                     else
                     {
-                        const size_t tree_index = it - trees_.cbegin();
-                        const size_t will_recurse = ((tree_index == index) ? 1 : 0);
+                        const std::size_t tree_index = it - trees_.cbegin();
+                        const std::size_t will_recurse = ((tree_index == index) ? 1 : 0);
 
                         if (recursed < recurse_limit_)
                         {
-                            const size_t size = tempstrings.size();
+                            const std::size_t size = tempstrings.size();
 
                             bool deleted = false;
 
@@ -134,7 +134,7 @@ namespace fatpound::automata
     }
 
 
-    TLTree_v2::Node::Node(const std::pair<std::string, std::vector<std::string>>& tree)
+    TLTree_v2::Node_::Node_(const std::pair<std::string, std::vector<std::string>>& tree)
         :
         item_(tree.first)
     {
@@ -142,10 +142,10 @@ namespace fatpound::automata
 
         for (const auto& str : tree.second)
         {
-            leaves_.push_back(new Node(str));
+            leaves_.push_back(new Node_(str));
         }
     }
-    TLTree_v2::Node::Node(const std::string& str)
+    TLTree_v2::Node_::Node_(const std::string& str)
         :
         item_(str)
     {
