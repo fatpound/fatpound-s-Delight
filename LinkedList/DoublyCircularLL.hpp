@@ -9,19 +9,15 @@ namespace fatpound::linkedlist
     {
     public:
         DoublyCircularLL() = default;
-        virtual ~DoublyCircularLL() noexcept override
-        {
-            Delete_();
-        }
         DoublyCircularLL(const DoublyCircularLL& src) = delete;
+        DoublyCircularLL& operator = (const DoublyCircularLL& src) = delete;
         DoublyCircularLL(DoublyCircularLL&& src) noexcept
             :
-            DoublyLL<T>(std::move(src))
+            DoublyLL(std::move(src))
         {
             
         }
-        DoublyCircularLL<T>& operator = (const DoublyCircularLL& src) = delete;
-        DoublyCircularLL<T>& operator = (DoublyCircularLL&& src) noexcept
+        DoublyCircularLL& operator = (DoublyCircularLL&& src) noexcept
         {
             Delete_();
 
@@ -35,12 +31,16 @@ namespace fatpound::linkedlist
                 return *this;
             }
         }
+        virtual ~DoublyCircularLL() noexcept override
+        {
+            Delete_();
+        }
 
 
     public:
-        void Add(T new_item) override
+        virtual void Add(T new_item) override final
         {
-            typename DoublyLL<T>::Node* new_part = new DoublyLL<T>::Node(new_item);
+            typename DoublyLL<T>::Node_* new_part = new DoublyLL<T>::Node_(new_item);
 
             ++(this->item_count_);
 
@@ -62,9 +62,9 @@ namespace fatpound::linkedlist
 
             this->end_ = new_part;
         }
-        void AddOrdered(T new_item) override
+        virtual void AddOrdered(T new_item) override final
         {
-            typename DoublyLL<T>::Node* new_part = new DoublyLL<T>::Node(new_item);
+            typename DoublyLL<T>::Node_* new_part = new DoublyLL<T>::Node_(new_item);
 
             ++(this->item_count_);
 
@@ -89,8 +89,8 @@ namespace fatpound::linkedlist
                 return;
             }
 
-            typename DoublyLL<T>::Node* temp = this->list_;
-            typename DoublyLL<T>::Node* start = temp;
+            typename DoublyLL<T>::Node_* temp = this->list_;
+            typename DoublyLL<T>::Node_* start = temp;
 
             while (temp->next != start)
             {
@@ -113,7 +113,7 @@ namespace fatpound::linkedlist
             new_part->next = start;
             start->prev = new_part;
         }
-        void Reverse() override
+        virtual void Reverse() override final
         {
             if (this->list_ == nullptr)
             {
@@ -125,8 +125,8 @@ namespace fatpound::linkedlist
                 return;
             }
 
-            typename DoublyLL<T>::Node* temp = this->list_;
-            typename DoublyLL<T>::Node* start = this->list_;
+            typename DoublyLL<T>::Node_* temp = this->list_;
+            typename DoublyLL<T>::Node_* start = this->list_;
 
             while (temp->next != start)
             {
@@ -137,15 +137,15 @@ namespace fatpound::linkedlist
             std::swap(temp->prev, temp->next);
             this->list_ = temp;
         }
-        void Print() const override
+        virtual void Print() const override final
         {
             if (this->list_ == nullptr)
             {
                 throw std::runtime_error("Tried to Print an empty DoublyCircularLL!");
             }
 
-            typename DoublyLL<T>::Node* temp = this->list_;
-            typename DoublyLL<T>::Node* start = temp;
+            typename DoublyLL<T>::Node_* temp = this->list_;
+            typename DoublyLL<T>::Node_* start = temp;
 
             do
             {
@@ -159,16 +159,16 @@ namespace fatpound::linkedlist
 
 
     protected:
-        void Delete_() override
+        virtual void Delete_() override final
         {
             if (this->list_ == nullptr)
             {
                 return;
             }
 
-            typename DoublyLL<T>::Node* start = this->list_;
-            typename DoublyLL<T>::Node* ex = this->list_;
-            typename DoublyLL<T>::Node* temp;
+            typename DoublyLL<T>::Node_* start = this->list_;
+            typename DoublyLL<T>::Node_* ex = this->list_;
+            typename DoublyLL<T>::Node_* temp;
 
             do
             {

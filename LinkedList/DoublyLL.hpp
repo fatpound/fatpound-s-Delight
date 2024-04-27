@@ -13,12 +13,9 @@ namespace fatpound::linkedlist
     {
     public:
         DoublyLL() = default;
-        virtual ~DoublyLL() noexcept
-        {
-            Delete_();
-        }
-        DoublyLL(const DoublyLL<T>& src) = delete;
-        DoublyLL(DoublyLL<T>&& src) noexcept
+        DoublyLL(const DoublyLL& src) = delete;
+        DoublyLL& operator = (const DoublyLL& src) = delete;
+        DoublyLL(DoublyLL&& src) noexcept
             :
             list_(std::exchange(src.list_, nullptr)),
             end_(std::exchange(src.end_, nullptr)),
@@ -26,8 +23,7 @@ namespace fatpound::linkedlist
         {
 
         }
-        DoublyLL<T>& operator = (const DoublyLL<T>& src) = delete;
-        DoublyLL<T>& operator = (DoublyLL<T>&& src) noexcept
+        DoublyLL& operator = (DoublyLL&& src) noexcept
         {
             Delete_();
 
@@ -41,20 +37,21 @@ namespace fatpound::linkedlist
 
             return *this;
         }
+        virtual ~DoublyLL() noexcept
+        {
+            Delete_();
+        }
 
 
     public:
-        virtual bool Contains(T item) const
+        virtual bool Contains(T item) const final
         {
-            return Find_(item) == nullptr
-                ? false
-                : true
-                ;
+            return Find_(item) != nullptr;
         }
 
         virtual void Add(T new_item)
         {
-            Node* new_part = new Node(new_item);
+            Node_* new_part = new Node_(new_item);
 
             ++item_count_;
 
@@ -73,7 +70,7 @@ namespace fatpound::linkedlist
         }
         virtual void AddOrdered(T new_item)
         {
-            Node* new_part = new Node(new_item);
+            Node_* new_part = new Node_(new_item);
 
             ++item_count_;
 
@@ -92,7 +89,7 @@ namespace fatpound::linkedlist
                 return;
             }
 
-            Node* temp = list_;
+            Node_* temp = list_;
 
             while (temp->next != nullptr)
             {
@@ -124,7 +121,7 @@ namespace fatpound::linkedlist
                 return;
             }
 
-            Node* temp = list_;
+            Node_* temp = list_;
 
             while (temp->next != nullptr)
             {
@@ -142,7 +139,7 @@ namespace fatpound::linkedlist
                 throw std::runtime_error("Tried to Print an empty DoublyLL!");
             }
 
-            Node* temp = list_;
+            Node_* temp = list_;
 
             do
             {
@@ -156,14 +153,14 @@ namespace fatpound::linkedlist
 
 
     protected:
-        struct Node
+        struct Node_
         {
-            Node* prev = nullptr;
-            Node* next = nullptr;
+            Node_* prev = nullptr;
+            Node_* next = nullptr;
 
             T item;
 
-            Node(T new_item)
+            Node_(T new_item)
                 :
                 item{ new_item }
             {}
@@ -171,7 +168,7 @@ namespace fatpound::linkedlist
 
 
     protected:
-        virtual DoublyLL<T>::Node* Find_(T item) const
+        virtual DoublyLL<T>::Node_* Find_(T item) const final
         {
             if (item_count_ == 0u)
             {
@@ -186,9 +183,9 @@ namespace fatpound::linkedlist
                     ;
             }
 
-            Node* temp = list_;
+            Node_* temp = list_;
 
-            for (size_t i = 0u; i < item_count_; ++i)
+            for (std::size_t i = 0u; i < item_count_; ++i)
             {
                 if (temp->item == item)
                 {
@@ -203,13 +200,13 @@ namespace fatpound::linkedlist
 
         virtual void Delete_()
         {
-            if (list_ == nullptr)
+            [[unlikely]] if (list_ == nullptr)
             {
                 return;
             }
 
-            Node* ex = list_;
-            Node* temp;
+            Node_* ex = list_;
+            Node_* temp;
 
             do
             {
@@ -228,10 +225,10 @@ namespace fatpound::linkedlist
 
 
     protected:
-        Node* list_ = nullptr;
-        Node* end_  = nullptr;
+        Node_* list_ = nullptr;
+        Node_* end_  = nullptr;
         
-        size_t item_count_ = 0u;
+        std::size_t item_count_ = 0u;
 
 
     private:

@@ -9,19 +9,15 @@ namespace fatpound::linkedlist
     {
     public:
         SinglyCircularLL() = default;
-        virtual ~SinglyCircularLL() noexcept override
-        {
-            Delete_();
-        }
-        SinglyCircularLL(const SinglyCircularLL<T>& src) = delete;
-        SinglyCircularLL(SinglyCircularLL<T>&& src) noexcept
+        SinglyCircularLL(const SinglyCircularLL& src) = delete;
+        SinglyCircularLL& operator = (const SinglyCircularLL& src) = delete;
+        SinglyCircularLL(SinglyCircularLL&& src) noexcept
             :
-            SinglyLL<T>(std::move(src))
+            SinglyLL(std::move(src))
         {
 
         }
-        SinglyCircularLL<T>& operator = (const SinglyCircularLL<T>& src) = delete;
-        SinglyCircularLL<T>& operator = (SinglyCircularLL<T>&& src) noexcept
+        SinglyCircularLL& operator = (SinglyCircularLL&& src) noexcept
         {
             if (this != std::addressof(src) && typeid(src) == typeid(*this) && src.list_ != nullptr)
             {
@@ -35,12 +31,16 @@ namespace fatpound::linkedlist
 
             return *this;
         }
+        virtual ~SinglyCircularLL() noexcept override
+        {
+            Delete_();
+        }
 
 
     public:
-        void Add(T new_item) override
+        virtual void Add(T new_item) override final
         {
-            typename SinglyLL<T>::Node* new_part = new SinglyLL<T>::Node(new_item);
+            typename SinglyLL<T>::Node_* new_part = new SinglyLL<T>::Node_(new_item);
 
             ++(this->item_count_);
 
@@ -58,9 +58,9 @@ namespace fatpound::linkedlist
 
             this->end_ = new_part;
         }
-        void AddOrdered(T new_item) override
+        virtual void AddOrdered(T new_item) override final
         {
-            typename SinglyLL<T>::Node* new_part = new SinglyLL<T>::Node(new_item);
+            typename SinglyLL<T>::Node_* new_part = new SinglyLL<T>::Node_(new_item);
 
             ++(this->item_count_);
 
@@ -82,8 +82,8 @@ namespace fatpound::linkedlist
                 return;
             }
 
-            typename SinglyLL<T>::Node* temp = this->list_;
-            typename SinglyLL<T>::Node* start = temp;
+            typename SinglyLL<T>::Node_* temp = this->list_;
+            typename SinglyLL<T>::Node_* start = temp;
 
             while (temp->next != start)
             {
@@ -101,7 +101,7 @@ namespace fatpound::linkedlist
             temp->next = new_part;
             new_part->next = start;
         }
-        void Reverse() override
+        virtual void Reverse() override final
         {
             if (this->list_ == nullptr)
             {
@@ -113,14 +113,14 @@ namespace fatpound::linkedlist
                 return;
             }
 
-            typename SinglyLL<T>::Node* start_backup = this->list_;
+            typename SinglyLL<T>::Node_* start_backup = this->list_;
 
-            typename SinglyLL<T>::Node* t;
-            typename SinglyLL<T>::Node* a = nullptr;
-            typename SinglyLL<T>::Node* x;
+            typename SinglyLL<T>::Node_* t;
+            typename SinglyLL<T>::Node_* a = nullptr;
+            typename SinglyLL<T>::Node_* x;
 
-            typename SinglyLL<T>::Node* temp = this->list_;
-            typename SinglyLL<T>::Node* start = temp;
+            typename SinglyLL<T>::Node_* temp = this->list_;
+            typename SinglyLL<T>::Node_* start = temp;
 
             while (true)
             {
@@ -159,15 +159,15 @@ namespace fatpound::linkedlist
 
             this->end_ = start_backup;
         }
-        void Print() const override
+        virtual void Print() const override final
         {
             if (this->list_ == nullptr)
             {
                 throw std::runtime_error("Tried to Print an empty SinglyCircularLL!");
             }
 
-            typename SinglyLL<T>::Node* temp = this->list_;
-            typename SinglyLL<T>::Node* start = temp;
+            typename SinglyLL<T>::Node_* temp = this->list_;
+            typename SinglyLL<T>::Node_* start = temp;
 
             do
             {
@@ -181,16 +181,16 @@ namespace fatpound::linkedlist
 
 
     protected:
-        void Delete_() override
+        virtual void Delete_() override final
         {
             if (this->list_ == nullptr)
             {
                 return;
             }
 
-            typename SinglyLL<T>::Node* start = this->list_;
-            typename SinglyLL<T>::Node* ex = this->list_;
-            typename SinglyLL<T>::Node* temp;
+            typename SinglyLL<T>::Node_* start = this->list_;
+            typename SinglyLL<T>::Node_* ex = this->list_;
+            typename SinglyLL<T>::Node_* temp;
 
             do
             {

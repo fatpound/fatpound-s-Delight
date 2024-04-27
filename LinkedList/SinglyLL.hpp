@@ -13,12 +13,9 @@ namespace fatpound::linkedlist
     {
     public:
         SinglyLL() = default;
-        virtual ~SinglyLL() noexcept
-        {
-            Delete_();
-        }
-        SinglyLL(const SinglyLL<T>& src) = delete;
-        SinglyLL(SinglyLL<T>&& src) noexcept
+        SinglyLL(const SinglyLL& src) = delete;
+        SinglyLL& operator = (const SinglyLL& src) = delete;
+        SinglyLL(SinglyLL&& src) noexcept
             :
             list_(std::exchange(src.list_, nullptr)),
             end_(std::exchange(src.end_, nullptr)),
@@ -26,8 +23,7 @@ namespace fatpound::linkedlist
         {
 
         }
-        SinglyLL<T>& operator = (const SinglyLL<T>& src) = delete;
-        SinglyLL<T>& operator = (SinglyLL<T>&& src) noexcept
+        SinglyLL& operator = (SinglyLL&& src) noexcept
         {
             if (this != std::addressof(src) && typeid(src) == typeid(*this) && src.list_ != nullptr)
             {
@@ -41,20 +37,21 @@ namespace fatpound::linkedlist
 
             return *this;
         }
+        virtual ~SinglyLL() noexcept
+        {
+            Delete_();
+        }
 
 
     public:
-        virtual bool Contains(T item) const
+        virtual bool Contains(T item) const final
         {
-            return Find_(item) == nullptr
-                ? false
-                : true
-                ;
+            return Find_(item) != nullptr;
         }
 
         virtual void Add(T new_item)
         {
-            Node* new_part = new Node(new_item);
+            Node_* new_part = new Node_(new_item);
 
             ++item_count_;
 
@@ -71,7 +68,7 @@ namespace fatpound::linkedlist
         }
         virtual void AddOrdered(T new_item)
         {
-            Node* new_part = new Node(new_item);
+            Node_* new_part = new Node_(new_item);
 
             ++item_count_;
 
@@ -91,7 +88,7 @@ namespace fatpound::linkedlist
                 return;
             }
 
-            Node* temp = list_;
+            Node_* temp = list_;
 
             while (temp->next != nullptr)
             {
@@ -121,13 +118,13 @@ namespace fatpound::linkedlist
                 return;
             }
 
-            Node* start_backup = list_;
+            Node_* start_backup = list_;
 
-            Node* t;
-            Node* a = nullptr;
-            Node* x;
+            Node_* t;
+            Node_* a = nullptr;
+            Node_* x;
 
-            Node* temp = list_;
+            Node_* temp = list_;
 
             while (true)
             {
@@ -163,7 +160,7 @@ namespace fatpound::linkedlist
                 throw std::runtime_error("Tried to Print an empty SinglyLL!");
             }
 
-            Node* temp = list_;
+            Node_* temp = list_;
 
             do
             {
@@ -177,13 +174,13 @@ namespace fatpound::linkedlist
 
 
     protected:
-        struct Node
+        struct Node_
         {
-            Node* next = nullptr;
+            Node_* next = nullptr;
 
             T item;
 
-            Node(T new_item)
+            Node_(T new_item)
                 :
                 item( new_item )
             {
@@ -193,7 +190,7 @@ namespace fatpound::linkedlist
 
 
     protected:
-        virtual SinglyLL<T>::Node* Find_(T item) const
+        virtual SinglyLL<T>::Node_* Find_(T item) const final
         {
             if (item_count_ == 0u)
             {
@@ -208,9 +205,9 @@ namespace fatpound::linkedlist
                     ;
             }
 
-            Node* temp = list_;
+            Node_* temp = list_;
 
-            for (size_t i = static_cast<size_t>(0); i < item_count_; ++i)
+            for (std::size_t i = static_cast<std::size_t>(0); i < item_count_; ++i)
             {
                 if (temp->item == item)
                 {
@@ -225,13 +222,13 @@ namespace fatpound::linkedlist
 
         virtual void Delete_()
         {
-            if (list_ == nullptr)
+            [[unlikely]] if (list_ == nullptr)
             {
                 return;
             }
 
-            Node* ex = list_;
-            Node* temp;
+            Node_* ex = list_;
+            Node_* temp;
 
             do
             {
@@ -250,10 +247,10 @@ namespace fatpound::linkedlist
 
 
     protected:
-        Node* list_ = nullptr;
-        Node* end_  = nullptr;
+        Node_* list_ = nullptr;
+        Node_* end_  = nullptr;
 
-        size_t item_count_ = 0u;
+        std::size_t item_count_ = 0u;
 
 
     private:
