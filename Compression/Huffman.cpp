@@ -26,7 +26,7 @@ namespace fatpound::compression
         }
 
         input_file.seekg(0, std::ios::end);
-        const size_t file_size = input_file.tellg();
+        const std::size_t file_size = input_file.tellg();
 
         if (file_size < 1u)
         {
@@ -36,7 +36,7 @@ namespace fatpound::compression
         // input_file.clear();
         input_file.seekg(0, std::ios::beg);
 
-        const auto& name_ext = fatpound::file::GetNameAndExtensionFromFilename(input_filename);
+        const auto& name_ext = fatpound::file::GetNameAndExtension(input_filename);
 
         std::ofstream output_file(name_ext.first + "_compressed" + "." + name_ext.second, std::ios::binary);
 
@@ -45,10 +45,10 @@ namespace fatpound::compression
             throw std::runtime_error("Compressed file cannot be created!");
         }
 
-        std::vector<std::pair<unsigned char, size_t>> pairs;
+        std::vector<std::pair<unsigned char, std::size_t>> pairs;
         pairs.reserve(256);
 
-        for (size_t i = 0u; i < 256u; ++i)
+        for (std::size_t i = 0u; i < 256u; ++i)
         {
             pairs.emplace_back(static_cast<unsigned char>(i), 0u);
         }
@@ -65,31 +65,31 @@ namespace fatpound::compression
         pairs.erase(rn::remove_if(pairs, [](const auto& pair) -> bool { return pair.second == 0u; }).begin(), pairs.end());
         rn::sort(pairs, [](const auto& pair1, const auto& pair2) -> bool { return pair1.second < pair2.second; });
 
-        std::deque<Node*> deque;
+        std::deque<Node_*> deque;
         deque.resize(pairs.size());
 
-        for (size_t i = 0u; i < pairs.size(); ++i)
+        for (std::size_t i = 0u; i < pairs.size(); ++i)
         {
-            deque[i] = new Node(static_cast<int64_t>(pairs[i].first), pairs[i].second);
+            deque[i] = new Node_(static_cast<std::int64_t>(pairs[i].first), pairs[i].second);
         }
 
-        const size_t first_size = deque.size();
+        const std::size_t first_size = deque.size();
 
         // Generating Huffman Tree
 
-        for (size_t i = 0u; i < first_size - 1u; ++i)
+        for (std::size_t i = 0u; i < first_size - 1u; ++i)
         {
-            Node* const left  = deque[0];
-            Node* const right = deque[1];
+            Node_* const left  = deque[0];
+            Node_* const right = deque[1];
 
-            Node* const newnode = new Node(left, right);
+            Node_* const newnode = new Node_(left, right);
 
             deque.pop_front();
             deque.pop_front();
 
-            size_t index = 0u;
+            std::size_t index = 0u;
 
-            for (size_t j = 0u; j < deque.size(); ++j)
+            for (std::size_t j = 0u; j < deque.size(); ++j)
             {
                 if (newnode->num_ > deque[index]->num_)
                 {
@@ -104,12 +104,12 @@ namespace fatpound::compression
             deque.insert(deque.begin() + index, newnode);
         }
 
-        // const size_t node_count = first_size * 2 - 1; // unused
+        // const std::size_t node_count = first_size * 2 - 1; // unused
 
         auto tree_results = GenerateBinaryWords_(deque[0], "");
         DeleteTree_(deque[0]);
 
-        const size_t tree_result_len = tree_results.length();
+        const std::size_t tree_result_len = tree_results.length();
 
         output_file << tree_result_len << ' ';
 
@@ -119,7 +119,7 @@ namespace fatpound::compression
 
         // rn::sort(tree_results_pairs, [](const auto& pair1, const auto& pair2) -> bool { return pair1.first < pair2.first; });
 
-        size_t bit_mod = 0u;
+        std::size_t bit_mod = 0u;
 
         for (const auto& pair : pairs)
         {
@@ -190,7 +190,7 @@ namespace fatpound::compression
         // input_file.clear();
         input_file.seekg(0, std::ios::beg);
 
-        const auto& name_ext = fatpound::file::GetNameAndExtensionFromFilename(input_filename);
+        const auto& name_ext = fatpound::file::GetNameAndExtension(input_filename);
 
         std::ofstream output_file(name_ext.first + "_decompressed" + "." + name_ext.second, std::ios::binary);
 
@@ -261,7 +261,7 @@ namespace fatpound::compression
     {
         std::vector<std::pair<unsigned char, std::string>> tree_results_pairs;
 
-        for (size_t i = 0u; i < tree_results.length(); ++i)
+        for (std::size_t i = 0u; i < tree_results.length(); ++i)
         {
             std::string tempstr;
 
@@ -269,7 +269,7 @@ namespace fatpound::compression
 
             tempstr += ch;
 
-            size_t j = i + 1u;
+            std::size_t j = i + 1u;
 
             ch = tree_results[j];
 
@@ -290,7 +290,7 @@ namespace fatpound::compression
         return tree_results_pairs;
     }
 
-    std::string Huffman::GenerateBinaryWords_(Node* node, const std::string& str)
+    std::string Huffman::GenerateBinaryWords_(Node_* node, const std::string& str)
     {
         if (node == nullptr)
         {
@@ -317,9 +317,9 @@ namespace fatpound::compression
 
         bool found = false;
         
-        size_t max = final_str.length() >= 16u ? 16u : final_str.length();
+        std::size_t max = final_str.length() >= 16u ? 16u : final_str.length();
         
-        for (size_t i = 1u; i <= max; ++i)
+        for (std::size_t i = 1u; i <= max; ++i)
         {
             std::string str(final_str.cbegin(), final_str.cbegin() + i);
 
@@ -340,7 +340,7 @@ namespace fatpound::compression
         return found;
     }
 
-    void Huffman::DeleteTree_(Node* node)
+    void Huffman::DeleteTree_(Node_* node)
     {
         if (node == nullptr)
         {
@@ -354,7 +354,7 @@ namespace fatpound::compression
     }
 
 
-    Huffman::Node::Node(Node* left, Node* right)
+    Huffman::Node_::Node_(Node_* left, Node_* right)
         :
         left_(left),
         right_(right),
@@ -362,7 +362,7 @@ namespace fatpound::compression
     {
 
     }
-    Huffman::Node::Node(const int64_t& ch, const int64_t& num)
+    Huffman::Node_::Node_(const std::int64_t& ch, const std::int64_t& num)
         :
         ch_(ch),
         num_(num)

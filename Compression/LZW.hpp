@@ -5,7 +5,7 @@
 
 namespace fatpound::compression
 {
-    class LZW
+    class LZW final
     {
     public:
         LZW() = delete;
@@ -20,6 +20,6 @@ namespace fatpound::compression
 
 
     private:
-        static void InitializeDictionary_(std::vector<std::pair<size_t, std::string>>& dictionary);
+        static void InitializeDictionary_(std::vector<std::pair<std::size_t, std::string>>& dictionary);
     };
 }

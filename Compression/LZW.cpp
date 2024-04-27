@@ -21,7 +21,7 @@ namespace fatpound::compression
             throw std::runtime_error("Input file cannot be opened for [Compressing]!");
         }
 
-        const auto name_ext = fatpound::file::GetNameAndExtensionFromFilename(input_filename);
+        const auto name_ext = fatpound::file::GetNameAndExtension(input_filename);
 
         std::ofstream output_file(name_ext.first + "_compressed" + "." + name_ext.second, std::ios::binary);
 
@@ -30,8 +30,7 @@ namespace fatpound::compression
             throw std::runtime_error("Compressed file cannot be created!");
         }
 
-        std::vector<std::pair<size_t, std::string>> dictionary;
-
+        std::vector<std::pair<std::size_t, std::string>> dictionary;
         InitializeDictionary_(dictionary);
 
         std::string strp;
@@ -44,7 +43,7 @@ namespace fatpound::compression
 
             const auto lambda = [&](const auto& pair) -> bool { return pair.second == strp; };
 
-            size_t wordcode = 256u;
+            std::size_t wordcode = 256u;
 
             int C = input_file.get();
 
@@ -66,7 +65,7 @@ namespace fatpound::compression
 
                     // std::cout << wordcode << '\t' << strpc << '\n';
 
-                    output_file << (strp.length() == 1u ? static_cast<size_t>(strp[0]) : (rn::find_if(dictionary, lambda))->first) << ' ';
+                    output_file << (strp.length() == 1u ? static_cast<std::size_t>(strp[0]) : (rn::find_if(dictionary, lambda))->first) << ' ';
 
                     ++wordcode;
 
@@ -76,7 +75,7 @@ namespace fatpound::compression
                 C = input_file.get();
             }
 
-            output_file << (strp.length() == 1u ? static_cast<size_t>(strp[0]) : (rn::find_if(dictionary, lambda))->first);
+            output_file << (strp.length() == 1u ? static_cast<std::size_t>(strp[0]) : (rn::find_if(dictionary, lambda))->first);
         }
     }
     void LZW::Decompress(const std::string& input_filename)
@@ -88,7 +87,7 @@ namespace fatpound::compression
             throw std::runtime_error("Input file cannot be opened for [Decompressing]!");
         }
 
-        const auto name_ext = fatpound::file::GetNameAndExtensionFromFilename(input_filename);
+        const auto name_ext = fatpound::file::GetNameAndExtension(input_filename);
 
         std::ofstream output_file(name_ext.first + "_decompressed" + "." + name_ext.second, std::ios::binary);
 
@@ -97,8 +96,7 @@ namespace fatpound::compression
             throw std::runtime_error("Compressed file cannot be created!");
         }
 
-        std::vector<std::pair<size_t, std::string>> dictionary;
-
+        std::vector<std::pair<std::size_t, std::string>> dictionary;
         InitializeDictionary_(dictionary);
 
         if ( ! input_file.eof() )
@@ -111,7 +109,7 @@ namespace fatpound::compression
 
             output_file << S;
 
-            size_t wordcode = 256u;
+            std::size_t wordcode = 256u;
 
             while ( ! input_file.eof() )
             {
@@ -146,17 +144,17 @@ namespace fatpound::compression
         }
     }
 
-    void LZW::InitializeDictionary_(std::vector<std::pair<size_t, std::string>>& dictionary)
+    void LZW::InitializeDictionary_(std::vector<std::pair<std::size_t, std::string>>& dictionary)
     {
         std::string tempstr;
         
-        for (size_t i = 'A'; i <= 'Z'; ++i)
+        for (std::size_t i = 'A'; i <= 'Z'; ++i)
         {
             tempstr = static_cast<char>(i);
             dictionary.emplace_back(i, tempstr);
         }
 
-        for (size_t i = 'a'; i <= 'z'; ++i)
+        for (std::size_t i = 'a'; i <= 'z'; ++i)
         {
             tempstr = static_cast<char>(i);
             dictionary.emplace_back(i, tempstr);
