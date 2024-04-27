@@ -55,6 +55,6 @@ namespace fatpound::automata
 
         Node_* tree_ = nullptr;
 
-        static constexpr const std::size_t recurse_limit_ = 1u;
+        static constexpr std::size_t recurse_limit_ = 1u;
     };
 }
