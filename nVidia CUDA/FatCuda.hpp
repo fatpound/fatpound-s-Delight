@@ -29,7 +29,6 @@ namespace fatpound::cuda
         void operator () (T* ptr) const
         {
             cudaFree(ptr);
-            ptr = nullptr;
         }
 
 
