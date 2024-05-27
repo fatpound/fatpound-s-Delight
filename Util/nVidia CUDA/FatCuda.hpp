@@ -10,7 +10,7 @@
 
 #include <memory>
 
-namespace fatpound::cuda
+namespace fatpound::util
 {
     class CudaPtr final
     {
