@@ -31,7 +31,7 @@ namespace fatpound::linkedlist
                 return *this;
             }
         }
-        virtual ~DoublyCircularLL() noexcept override
+        virtual ~DoublyCircularLL() noexcept
         {
             Delete_();
         }
