@@ -7,54 +7,62 @@ namespace fatpound::tree
     template <std::totally_ordered T>
     class AVL : public BST<T>
     {
-    public:
-        virtual void Insert(T new_item) override
-        {
-            typename BST<T>::Node_* new_root = BST<T>::Insert(nullptr, this->root_, new_item);
+        using typename BST<T>::Node_;
 
-            [[unlikely]] if (this->root_ == nullptr)
+    public:
+        virtual void Insert(const T& new_item) override
+        {
+            [[maybe_unused]] Node_* new_node = BST<T>::Insert_(nullptr, this->root_, new_item);
+
+            if (this->root_ == nullptr) [[unlikely]]
             {
-                this->root_ = new_root;
+                this->root_ = new_node;
             }
             else
             {
-                this->Balance(new_root);
+                Balance_();
             }
 
             this->node_count_++;
         }
-        virtual void Delete(T old_item) override
+        virtual void Delete(const T& old_item) override
         {
-            typename BST<T>::Node_* node = BST<T>::Find(this->root_, old_item);
+            Node_* node = BST<T>::Find_(this->root_, old_item);
 
             if (node == this->root_)
             {
-                typename BST<T>::Node_* iosuc = BST<T>::GetInorderSuccessor(node);
+                // inorder_successor
+                Node_* iosuc = BST<T>::GetInorderSuccessor_(node);
+
                 node->item = iosuc->item;
 
-                Balance(BST<T>::Delete(iosuc));
+                Balance_(BST<T>::Delete_(iosuc));
             }
             else
             {
-                Balance(BST<T>::Delete(node));
+                Balance_(BST<T>::Delete_(node));
             }
         }
 
 
     protected:
-        virtual void Balance(BST<T>::Node_* latest)
+        virtual void Balance_()
+        {
+            this->Balance_(this->last_added_);
+        }
+        virtual void Balance_(const Node_* const latest)
         {
             if (latest == nullptr)
             {
                 return;
             }
 
-            typename BST<T>::Node_* last = latest; // Y
-        
+            Node_* last = const_cast<Node_*>(latest); // Y
+
             while (last->parent != nullptr) // Going up
             {
-                const int  left_val = BST<T>::GetDepth(last->parent->left,  0);
-                const int right_val = BST<T>::GetDepth(last->parent->right, 0);
+                const int  left_val = BST<T>::GetDepth_(last->parent->left, 0);
+                const int right_val = BST<T>::GetDepth_(last->parent->right, 0);
 
                 const int balanceFactor = right_val - left_val;
 
@@ -68,21 +76,21 @@ namespace fatpound::tree
 
                 if (balanceFactor > 1 && latest->item > last->item)
                 {
-                    RotateLeft(last->parent, last);
+                    RotateLeft_(last->parent, last);
                 }
                 else if (balanceFactor < -1 && latest->item < last->item)
                 {
-                    RotateRight(last->parent, last);
+                    RotateRight_(last->parent, last);
                 }
                 else if (balanceFactor > 1 && latest->item < last->item)
                 {
-                    RotateRight(last, last->left);
-                    RotateLeft(last->parent->parent, last->parent);
+                    RotateRight_(last, last->left);
+                    RotateLeft_(last->parent->parent, last->parent);
                 }
                 else if (balanceFactor < -1 && latest->item > last->item)
                 {
-                    RotateLeft(last, last->right);
-                    RotateRight(last->parent->parent, last->parent);
+                    RotateLeft_(last, last->right);
+                    RotateRight_(last->parent->parent, last->parent);
                 }
 
                 if (last->parent == nullptr)
@@ -93,9 +101,9 @@ namespace fatpound::tree
                 last = last->parent;
             }
         }
-        virtual void RotateLeft(BST<T>::Node_* X, BST<T>::Node_* Y) final
+        virtual void RotateLeft_(Node_* X, Node_* Y) final
         {
-            typename BST<T>::Node_* parent_of_parent = X->parent;
+            Node_* parent_of_parent = X->parent;
 
             X->right = Y->left;
 
@@ -125,9 +133,9 @@ namespace fatpound::tree
                 }
             }
         }
-        virtual void RotateRight(BST<T>::Node_* X, BST<T>::Node_* Y) final
+        virtual void RotateRight_(Node_* X, Node_* Y) final
         {
-            typename BST<T>::Node_* parent_of_parent = X->parent;
+            Node_* parent_of_parent = X->parent;
 
             X->left = Y->right;
 

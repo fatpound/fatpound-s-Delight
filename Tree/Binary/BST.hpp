@@ -8,13 +8,15 @@ namespace fatpound::tree
     template <std::totally_ordered T>
     class BST
     {
+        using SizeType = std::size_t;
+
     public:
         BST() = default;
         BST(const BST& src) noexcept
         {
             if (src.root_ != nullptr)
             {
-                root_ = src.Clone(src.root_);
+                root_ = src.Clone_(src.root_);
                 node_count_ = src.node_count_;
             }
         }
@@ -24,13 +26,13 @@ namespace fatpound::tree
             {
                 if (root_ != nullptr)
                 {
-                    Delete(root_);
+                    Delete_(root_);
 
                     root_ = nullptr;
                     node_count_ = 0ull;
                 }
 
-                root_ = src.Clone(src.root_);
+                root_ = src.Clone_(src.root_);
                 node_count_ = src.node_count_;
             }
 
@@ -53,7 +55,7 @@ namespace fatpound::tree
             {
                 if (root_ != nullptr)
                 {
-                    Delete(root_);
+                    Delete_(root_);
 
                     root_ = nullptr;
                     node_count_ = 0ull;
@@ -70,75 +72,73 @@ namespace fatpound::tree
         }
         ~BST() noexcept
         {
-            DeleteTree(root_);
+            DeleteTree_(root_);
+
             root_ = nullptr;
             node_count_ = 0u;
         }
 
 
     public:
-        virtual std::int64_t GetTotalNodeCount() const final
+        virtual SizeType GetTotalNodeCount() const final
         {
             return node_count_;
         }
 
         virtual bool Contains(T item)       const final
         {
-            return Find(root_, item) == nullptr
-                ? false
-                : true
-                ;
+            return Find_(root_, item) != nullptr;
         }
 
         virtual void ListPreorder()         const final
         {
-            ListPreorder(root_);
+            ListPreorder_(root_);
             std::cout << '\n';
         }
         virtual void ListPreorderReverse()  const final
         {
-            ListPreorderReverse(root_);
+            ListPreorderReverse_(root_);
             std::cout << '\n';
         }
         virtual void ListInorder()          const final
         {
-            ListInorder(root_);
+            ListInorder_(root_);
             std::cout << '\n';
         }
         virtual void ListInorderReverse()   const final
         {
-            ListInorderReverse(root_);
+            ListInorderReverse_(root_);
             std::cout << '\n';
         }
         virtual void ListPostorder()        const final
         {
-            ListPostorder(root_);
+            ListPostorder_(root_);
             std::cout << '\n';
         }
         virtual void ListPostorderReverse() const final
         {
-            ListPostorderReverse(root_);
+            ListPostorderReverse_(root_);
             std::cout << '\n';
         }
         virtual void ListLeaves()           const final
         {
-            ListLeaves(root_);
+            ListLeaves_(root_);
             std::cout << '\n';
         }
         virtual void ListLeavesReverse()    const final
         {
-            ListLeavesReverse(root_);
+            ListLeavesReverse_(root_);
             std::cout << '\n';
         }
         virtual void ListLevelorder()       const final
         {
-            const std::int64_t height = GetDepth(root_, 0);
+            const std::int64_t height = GetDepth_(root_, 0);
 
             for (std::int64_t i = 1; i <= height; i++)
             {
                 std::cout << "Level " << i << " : ";
 
-                ListLevelorder(root_, i);
+                ListLevelorder_(root_, i);
 
                 std::cout << '\n';
             }
@@ -146,34 +146,34 @@ namespace fatpound::tree
             std::cout << '\n';
         }
 
-        virtual void Insert(T new_item) final
+        virtual void Insert(const T& new_item)
         {
-            BST<T>::Node_* new_root = Insert(nullptr, root_, new_item);
+            Node_* new_node = Insert_(nullptr, root_, new_item);
 
-            [[unlikely]] if (root_ == nullptr)
+            if (root_ == nullptr) [[unlikely]]
             {
-                root_ = new_root;
+                root_ = new_node;
             }
 
             ++node_count_;
         }
-        virtual void Delete(T old_item) final
+        virtual void Delete(const T& old_item)
         {
-            BST<T>::Node_* node = Find(root_, old_item);
+            Node_* node = Find_(root_, old_item);
 
             if (node != nullptr)
             {
-                static_cast<void>(Delete(node));
+                static_cast<void>(Delete_(node));
             }
         }
         virtual void Mirror() final
         {
-            Mirror(root_);
+            Mirror_(root_);
         }
 
 
     protected:
-        struct Node_
+        struct Node_ final
         {
             Node_* left   = nullptr;
             Node_* right  = nullptr;
@@ -192,39 +192,41 @@ namespace fatpound::tree
 
 
     protected:
-        virtual BST<T>::Node_* Insert(BST<T>::Node_* __restrict parent, BST<T>::Node_* __restrict node, T new_item) final
+        virtual Node_* Insert_(Node_* __restrict parent, Node_* __restrict node, const T& new_item) final
         {
             if (node == nullptr)
             {
-                return new BST<T>::Node_(new_item, parent);
+                last_added_ = new Node_(new_item, parent);
+
+                return last_added_;
             }
 
             if (new_item < node->item)
             {
-                node->left = Insert(node, node->left, new_item);
+                node->left = Insert_(node, node->left, new_item);
             }
             else if (new_item > node->item)
             {
-                node->right = Insert(node, node->right, new_item);
+                node->right = Insert_(node, node->right, new_item);
             }
 
             return node;
         }
-        virtual BST<T>::Node_* Clone(BST<T>::Node_* node) const final
+        virtual Node_* Clone_(Node_* node) const final
         {
             if (node == nullptr)
             {
                 return nullptr;
             }
 
-            BST<T>::Node_* new_node = new BST<T>::Node_(node->item, node->parent);
+            Node_* new_node = new Node_(node->item, node->parent);
 
-            new_node->left  = Clone(node->left);
-            new_node->right = Clone(node->right);
+            new_node->left  = Clone_(node->left);
+            new_node->right = Clone_(node->right);
 
             return new_node;
         }
-        virtual BST<T>::Node_* Find(BST<T>::Node_* node, T item) const final
+        virtual Node_* Find_(Node_* node, const T& item) const final
         {
             if (node == nullptr)
             {
@@ -236,34 +238,34 @@ namespace fatpound::tree
                 return node;
             }
 
-            BST<T>::Node_* left_address = Find(node->left, item);
+            Node_* left_address = Find_(node->left, item);
 
             if (left_address != nullptr)
             {
                 return left_address;
             }
 
-            BST<T>::Node_* right_address = Find(node->right, item);
+            Node_* right_address = Find_(node->right, item);
 
             if (right_address != nullptr)
             {
                 return right_address;
             }
         }
-        virtual BST<T>::Node_* Delete(BST<T>::Node_* node) final
+        virtual Node_* Delete_(Node_* node) final
         {
             if (node == nullptr)
             {
                 return nullptr;
             }
 
-            BST<T>::Node_* latest = nullptr;
+            Node_* latest = nullptr;
 
             if (node->parent != nullptr)
             {
                 if (node->right != nullptr)
                 {
-                    BST<T>::Node_* leftmost = GetMin(node->right);
+                    Node_* leftmost = GetMin_(node->right);
 
                     if (leftmost != nullptr)
                     {
@@ -319,7 +321,7 @@ namespace fatpound::tree
             return latest;
         }
 
-        virtual BST<T>::Node_* GetMin(BST<T>::Node_* node) final
+        virtual Node_* GetMin_(Node_* node) final
         {
             if (node == nullptr)
             {
@@ -333,7 +335,7 @@ namespace fatpound::tree
 
             return node;
         }
-        virtual BST<T>::Node_* GetMax(BST<T>::Node_* node) final
+        virtual Node_* GetMax_(Node_* node) final
         {
             if (node == nullptr)
             {
@@ -347,14 +349,15 @@ namespace fatpound::tree
 
             return node;
         }
-        virtual BST<T>::Node_* GetInorderSuccessor(BST<T>::Node_* node) final
+        virtual Node_* GetInorderSuccessor_(Node_* node) final
         {
             if (node->right != nullptr)
             {
-                return GetMin(node->right);
+                return GetMin_(node->right);
             }
 
-            BST<T>::Node_* prnt = node->parent;
+            // parent_of_node
+            Node_* prnt = node->parent;
 
             while (prnt != nullptr && prnt->right == node)
             {
@@ -365,105 +368,105 @@ namespace fatpound::tree
             return prnt;
         }
 
-        virtual std::int64_t GetDepth(BST<T>::Node_* node, std::int64_t depth) const final
+        virtual SizeType GetDepth_      (Node_* node, SizeType depth) const final
         {
             if (node == nullptr)
             {
                 return depth;
             }
 
-            const std::int64_t  left_val = GetDepth(node->left, depth + 1);
-            const std::int64_t right_val = GetDepth(node->right, depth + 1);
+            const auto  left_val = GetDepth_(node->left,  depth + 1);
+            const auto right_val = GetDepth_(node->right, depth + 1);
 
             return std::max(left_val, right_val);
         }
-        virtual std::int64_t GetDepthLeft(BST<T>::Node_* node, std::int64_t depth) const final
+        virtual SizeType GetDepthLeft_  (Node_* node, SizeType depth) const final
         {
-            return node ? GetDepthLeft(node->left, depth + 1) : depth;
+            return node ? GetDepthLeft_(node->left, depth + 1) : depth;
         }
-        virtual std::int64_t GetDepthRight(BST<T>::Node_* node, std::int64_t depth) const final
+        virtual SizeType GetDepthRight_ (Node_* node, SizeType depth) const final
         {
-            return node ? GetDepthLeft(node->right, depth + 1) : depth;
+            return node ? GetDepthLeft_(node->right, depth + 1) : depth;
         }
-        virtual std::int64_t GetNodeCount(BST<T>::Node_* node) const final
+        virtual SizeType GetNodeCount_  (Node_* node) const final
         {
             if (node == nullptr)
             {
                 return 0;
             }
 
-            const std::int64_t  left_val = GetNodeCount(node->left);
-            const std::int64_t right_val = GetNodeCount(node->right);
+            const auto  left_val = GetNodeCount_(node->left);
+            const auto right_val = GetNodeCount_(node->right);
 
             return 1 + left_val + right_val;
         }
         
-        virtual void Mirror(BST<T>::Node_* node) final
+        virtual void Mirror_(Node_* node) final
         {
             if (node != nullptr)
             {
                 std::swap(node->left, node->right);
 
-                Mirror(node->left);
-                Mirror(node->right);
+                Mirror_(node->left);
+                Mirror_(node->right);
             }
         }
 
-        virtual void ListPreorder         (const BST<T>::Node_* node) const final
+        virtual void ListPreorder_         (const Node_* node) const final
         {
             if (node != nullptr)
             {
                 std::cout << node->item << ' ';
-                ListPreorder(node->left);
-                ListPreorder(node->right);
+                ListPreorder_(node->left);
+                ListPreorder_(node->right);
             }
         }
-        virtual void ListPreorderReverse  (const BST<T>::Node_* node) const final
+        virtual void ListPreorderReverse_  (const Node_* node) const final
         {
             if (node != nullptr)
             {
                 std::cout << node->item << ' ';
-                ListPreorderReverse(node->right);
-                ListPreorderReverse(node->left);
+                ListPreorderReverse_(node->right);
+                ListPreorderReverse_(node->left);
             }
         }
-        virtual void ListInorder          (const BST<T>::Node_* node) const final
+        virtual void ListInorder_          (const Node_* node) const final
         {
             if (node != nullptr)
             {
-                ListInorder(node->left);
+                ListInorder_(node->left);
                 std::cout << node->item << ' ';
-                ListInorder(node->right);
+                ListInorder_(node->right);
             }
         }
-        virtual void ListInorderReverse   (const BST<T>::Node_* node) const final
+        virtual void ListInorderReverse_   (const Node_* node) const final
         {
             if (node != nullptr)
             {
-                ListInorderReverse(node->right);
+                ListInorderReverse_(node->right);
                 std::cout << node->item << ' ';
-                ListInorderReverse(node->left);
+                ListInorderReverse_(node->left);
             }
         }
-        virtual void ListPostorder        (const BST<T>::Node_* node) const final
+        virtual void ListPostorder_        (const Node_* node) const final
         {
             if (node != nullptr)
             {
-                ListPostorder(node->left);
-                ListPostorder(node->right);
+                ListPostorder_(node->left);
+                ListPostorder_(node->right);
                 std::cout << node->item << ' ';
             }
         }
-        virtual void ListPostorderReverse (const BST<T>::Node_* node) const final
+        virtual void ListPostorderReverse_ (const Node_* node) const final
         {
             if (node != nullptr)
             {
-                ListPostorderReverse(node->right);
-                ListPostorderReverse(node->left);
+                ListPostorderReverse_(node->right);
+                ListPostorderReverse_(node->left);
                 std::cout << node->item << ' ';
             }
         }
-        virtual void ListLeaves           (const BST<T>::Node_* node) const final
+        virtual void ListLeaves_           (const Node_* node) const final
         {
             if (node != nullptr)
             {
@@ -473,11 +476,11 @@ namespace fatpound::tree
                     return;
                 }
 
-                ListLeaves(root_->left);
-                ListLeaves(root_->right);
+                ListLeaves_(root_->left);
+                ListLeaves_(root_->right);
             }
         }
-        virtual void ListLeavesReverse    (const BST<T>::Node_* node) const final
+        virtual void ListLeavesReverse_    (const Node_* node) const final
         {
             if (node != nullptr)
             {
@@ -487,11 +490,11 @@ namespace fatpound::tree
                     return;
                 }
 
-                ListLeavesReverse(root_->right);
-                ListLeavesReverse(root_->left);
+                ListLeavesReverse_(root_->right);
+                ListLeavesReverse_(root_->left);
             }
         }
-        virtual void ListLevelorder       (const BST<T>::Node_* node, std::int64_t level) const final
+        virtual void ListLevelorder_       (const Node_* node, SizeType level) const final
         {
             if (node != nullptr)
             {
@@ -501,8 +504,8 @@ namespace fatpound::tree
                 }
                 else if (level > 1)
                 {
-                    ListLevelorder(node->left,  level - 1);
-                    ListLevelorder(node->right, level - 1);
+                    ListLevelorder_(node->left,  level - 1);
+                    ListLevelorder_(node->right, level - 1);
                 }
             }
             else if (level == 1)
@@ -514,17 +517,18 @@ namespace fatpound::tree
 
     protected:
         Node_* root_ = nullptr;
+        Node_* last_added_ = nullptr;
 
-        std::size_t node_count_ = 0u;
+        SizeType node_count_ = 0u;
 
 
     private:
-        virtual void DeleteTree(BST<T>::Node_* root) final noexcept
+        virtual void DeleteTree_(Node_* root) noexcept final
         {
             if (root != nullptr)
             {
-                DeleteTree(root->left);
-                DeleteTree(root->right);
+                DeleteTree_(root->left);
+                DeleteTree_(root->right);
 
                 delete root;
             }
