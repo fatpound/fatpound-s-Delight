@@ -12,16 +12,20 @@ namespace fatpound::tree
     template <std::totally_ordered T, std::size_t I, std::size_t S>
     class B_Plus
     {
+        using SizeType = std::size_t;
+
     public:
         B_Plus() = default;
+        B_Plus(const B_Plus& src) = delete;
+        B_Plus& operator = (const B_Plus& src) = delete;
+        B_Plus(B_Plus&& src) = delete;
+        B_Plus& operator = (B_Plus&& src) = delete;
         ~B_Plus() noexcept
         {
             if (root_ == nullptr)
             {
                 return;
             }
-
-            class Node_;
 
             std::queue<Node_*> Q;
             Q.push(root_);
@@ -51,10 +55,6 @@ namespace fatpound::tree
 
             root_ = nullptr;
         }
-        B_Plus(const B_Plus<T, I, S>& src) = delete;
-        B_Plus(B_Plus<T, I, S>&& src) = delete;
-        B_Plus<T, I, S>& operator = (const B_Plus<T, I, S>& src) = delete;
-        B_Plus<T, I, S>& operator = (B_Plus<T, I, S>&& src) = delete;
 
 
     public:
@@ -130,7 +130,7 @@ namespace fatpound::tree
                 return;
             }
 
-            Insert(root_, new_item);
+            Insert_(root_, new_item);
 
             item_count_++;
         }
@@ -141,13 +141,13 @@ namespace fatpound::tree
                 return;
             }
 
-            const std::int64_t height = GetDepth(root_);
+            const SizeType height = GetDepth_(root_);
 
-            for (std::int64_t i = 1; i <= height; ++i)
+            for (SizeType i = 1u; i <= height; ++i)
             {
                 std::cout << "Level " << i << " : ";
 
-                ListLevelorder(root_, i);
+                ListLevelorder_(root_, i);
 
                 std::cout << '\n';
             }
@@ -160,8 +160,13 @@ namespace fatpound::tree
 
 
     private:
-        struct Node_
+        struct Node_ final
         {
+            std::vector<std::pair<T, Node_*>*> items;
+
+            Node_* lesser = nullptr;
+            Node_* parent = nullptr;
+
             Node_() = default;
 
             Node_(std::vector<std::pair<T, Node_*>*>& new_items, Node_* new_lesser, Node_* new_parent)
@@ -186,30 +191,25 @@ namespace fatpound::tree
             {
                 items.push_back(new std::pair<T, Node_*>(new_item, nullptr));
             }
-
-            std::vector<std::pair<T, Node_*>*> items;
-
-            Node_* lesser = nullptr;
-            Node_* parent = nullptr;
         };
 
 
     private:
-        std::int64_t GetDepth(Node_* node, std::int64_t depth = 0) const
+        SizeType GetDepth_(Node_* node, SizeType depth = 0) const
         {
             if (node == nullptr)
             {
                 return depth;
             }
 
-            return GetDepth(node->lesser, depth + 1);
+            return GetDepth_(node->lesser, depth + 1);
         }
 
-        void Insert(Node_* node, T new_item)
+        void Insert_(Node_* node, T new_item)
         {
-            Insert(node, new std::pair<T, Node_*>(new_item, nullptr), nullptr, false);
+            Insert_(node, new std::pair<T, Node_*>(new_item, nullptr), nullptr, false);
         }
-        void Insert(Node_* node, std::pair<T, Node_*>* new_pair, Node_* extend_node, bool extend, bool create = true)
+        void Insert_(Node_* node, std::pair<T, Node_*>* new_pair, Node_* extend_node, bool extend, bool create = true)
         {
             if (node == nullptr)
             {
@@ -265,7 +265,7 @@ namespace fatpound::tree
 
             if (node->items.size() == S * 2u)
             {
-                Overflow(node, new_pair, nullptr, false);
+                Overflow_(node, new_pair, nullptr, false);
             }
             else
             {
@@ -287,11 +287,11 @@ namespace fatpound::tree
             {
                 if (create)
                 {
-                    Overflow(node, new std::pair<T, Node_*>(new_pair->first, nullptr), extend_node, true);
+                    Overflow_(node, new std::pair<T, Node_*>(new_pair->first, nullptr), extend_node, true);
                 }
                 else
                 {
-                    Overflow(node, new_pair, extend_node, true);
+                    Overflow_(node, new_pair, extend_node, true);
                 }
             }
             else
@@ -313,7 +313,7 @@ namespace fatpound::tree
                 }
             }
         }
-        void Overflow(Node_* node, std::pair<T, Node_*>* new_pair, Node_* extend_node, bool extend)
+        void Overflow_(Node_* node, std::pair<T, Node_*>* new_pair, Node_* extend_node, bool extend)
         {
             const std::size_t a = (node->lesser == nullptr ? S : I);
 
@@ -353,7 +353,7 @@ namespace fatpound::tree
                     new_node->lesser = node->items[center]->second;
                     node->items[center]->second->parent = new_node;
 
-                    Insert(node->parent, node->items[center], new_node, true, false);
+                    Insert_(node->parent, node->items[center], new_node, true, false);
                 }
 
                 extend_node->parent = new_node;
@@ -375,10 +375,10 @@ namespace fatpound::tree
                 new_node->parent = node->parent;
                 node->items.resize(center + 1u);
 
-                Insert(node->parent, node->items[center], new_node, true);
+                Insert_(node->parent, node->items[center], new_node, true);
             }
         }
-        void ListLevelorder(const Node_* node, std::int64_t level) const
+        void ListLevelorder_(const Node_* const node, SizeType level) const
         {
             if (node != nullptr)
             {
@@ -391,11 +391,11 @@ namespace fatpound::tree
                 }
                 else if (level > 1u)
                 {
-                    ListLevelorder(node->lesser, level - 1u);
+                    ListLevelorder_(node->lesser, level - 1u);
 
                     for (std::size_t i = 0u; i < node->items.size(); ++i)
                     {
-                        ListLevelorder(node->items[i]->second, level - 1u);
+                        ListLevelorder_(node->items[i]->second, level - 1u);
                         std::cout << '\t';
                     }
                 }
