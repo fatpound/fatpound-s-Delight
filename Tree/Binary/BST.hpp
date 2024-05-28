@@ -148,7 +148,7 @@ namespace fatpound::tree
 
         virtual void Insert(const T& new_item)
         {
-            Node_* new_node = Insert_(nullptr, root_, new_item);
+            [[maybe_unused]] Node_* new_node = Insert_(nullptr, root_, new_item);
 
             if (root_ == nullptr) [[unlikely]]
             {
@@ -192,13 +192,11 @@ namespace fatpound::tree
 
 
     protected:
-        virtual Node_* Insert_(Node_* __restrict parent, Node_* __restrict node, const T& new_item) final
+        virtual Node_* Insert_(Node_* __restrict parent, Node_* __restrict node, const T& new_item)
         {
             if (node == nullptr)
             {
-                last_added_ = new Node_(new_item, parent);
-
-                return last_added_;
+                return new Node_(new_item, parent);
             }
 
             if (new_item < node->item)
@@ -517,7 +515,6 @@ namespace fatpound::tree
 
     protected:
         Node_* root_ = nullptr;
-        Node_* last_added_ = nullptr;
 
         SizeType node_count_ = 0u;
 

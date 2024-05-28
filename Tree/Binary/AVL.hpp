@@ -12,13 +12,13 @@ namespace fatpound::tree
     public:
         virtual void Insert(const T& new_item) override
         {
-            [[maybe_unused]] Node_* new_node = BST<T>::Insert_(nullptr, this->root_, new_item);
+            [[maybe_unused]] Node_* new_node = Insert_(nullptr, this->root_, new_item);
 
             if (this->root_ == nullptr) [[unlikely]]
             {
                 this->root_ = new_node;
             }
-            else
+            else [[likely]]
             {
                 Balance_();
             }
@@ -46,6 +46,27 @@ namespace fatpound::tree
 
 
     protected:
+        virtual Node_* Insert_(Node_* __restrict parent, Node_* __restrict node, const T& new_item) override final
+        {
+            if (node == nullptr)
+            {
+                last_added_ = new Node_(new_item, parent);
+
+                return last_added_;
+            }
+
+            if (new_item < node->item)
+            {
+                node->left = Insert_(node, node->left, new_item);
+            }
+            else if (new_item > node->item)
+            {
+                node->right = Insert_(node, node->right, new_item);
+            }
+
+            return node;
+        }
+
         virtual void Balance_()
         {
             this->Balance_(this->last_added_);
@@ -165,6 +186,10 @@ namespace fatpound::tree
                 }
             }
         }
+
+
+    protected:
+        Node_* last_added_ = nullptr;
 
 
     private:

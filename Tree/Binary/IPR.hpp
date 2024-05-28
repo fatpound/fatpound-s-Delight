@@ -14,13 +14,13 @@ namespace fatpound::tree
     public:
         virtual void Insert(const T& new_item) override final
         {
-            Node_* new_node = BST<T>::Insert_(nullptr, this->root_, new_item);
+            Node_* new_node = AVL<T>::Insert_(nullptr, this->root_, new_item);
 
             if (this->root_ == nullptr) [[unlikely]]
             {
                 this->root_ = new_node;
             }
-            else
+            else [[likely]]
             {
                 Balance_();
             }
