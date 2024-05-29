@@ -4,31 +4,27 @@
 #include <sstream>
 #include <iostream>
 #include <algorithm>
-#include <vector>
-#include <string>
-#include <locale>
-#include <stdexcept>
 
 namespace rn = std::ranges;
 
 namespace fatpound::automata
 {
-    std::vector<std::pair<std::string, std::vector<std::string>>> CFG::ParseFromFile(const std::string& input_filename)
+    auto CFG::ParseFromFile(const String& filename) -> Vector<Pair<String, Vector<String>>>
     {
-        std::ifstream input_file(input_filename);
+        std::ifstream input_file(filename);
 
-        if ( ! input_file.is_open() )
+        if ( ! input_file.is_open())
         {
             throw std::runtime_error("Input file cannot be opened for [InputtingCFG]!");
         }
 
         /////////////
-        std::vector<char> alphabet;
+        Vector<char> alphabet;
 
         {
             std::stringstream ss;
 
-            std::string str;
+            String str;
             std::getline(input_file, str);
 
             ss << str;
@@ -46,12 +42,12 @@ namespace fatpound::automata
             alphabet.erase(it.begin(), it.end());
         }
 
-        ////////////
-        std::vector<std::pair<std::string, std::vector<std::string>>> cfgs;
+        /////////////////////////////////////////
+        Vector<Pair<String, Vector<String>>> cfgs;
 
         {
-            const std::string arrow = "-->";
-            std::string str;
+            const String arrow = "-->";
+            String str;
 
             while (std::getline(input_file, str, ','))
             {
@@ -61,17 +57,17 @@ namespace fatpound::automata
 
                 const std::size_t index = str.find(arrow);
 
-                if (index != std::string::npos)
+                if (index != String::npos)
                 {
-                    std::string word(str.cbegin(), str.cbegin() + index);
+                    String word(str.cbegin(), str.cbegin() + index);
 
                     str.erase(0, index + arrow.length());
 
-                    std::vector<std::string> leaves;
+                    Vector<String> leaves;
 
                     std::istringstream iss(str);
 
-                    std::string tempstr;
+                    String tempstr;
 
                     while (std::getline(iss, tempstr, '|'))
                     {
@@ -81,7 +77,7 @@ namespace fatpound::automata
                             {
                                 if (std::islower(ch) && rn::find(alphabet, ch) == alphabet.cend())
                                 {
-                                    throw std::runtime_error("The letter " + std::string{ ch } + " is not in the alphabet!");
+                                    throw std::runtime_error("The letter " + String{ ch } + " is not in the alphabet!");
                                 }
                             }
 
@@ -97,10 +93,10 @@ namespace fatpound::automata
         return cfgs;
     }
 
-    void CFG::Print(const std::vector<std::string>& results)
+    void CFG::Print(const Vector<String>& results)
     {
-        std::vector<std::string> finals;
-        std::vector<std::string> repeaters;
+        Vector<String> finals;
+        Vector<String> repeaters;
 
         for (const auto& str : results)
         {
@@ -134,7 +130,7 @@ namespace fatpound::automata
 
         std::cout << '\n';
     }
-    void CFG::Print(const std::vector<std::pair<std::string, bool>>& results)
+    void CFG::Print(const Vector<Pair<String, bool>>& results)
     {
         for (const auto& item : results)
         {
