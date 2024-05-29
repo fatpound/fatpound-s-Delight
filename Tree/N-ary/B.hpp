@@ -10,7 +10,7 @@ namespace rn = std::ranges;
 namespace fatpound::tree
 {
     template <std::totally_ordered T, std::size_t C>
-    class B
+    class B final
     {
     public:
         B() = default;
