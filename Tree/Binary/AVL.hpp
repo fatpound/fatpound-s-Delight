@@ -2,7 +2,7 @@
 
 #include "BST.hpp"
 
-namespace fatpound::tree
+namespace fatpound::tree::binary
 {
     template <std::totally_ordered T>
     class AVL : public BST<T>

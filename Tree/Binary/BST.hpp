@@ -3,7 +3,7 @@
 #include <iostream>
 #include <concepts>
 
-namespace fatpound::tree
+namespace fatpound::tree::binary
 {
     template <std::totally_ordered T>
     class BST
