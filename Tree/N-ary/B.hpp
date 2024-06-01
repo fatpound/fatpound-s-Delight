@@ -7,7 +7,7 @@
 
 namespace rn = std::ranges;
 
-namespace fatpound::tree
+namespace fatpound::tree::n_ary
 {
     template <std::totally_ordered T, std::size_t C>
     class B final
