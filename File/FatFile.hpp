@@ -1,13 +1,12 @@
 #pragma once
 
 #include <string>
-#include <filesystem>
-#include <exception>
 #include <stdexcept>
+#include <filesystem>
 
 namespace fatpound::file
 {
-    static std::pair<std::string, std::string> GetNameAndExtension(const std::string& filename)
+    static auto GetNameAndExtension(const std::string& filename) -> std::pair<std::string, std::string>
     {
         if (std::filesystem::is_regular_file(filename))
         {
@@ -26,7 +25,7 @@ namespace fatpound::file
         }
         else
         {
-            throw std::invalid_argument("The given path is not pointing to a file!");
+            throw std::runtime_error("The given path is not pointing to a file!");
         }
     }
 }
