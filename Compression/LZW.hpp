@@ -5,6 +5,9 @@
 
 namespace fatpound::compression
 {
+    /// <summary>
+    /// Unlike Huffman class, this one is not complete.
+    /// </summary>
     class LZW final
     {
     public:

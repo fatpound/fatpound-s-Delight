@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 #include <iostream>
 #include <concepts>
 
@@ -183,8 +185,8 @@ namespace fatpound::tree::binary
 
             Node_(T new_item, Node_* new_parent)
                 :
-                item(new_item),
-                parent(new_parent)
+                parent(new_parent),
+                item(new_item)
             {
 
             }
@@ -249,6 +251,8 @@ namespace fatpound::tree::binary
             {
                 return right_address;
             }
+
+            return nullptr;
         }
         virtual Node_* Delete_(Node_* node) final
         {

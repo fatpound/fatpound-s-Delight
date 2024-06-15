@@ -91,10 +91,6 @@ namespace fatpound::automata
 
                         if (recursed_count < recurse_limit_)
                         {
-                            const std::size_t size = tempstrings.size();
-
-                            bool deleted = false;
-
                             String tempstr = strPair.first;
 
                             if (tempstr == ""s)

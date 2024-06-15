@@ -67,16 +67,16 @@ namespace fatpound::automata
     {
         results_.reserve(node->leaves_.size());
 
-        for (auto& node : node->leaves_)
+        for (auto& leaf : node->leaves_)
         {
-            if (TLT::IsTerminal_(node->item_))
+            if (TLT::IsTerminal_(leaf->item_))
             {
-                results_.push_back(node->item_);
+                results_.push_back(leaf->item_);
 
                 continue;
             }
 
-            CreateInnerTree_(node);
+            CreateInnerTree_(leaf);
         }
     }
     void TLT::CreateInnerTree_(Node_* node)

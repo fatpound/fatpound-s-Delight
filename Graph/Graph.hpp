@@ -26,10 +26,10 @@ namespace fatpound::graph
     public:
         const std::vector<std::int64_t>& GetNextList(std::size_t index) const;
 
-        const std::int64_t GetAdjAt(const std::int64_t u, const std::int64_t v) const;
+        std::int64_t GetAdjAt(const std::int64_t u, const std::int64_t v) const;
 
-        const std::size_t GetNodeCount() const;
-        const std::size_t GetEdgeCount() const;
+        std::size_t GetNodeCount() const;
+        std::size_t GetEdgeCount() const;
 
 
     protected:

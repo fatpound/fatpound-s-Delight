@@ -101,7 +101,7 @@ namespace fatpound::compression
 
         if ( ! input_file.eof() )
         {
-            int oldcode;
+            std::size_t oldcode;
             input_file >> oldcode;
 
             std::string S;
@@ -113,7 +113,7 @@ namespace fatpound::compression
 
             while ( ! input_file.eof() )
             {
-                int newcode;
+                std::size_t newcode;
                 input_file >> newcode;
 
                 const auto it = rn::find_if(dictionary, [&](const auto& pair) -> bool { return pair.first == newcode; });

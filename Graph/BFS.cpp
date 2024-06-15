@@ -51,7 +51,7 @@ namespace fatpound::graph
             ss << static_cast<char>('a' + u);
         }
 
-        output_  = std::move(ss.str());
+        output_  = ss.str();
         output_ += '\n';
     }
 

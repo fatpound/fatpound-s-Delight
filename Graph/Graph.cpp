@@ -57,16 +57,16 @@ namespace fatpound::graph
         return nexts_[index];
     }
 
-    const std::int64_t Graph::GetAdjAt(const std::int64_t u, const std::int64_t v) const
+    std::int64_t Graph::GetAdjAt(const std::int64_t u, const std::int64_t v) const
     {
         return adj_[u][v];
     }
 
-    const std::size_t Graph::GetNodeCount() const
+    std::size_t Graph::GetNodeCount() const
     {
         return node_count_;
     }
-    const std::size_t Graph::GetEdgeCount() const
+    std::size_t Graph::GetEdgeCount() const
     {
         return edge_count_;
     }
