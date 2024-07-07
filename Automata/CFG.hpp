@@ -28,7 +28,7 @@ namespace fatpound::automata
         ///
         /// Example :
         /// a b  c   d e
-        /// S-- > aa | bX | aXX, X-- > ab | b
+        /// S --> aa | bX | aXX, X --> ab | b
         /// </summary>
         static auto ParseFromFile(const String& filename) -> Vector<Pair<String, Vector<String>>>;
 
