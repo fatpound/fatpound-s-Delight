@@ -7,29 +7,34 @@ namespace fatpound::dsa::linkedlist
     template <std::totally_ordered T>
     class DoublyCircularLL final : public DoublyLL<T>
     {
+        using typename DoublyLL<T>::Node_;
+
+        using DoublyLL<T>::DoublyLL;
+
     public:
         DoublyCircularLL() = default;
         DoublyCircularLL(const DoublyCircularLL& src) = delete;
         DoublyCircularLL& operator = (const DoublyCircularLL& src) = delete;
+
         DoublyCircularLL(DoublyCircularLL&& src) noexcept
             :
-            DoublyLL<T>(std::move(src))
+            DoublyLL(std::move(src))
         {
-            
+
         }
         DoublyCircularLL& operator = (DoublyCircularLL&& src) noexcept
         {
-            Delete_();
-
             if (this != std::addressof(src) && typeid(src) == typeid(*this) && src.list_ != nullptr)
             {
+                Delete_();
+
                 this->list_ = std::exchange(src.list_, nullptr);
                 this->end_ = std::exchange(src.end_, nullptr);
 
                 this->item_count_ = std::exchange(src.item_count_, 0u);
-
-                return *this;
             }
+
+            return *this;
         }
         virtual ~DoublyCircularLL() noexcept
         {
@@ -38,11 +43,11 @@ namespace fatpound::dsa::linkedlist
 
 
     public:
-        virtual void Add(T new_item) override final
+        virtual void Add(const T& new_item) override final
         {
-            typename DoublyLL<T>::Node_* new_part = new DoublyLL<T>::Node_(new_item);
+            Node_* new_part = new Node_(new_item);
 
-            ++(this->item_count_);
+            ++this->item_count_;
 
             if (this->list_ == nullptr)
             {
@@ -62,11 +67,11 @@ namespace fatpound::dsa::linkedlist
 
             this->end_ = new_part;
         }
-        virtual void AddOrdered(T new_item) override final
+        virtual void AddOrdered(const T& new_item) override final
         {
-            typename DoublyLL<T>::Node_* new_part = new DoublyLL<T>::Node_(new_item);
+            Node_* new_part = new Node_(new_item);
 
-            ++(this->item_count_);
+            ++this->item_count_;
 
             if (this->list_ == nullptr)
             {
@@ -89,8 +94,8 @@ namespace fatpound::dsa::linkedlist
                 return;
             }
 
-            typename DoublyLL<T>::Node_* temp = this->list_;
-            typename DoublyLL<T>::Node_* start = temp;
+            Node_* temp = this->list_;
+            Node_* start = temp;
 
             while (temp->next != start)
             {
@@ -125,8 +130,8 @@ namespace fatpound::dsa::linkedlist
                 return;
             }
 
-            typename DoublyLL<T>::Node_* temp = this->list_;
-            typename DoublyLL<T>::Node_* start = this->list_;
+            Node_* temp = this->list_;
+            Node_* start = this->list_;
 
             while (temp->next != start)
             {
@@ -144,8 +149,8 @@ namespace fatpound::dsa::linkedlist
                 throw std::runtime_error("Tried to Print an empty DoublyCircularLL!");
             }
 
-            typename DoublyLL<T>::Node_* temp = this->list_;
-            typename DoublyLL<T>::Node_* start = temp;
+            Node_* temp = this->list_;
+            Node_* start = temp;
 
             do
             {
@@ -166,9 +171,9 @@ namespace fatpound::dsa::linkedlist
                 return;
             }
 
-            typename DoublyLL<T>::Node_* start = this->list_;
-            typename DoublyLL<T>::Node_* ex = this->list_;
-            typename DoublyLL<T>::Node_* temp;
+            Node_* start = this->list_;
+            Node_* ex = this->list_;
+            Node_* temp;
 
             do
             {
@@ -180,7 +185,7 @@ namespace fatpound::dsa::linkedlist
             while (ex != start);
 
             this->list_ = nullptr;
-            this->end_ = nullptr;
+            this->end_  = nullptr;
 
             this->item_count_ = 0u;
         }

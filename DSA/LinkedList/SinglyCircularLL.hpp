@@ -7,10 +7,15 @@ namespace fatpound::dsa::linkedlist
     template <std::totally_ordered T>
     class SinglyCircularLL final : public SinglyLL<T>
     {
+        using typename SinglyLL<T>::Node_;
+
+        using SinglyLL<T>::SinglyLL;
+
     public:
         SinglyCircularLL() = default;
         SinglyCircularLL(const SinglyCircularLL& src) = delete;
         SinglyCircularLL& operator = (const SinglyCircularLL& src) = delete;
+
         SinglyCircularLL(SinglyCircularLL&& src) noexcept
             :
             SinglyLL(std::move(src))
@@ -38,11 +43,11 @@ namespace fatpound::dsa::linkedlist
 
 
     public:
-        virtual void Add(T new_item) override final
+        virtual void Add(const T& new_item) override final
         {
-            typename SinglyLL<T>::Node_* new_part = new SinglyLL<T>::Node_(new_item);
+            Node_* new_part = new Node_(new_item);
 
-            ++(this->item_count_);
+            ++this->item_count_;
 
             if (this->list_ == nullptr)
             {
@@ -58,11 +63,11 @@ namespace fatpound::dsa::linkedlist
 
             this->end_ = new_part;
         }
-        virtual void AddOrdered(T new_item) override final
+        virtual void AddOrdered(const T& new_item) override final
         {
-            typename SinglyLL<T>::Node_* new_part = new SinglyLL<T>::Node_(new_item);
+            Node_* new_part = new Node_(new_item);
 
-            ++(this->item_count_);
+            ++this->item_count_;
 
             if (this->list_ == nullptr)
             {
@@ -82,8 +87,8 @@ namespace fatpound::dsa::linkedlist
                 return;
             }
 
-            typename SinglyLL<T>::Node_* temp = this->list_;
-            typename SinglyLL<T>::Node_* start = temp;
+            Node_* temp = this->list_;
+            Node_* start = temp;
 
             while (temp->next != start)
             {
@@ -113,14 +118,14 @@ namespace fatpound::dsa::linkedlist
                 return;
             }
 
-            typename SinglyLL<T>::Node_* start_backup = this->list_;
+            Node_* start_backup = this->list_;
 
-            typename SinglyLL<T>::Node_* t;
-            typename SinglyLL<T>::Node_* a = nullptr;
-            typename SinglyLL<T>::Node_* x;
+            Node_* t;
+            Node_* a = nullptr;
+            Node_* x;
 
-            typename SinglyLL<T>::Node_* temp = this->list_;
-            typename SinglyLL<T>::Node_* start = temp;
+            Node_* temp = this->list_;
+            Node_* start = temp;
 
             while (true)
             {
@@ -166,8 +171,8 @@ namespace fatpound::dsa::linkedlist
                 throw std::runtime_error("Tried to Print an empty SinglyCircularLL!");
             }
 
-            typename SinglyLL<T>::Node_* temp = this->list_;
-            typename SinglyLL<T>::Node_* start = temp;
+            Node_* temp = this->list_;
+            Node_* start = temp;
 
             do
             {
@@ -188,9 +193,9 @@ namespace fatpound::dsa::linkedlist
                 return;
             }
 
-            typename SinglyLL<T>::Node_* start = this->list_;
-            typename SinglyLL<T>::Node_* ex = this->list_;
-            typename SinglyLL<T>::Node_* temp;
+            Node_* start = this->list_;
+            Node_* ex = this->list_;
+            Node_* temp;
 
             do
             {

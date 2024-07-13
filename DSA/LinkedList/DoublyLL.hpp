@@ -15,6 +15,7 @@ namespace fatpound::dsa::linkedlist
         DoublyLL() = default;
         DoublyLL(const DoublyLL& src) = delete;
         DoublyLL& operator = (const DoublyLL& src) = delete;
+
         DoublyLL(DoublyLL&& src) noexcept
             :
             list_(std::exchange(src.list_, nullptr)),
@@ -25,10 +26,10 @@ namespace fatpound::dsa::linkedlist
         }
         DoublyLL& operator = (DoublyLL&& src) noexcept
         {
-            Delete_();
-
             if (this != std::addressof(src) && typeid(src) == typeid(*this) && src.list_ != nullptr)
             {
+                Delete_();
+
                 list_ = std::exchange(src.list_, nullptr);
                 end_ = std::exchange(src.end_, nullptr);
 
@@ -44,12 +45,12 @@ namespace fatpound::dsa::linkedlist
 
 
     public:
-        virtual bool Contains(T item) const final
+        virtual bool Contains(const T& item) const final
         {
             return Find_(item) != nullptr;
         }
 
-        virtual void Add(T new_item)
+        virtual void Add(const T& new_item)
         {
             Node_* new_part = new Node_(new_item);
 
@@ -68,7 +69,7 @@ namespace fatpound::dsa::linkedlist
 
             end_ = new_part;
         }
-        virtual void AddOrdered(T new_item)
+        virtual void AddOrdered(const T& new_item)
         {
             Node_* new_part = new Node_(new_item);
 
@@ -153,7 +154,7 @@ namespace fatpound::dsa::linkedlist
 
 
     protected:
-        struct Node_
+        struct Node_ final
         {
             Node_* prev = nullptr;
             Node_* next = nullptr;
@@ -163,12 +164,14 @@ namespace fatpound::dsa::linkedlist
             Node_(T new_item)
                 :
                 item{ new_item }
-            {}
+            {
+
+            }
         };
 
 
     protected:
-        virtual DoublyLL<T>::Node_* Find_(T item) const final
+        virtual Node_* Find_(const T& item) const final
         {
             if (item_count_ == 0u)
             {
@@ -200,7 +203,7 @@ namespace fatpound::dsa::linkedlist
 
         virtual void Delete_()
         {
-            [[unlikely]] if (list_ == nullptr)
+            if (list_ == nullptr)
             {
                 return;
             }
@@ -218,7 +221,7 @@ namespace fatpound::dsa::linkedlist
             while (ex != nullptr);
 
             list_ = nullptr;
-            end_ = nullptr;
+            end_  = nullptr;
 
             item_count_ = 0u;
         }
@@ -227,7 +230,7 @@ namespace fatpound::dsa::linkedlist
     protected:
         Node_* list_ = nullptr;
         Node_* end_  = nullptr;
-        
+
         std::size_t item_count_ = 0u;
 
 
