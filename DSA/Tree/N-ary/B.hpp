@@ -16,40 +16,12 @@ namespace fatpound::dsa::tree::n_ary
         B() = default;
         B(const B& src) = delete;
         B& operator = (const B& src) = delete;
+
         B(B&& src) = delete;
         B& operator = (B&& src) = delete;
         ~B() noexcept
         {
-            if (root_ == nullptr)
-            {
-                return;
-            }
-
-            std::queue<Node_*> Q;
-            Q.push(root_);
-
-            while (Q.size() > 0u)
-            {
-                Node_* u = Q.front();
-                Q.pop();
-
-                if (u->lesser != nullptr)
-                {
-                    Q.push(u->lesser);
-                }
-
-                for (std::size_t i = 0u; i < u->items.size(); ++i)
-                {
-                    if (u->items[i]->second != nullptr)
-                    {
-                        Q.push(u->items[i]->second);
-                    }
-
-                    delete u->items[i];
-                }
-
-                delete u;
-            }
+            DeleteTree_();
 
             root_ = nullptr;
         }
@@ -140,7 +112,7 @@ namespace fatpound::dsa::tree::n_ary
 
 
     private:
-        void Insert_(Node_* node, std::pair<T, Node_*>* pair, bool add_first_time)
+        void Insert_(Node_* node, std::pair<T, Node_*>* pair, const bool add_first_time)
         {
             if (node == nullptr)
             {
@@ -272,6 +244,39 @@ namespace fatpound::dsa::tree::n_ary
 
             new_node->lesser = temp_vec[center]->second;
             temp_vec[center]->second = new_node;
+        }
+        void DeleteTree_()
+        {
+            if (root_ == nullptr)
+            {
+                return;
+            }
+
+            std::queue<Node_*> Q;
+            Q.push(root_);
+
+            while (Q.size() > 0u)
+            {
+                Node_* u = Q.front();
+                Q.pop();
+
+                if (u->lesser != nullptr)
+                {
+                    Q.push(u->lesser);
+                }
+
+                for (std::size_t i = 0u; i < u->items.size(); ++i)
+                {
+                    if (u->items[i]->second != nullptr)
+                    {
+                        Q.push(u->items[i]->second);
+                    }
+
+                    delete u->items[i];
+                }
+
+                delete u;
+            }
         }
 
 

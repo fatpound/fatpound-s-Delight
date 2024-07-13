@@ -23,36 +23,7 @@ namespace fatpound::dsa::tree::n_ary
         B_Plus& operator = (B_Plus&& src) = delete;
         ~B_Plus() noexcept
         {
-            if (root_ == nullptr)
-            {
-                return;
-            }
-
-            std::queue<Node_*> Q;
-            Q.push(root_);
-
-            while (Q.size() > 0u)
-            {
-                Node_* u = Q.front();
-                Q.pop();
-
-                if (u->lesser != nullptr)
-                {
-                    Q.push(u->lesser);
-                }
-
-                for (std::size_t i = 0u; i < u->items.size(); ++i)
-                {
-                    if (u->items[i]->second != nullptr)
-                    {
-                        Q.push(u->items[i]->second);
-                    }
-
-                    delete u->items[i];
-                }
-
-                delete u;
-            }
+            DeleteTree_();
 
             root_ = nullptr;
         }
@@ -407,6 +378,39 @@ namespace fatpound::dsa::tree::n_ary
             }
 
             std::cout << '\t';
+        }
+        void DeleteTree_()
+        {
+            if (root_ == nullptr)
+            {
+                return;
+            }
+
+            std::queue<Node_*> Q;
+            Q.push(root_);
+
+            while (Q.size() > 0u)
+            {
+                Node_* u = Q.front();
+                Q.pop();
+
+                if (u->lesser != nullptr)
+                {
+                    Q.push(u->lesser);
+                }
+
+                for (std::size_t i = 0u; i < u->items.size(); ++i)
+                {
+                    if (u->items[i]->second != nullptr)
+                    {
+                        Q.push(u->items[i]->second);
+                    }
+
+                    delete u->items[i];
+                }
+
+                delete u;
+            }
         }
 
 
