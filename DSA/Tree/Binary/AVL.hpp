@@ -23,7 +23,7 @@ namespace fatpound::dsa::tree::binary
                 Balance_();
             }
 
-            this->node_count_++;
+            ++this->node_count_;
         }
         virtual void Delete(const T& old_item) override
         {
@@ -43,8 +43,7 @@ namespace fatpound::dsa::tree::binary
                 Balance_(BST<T>::Delete_(node));
             }
         }
-
-
+        
     protected:
         virtual Node_* Insert_(Node_* __restrict parent, Node_* __restrict node, const T& new_item) override final
         {
@@ -71,21 +70,21 @@ namespace fatpound::dsa::tree::binary
         {
             this->Balance_(this->last_added_);
         }
-        virtual void Balance_(const Node_* const latest)
+        virtual void Balance_(Node_* const latest)
         {
             if (latest == nullptr)
             {
                 return;
             }
 
-            Node_* last = const_cast<Node_*>(latest); // Y
+            Node_* last = latest; // Y
 
             while (last->parent != nullptr) // Going up
             {
-                const int  left_val = BST<T>::GetDepth_(last->parent->left, 0);
-                const int right_val = BST<T>::GetDepth_(last->parent->right, 0);
+                auto  left_val = BST<T>::GetDepth_(last->parent->left,  0);
+                auto right_val = BST<T>::GetDepth_(last->parent->right, 0);
 
-                const int balanceFactor = right_val - left_val;
+                const auto balanceFactor = static_cast<std::int64_t>(right_val - left_val);
 
                 /*
                 std::cout << "parent  : " << last->parent->item << '\n';

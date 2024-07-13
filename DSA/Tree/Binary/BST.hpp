@@ -10,7 +10,9 @@ namespace fatpound::dsa::tree::binary
     template <std::totally_ordered T>
     class BST
     {
+    public:
         using SizeType = std::size_t;
+
 
     public:
         BST() = default;
@@ -73,7 +75,7 @@ namespace fatpound::dsa::tree::binary
 
             return *this;
         }
-        ~BST() noexcept
+        virtual ~BST() noexcept
         {
             DeleteTree_(root_);
 
@@ -135,9 +137,9 @@ namespace fatpound::dsa::tree::binary
         }
         virtual void ListLevelorder()       const final
         {
-            const std::int64_t height = GetDepth_(root_, 0);
+            const auto height = GetDepth_(root_, 0);
 
-            for (std::int64_t i = 1; i <= height; i++)
+            for (SizeType i = 1u; i <= height; ++i)
             {
                 std::cout << "Level " << i << " : ";
 
