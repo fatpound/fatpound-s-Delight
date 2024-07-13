@@ -81,8 +81,8 @@ namespace fatpound::dsa::tree::binary
 
             while (last->parent != nullptr) // Going up
             {
-                auto  left_val = BST<T>::GetDepth_(last->parent->left,  0);
-                auto right_val = BST<T>::GetDepth_(last->parent->right, 0);
+                const auto  left_val = BST<T>::GetDepth_(last->parent->left,  0);
+                const auto right_val = BST<T>::GetDepth_(last->parent->right, 0);
 
                 const auto balanceFactor = static_cast<std::int64_t>(right_val - left_val);
 
