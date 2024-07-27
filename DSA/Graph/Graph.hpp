@@ -1,12 +1,15 @@
 #pragma once
 
+#include "../../Util/Color.hpp"
+
+#include <cstdint>
+
 #include <vector>
 #include <fstream>
 #include <sstream>
 #include <iostream>
 #include <exception>
-
-#include "../../Util/FatColor.hpp"
+#include <limits>
 
 namespace fatpound::dsa::graph
 {

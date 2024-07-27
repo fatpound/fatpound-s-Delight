@@ -2,6 +2,8 @@
 
 #pragma warning(disable:4820)
 
+#include <cstdint>
+
 #include <vector>
 #include <string>
 

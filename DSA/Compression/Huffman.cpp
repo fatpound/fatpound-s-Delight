@@ -1,6 +1,6 @@
 #include "Huffman.hpp"
 
-#include "../../File/FatFile.hpp"
+#include "../../File/File.hpp"
 
 #include <fstream>
 #include <iostream>

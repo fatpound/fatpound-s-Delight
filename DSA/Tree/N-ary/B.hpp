@@ -3,6 +3,7 @@
 #include <iostream>
 #include <vector>
 #include <queue>
+#include <algorithm>
 #include <ranges>
 
 namespace rn = std::ranges;

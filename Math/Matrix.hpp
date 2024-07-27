@@ -2,11 +2,13 @@
 
 #include "Math.hpp"
 
+#include <cassert>
+
 #include <iostream>
 #include <memory>
 #include <random>
 #include <algorithm>
-#include <cassert>
+#include <utility>
 
 namespace fatpound::math
 {
@@ -418,8 +420,8 @@ namespace fatpound::math
 
 
     private:
-        const std::size_t row_count_;
-        const std::size_t col_count_;
+        std::size_t row_count_;
+        std::size_t col_count_;
 
         std::unique_ptr<N[]> matrix_ = nullptr;
     };

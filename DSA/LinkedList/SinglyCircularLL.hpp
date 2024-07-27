@@ -9,8 +9,6 @@ namespace fatpound::dsa::linkedlist
     {
         using typename SinglyLL<T>::Node_;
 
-        using SinglyLL<T>::SinglyLL;
-
     public:
         SinglyCircularLL() = default;
         SinglyCircularLL(const SinglyCircularLL& src) = delete;
@@ -18,7 +16,7 @@ namespace fatpound::dsa::linkedlist
 
         SinglyCircularLL(SinglyCircularLL&& src) noexcept
             :
-            SinglyLL(std::move(src))
+            SinglyLL<T>(std::move(src))
         {
 
         }

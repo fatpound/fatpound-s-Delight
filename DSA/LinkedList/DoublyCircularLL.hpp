@@ -9,8 +9,6 @@ namespace fatpound::dsa::linkedlist
     {
         using typename DoublyLL<T>::Node_;
 
-        using DoublyLL<T>::DoublyLL;
-
     public:
         DoublyCircularLL() = default;
         DoublyCircularLL(const DoublyCircularLL& src) = delete;
@@ -18,7 +16,7 @@ namespace fatpound::dsa::linkedlist
 
         DoublyCircularLL(DoublyCircularLL&& src) noexcept
             :
-            DoublyLL(std::move(src))
+            DoublyLL<T>(std::move(src))
         {
 
         }
