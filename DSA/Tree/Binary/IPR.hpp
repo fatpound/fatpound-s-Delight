@@ -7,28 +7,31 @@ namespace fatpound::dsa::tree::binary
     template <std::totally_ordered T>
     class IPR final : public AVL<T>
     {
-        using typename BST<T>::SizeType;
+    public:
         using typename BST<T>::Node_;
 
         using AVL<T>::Balance_;
 
-    public:
-        virtual void Insert(const T& new_item) override final
-        {
-            [[maybe_unused]] Node_* new_node = AVL<T>::Insert_(nullptr, this->root_, new_item);
+        using SizeType = AVL<T>::SizeType;
 
-            if (this->root_ == nullptr) [[unlikely]]
+
+    public:
+        virtual void Insert(const T new_item) override final
+        {
+            [[maybe_unused]] Node_* new_node = AVL<T>::Insert_(nullptr, this->m_root_, new_item);
+
+            if (this->m_root_ == nullptr)
             {
-                this->root_ = new_node;
+                this->m_root_ = new_node;
             }
-            else [[likely]]
+            else
             {
                 Balance_();
             }
 
-            ++this->node_count_;
+            ++this->m_node_count_;
         }
-    
+
 
     protected:
 
@@ -43,9 +46,11 @@ namespace fatpound::dsa::tree::binary
 
             Node_* last = latest; // Y
 
-            while (last->parent != nullptr) // Going up
+            while (last->parent not_eq nullptr) // Going up
             {
-                decltype(SizeType{}) na, nb, nc;
+                decltype(SizeType{}) na;
+                decltype(SizeType{}) nb;
+                decltype(SizeType{}) nc;
 
                 // false => left, true => right
                 bool a_location;
@@ -80,20 +85,20 @@ namespace fatpound::dsa::tree::binary
                 std::cout << "nc      : " << nc << '\n' << '\n';
                 */
 
-                if (nc > na && a_location == false)
+                if ((nc > na) and (a_location == false))
                 {
                     AVL<T>::RotateLeft_(last->parent, last);
                 }
-                else if (nc > na && a_location == true)
+                else if ((nc > na) and (a_location == true))
                 {
                     AVL<T>::RotateRight_(last->parent, last);
                 }
-                else if (nb > na && a_location == false)
+                else if ((nb > na) and (a_location == false))
                 {
                     AVL<T>::RotateRight_(last, last->left);
                     AVL<T>::RotateLeft_(last->parent->parent, last->parent);
                 }
-                else if (nb > na && a_location == true)
+                else if ((nb > na) and (a_location == true))
                 {
                     AVL<T>::RotateLeft_(last, last->right);
                     AVL<T>::RotateRight_(last->parent->parent, last->parent);

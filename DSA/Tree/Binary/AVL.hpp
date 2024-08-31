@@ -7,29 +7,33 @@ namespace fatpound::dsa::tree::binary
     template <std::totally_ordered T>
     class AVL : public BST<T>
     {
+    public:
         using typename BST<T>::Node_;
 
-    public:
-        virtual void Insert(const T& new_item) override
-        {
-            [[maybe_unused]] Node_* new_node = Insert_(nullptr, this->root_, new_item);
+        using SizeType = BST<T>::SizeType;
 
-            if (this->root_ == nullptr) [[unlikely]]
+
+    public:
+        virtual void Insert(const T new_item) override
+        {
+            [[maybe_unused]] Node_* new_node = Insert_(nullptr, this->m_root_, new_item);
+
+            if (this->m_root_ == nullptr)
             {
-                this->root_ = new_node;
+                this->m_root_ = new_node;
             }
-            else [[likely]]
+            else
             {
                 Balance_();
             }
 
-            ++this->node_count_;
+            ++this->m_node_count_;
         }
-        virtual void Delete(const T& old_item) override
+        virtual void Delete(const T old_item) override
         {
-            Node_* node = BST<T>::Find_(this->root_, old_item);
+            Node_* node = BST<T>::Find_(this->m_root_, old_item);
 
-            if (node == this->root_)
+            if (node == this->m_root_)
             {
                 // inorder_successor
                 Node_* iosuc = BST<T>::GetInorderSuccessor_(node);
@@ -43,15 +47,16 @@ namespace fatpound::dsa::tree::binary
                 Balance_(BST<T>::Delete_(node));
             }
         }
-        
+
+
     protected:
         virtual Node_* Insert_(Node_* __restrict parent, Node_* __restrict node, const T& new_item) override final
         {
             if (node == nullptr)
             {
-                last_added_ = new Node_(new_item, parent);
+                m_last_added_ = new Node_(new_item, parent);
 
-                return last_added_;
+                return m_last_added_;
             }
 
             if (new_item < node->item)
@@ -68,7 +73,7 @@ namespace fatpound::dsa::tree::binary
 
         virtual void Balance_()
         {
-            this->Balance_(this->last_added_);
+            Balance_(m_last_added_);
         }
         virtual void Balance_(Node_* const latest)
         {
@@ -79,12 +84,12 @@ namespace fatpound::dsa::tree::binary
 
             Node_* last = latest; // Y
 
-            while (last->parent != nullptr) // Going up
+            while (last->parent not_eq nullptr) // Going up
             {
-                const auto  left_val = BST<T>::GetDepth_(last->parent->left,  0);
+                const auto  left_val = BST<T>::GetDepth_(last->parent->left, 0);
                 const auto right_val = BST<T>::GetDepth_(last->parent->right, 0);
 
-                const auto balanceFactor = static_cast<std::int64_t>(right_val - left_val);
+                const auto balanceFactor = right_val - left_val;
 
                 /*
                 std::cout << "parent  : " << last->parent->item << '\n';
@@ -94,20 +99,20 @@ namespace fatpound::dsa::tree::binary
                 std::cout << "Balance : " << balanceFactor << "\n\n";
                 */
 
-                if (balanceFactor > 1 && latest->item > last->item)
+                if ((balanceFactor > 1) and (latest->item > last->item))
                 {
                     RotateLeft_(last->parent, last);
                 }
-                else if (balanceFactor < -1 && latest->item < last->item)
+                else if ((balanceFactor < -1) and (latest->item < last->item))
                 {
                     RotateRight_(last->parent, last);
                 }
-                else if (balanceFactor > 1 && latest->item < last->item)
+                else if ((balanceFactor >  1) and (latest->item < last->item))
                 {
                     RotateRight_(last, last->left);
                     RotateLeft_(last->parent->parent, last->parent);
                 }
-                else if (balanceFactor < -1 && latest->item > last->item)
+                else if ((balanceFactor < -1) and (latest->item > last->item))
                 {
                     RotateLeft_(last, last->right);
                     RotateRight_(last->parent->parent, last->parent);
@@ -127,7 +132,7 @@ namespace fatpound::dsa::tree::binary
 
             X->right = Y->left;
 
-            if (X->right != nullptr)
+            if (X->right not_eq nullptr)
             {
                 X->right->parent = X;
             }
@@ -139,7 +144,7 @@ namespace fatpound::dsa::tree::binary
 
             if (parent_of_parent == nullptr)
             {
-                this->root_ = Y;
+                this->m_root_ = Y;
             }
             else
             {
@@ -159,7 +164,7 @@ namespace fatpound::dsa::tree::binary
 
             X->left = Y->right;
 
-            if (X->left != nullptr)
+            if (X->left not_eq nullptr)
             {
                 X->left->parent = X;
             }
@@ -171,7 +176,7 @@ namespace fatpound::dsa::tree::binary
 
             if (parent_of_parent == nullptr)
             {
-                this->root_ = Y;
+                this->m_root_ = Y;
             }
             else
             {
@@ -188,7 +193,7 @@ namespace fatpound::dsa::tree::binary
 
 
     protected:
-        Node_* last_added_ = nullptr;
+        Node_* m_last_added_ = nullptr;
 
 
     private:

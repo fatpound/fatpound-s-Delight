@@ -4,101 +4,99 @@
 #include <deque>
 #include <algorithm>
 
-namespace rn = std::ranges;
-
 using namespace std::literals::string_literals;
+
+using std::vector, std::string, std::pair;
 
 namespace fatpound::automata
 {
-    // TLT_v2
-
-    TLT_v2::TLT_v2(const Vector<Pair<String, Vector<String>>>& trees)
+    TLT_v2::TLT_v2(const CFG& cfg)
     {
-        trees_.reserve(trees.size());
-
-        for (const auto& tree : trees)
         {
-            trees_.push_back(new Node_(tree));
+            const auto& cfgrammar = cfg.GetGrammar();
+
+            m_trees_.reserve(cfgrammar.size());
+
+            for (const auto& tree : cfgrammar)
+            {
+                m_trees_.push_back(new Node_(tree));
+            }
         }
 
-        results_ = Generate_(""s, 0u, 0u);
+        m_results_ = GenerateResults_("", 0u, 0u);
     }
-    TLT_v2::~TLT_v2() noexcept
+    TLT_v2::TLT_v2(const string& inputFilename)
+        :
+        TLT_v2(CFG{ inputFilename })
     {
-        std::deque<Node_*> nodes;
 
-        for (auto& tree : trees_)
+    }
+    TLT_v2::~TLT_v2() noexcept(false)
+    {
+        Clear_();
+    }
+
+    auto TLT_v2::GetWords() const noexcept -> vector<pair<string, bool>>
+    {
+        return m_results_;
+    }
+
+    void TLT_v2::PrintWords() const
+    {
+        for (const auto& item : m_results_)
         {
-            if (tree != nullptr)
+            if (item.second == true)
             {
-                nodes.push_back(tree);
-            }
-            else
-            {
-                continue;
-            }
-
-            while (nodes.size() > 0)
-            {
-                Node_* node = nodes.back();
-
-                nodes.pop_back();
-
-                for (auto& leaf : node->leaves_)
-                {
-                    nodes.push_back(leaf);
-                }
-
-                delete node;
+                std::cout << item.first << '\n';
             }
         }
     }
 
-    auto TLT_v2::GetWords() const noexcept -> Vector<Pair<String, bool>>
+    auto TLT_v2::GenerateResults_(string init_str, std::size_t index, std::size_t recursed) const -> vector<pair<string, bool>>
     {
-        return results_;
-    }
+        vector<pair<string, bool>> strings;
 
-    auto TLT_v2::Generate_(String init_str, std::size_t index, std::size_t recursed_count) const -> Vector<Pair<String, bool>>
-    {
-        Vector<Pair<String, bool>> strings;
-
-        for (const auto& node : trees_[index]->leaves_)
+        for (const auto& node : m_trees_[index]->leaves_)
         {
-            Vector<Pair<String, bool>> tempstrings;
+            vector<pair<string, bool>> tempstrings;
 
             tempstrings.emplace_back(init_str, false);
 
             for (const auto& ch : node->item_)
             {
-                Vector<Pair<String, bool>> newTempStrings;
+                vector<pair<string, bool>> newTempStrings;
 
                 for (const auto& strPair : tempstrings)
                 {
-                    String& str = newTempStrings.emplace_back(strPair).first;
-                    const std::size_t insertedindex = newTempStrings.size() - 1;
+                    string& str = newTempStrings.emplace_back(strPair).first;
 
-                    const auto it = std::find_if(trees_.cbegin() + index, trees_.cend(), [&](const auto& tree) -> bool { return ch == tree->item_[0]; });
+                    const auto insertedindex = newTempStrings.size() - 1;
 
-                    if (it == trees_.cend())
+                    const auto it = std::find_if(m_trees_.cbegin() + index, m_trees_.cend(), [&](const auto& tree) -> bool { return ch == tree->item_[0]; });
+
+                    if (it == m_trees_.cend())
                     {
                         str += ch;
                     }
                     else
                     {
-                        const std::size_t tree_index = it - trees_.cbegin();
-                        const std::size_t will_recurse = ((tree_index == index) ? 1 : 0);
+                        const auto tree_index = static_cast<std::size_t>(it - m_trees_.cbegin());
+                        const auto will_recurse = ((tree_index == index) ? 1 : 0);
 
-                        if (recursed_count < recurse_limit_)
+                        if (recursed < s_recurse_limit_)
                         {
-                            String tempstr = strPair.first;
+                            // const auto size = tempstrings.size();
 
-                            if (tempstr == ""s)
+                            // bool deleted = false;
+
+                            string tempstr = strPair.first;
+
+                            if (tempstr == "")
                             {
                                 continue;
                             }
 
-                            const auto vec = Generate_(tempstr, tree_index, recursed_count + will_recurse);
+                            const auto vec = GenerateResults_(tempstr, tree_index, recursed + will_recurse);
 
                             for (const auto& pair : vec)
                             {
@@ -126,11 +124,11 @@ namespace fatpound::automata
         return strings;
     }
 
-    bool TLT_v2::IsTerminal_(const String& str) const
+    bool TLT_v2::IsTerminal_(const string& str) const
     {
-        for (const auto& tree : trees_)
+        for (const auto& tree : m_trees_)
         {
-            if (rn::any_of(str, [&](const auto& ch) -> bool { return ch == (tree->item_[0]); }))
+            if (std::any_of(str.cbegin(), str.cend(), [&](const auto& ch) -> bool { return ch == (tree->item_[0]); }))
             {
                 return false;
             }
@@ -139,10 +137,41 @@ namespace fatpound::automata
         return true;
     }
 
+    void TLT_v2::Clear_()
+    {
+        std::deque<Node_*> nodes;
 
-    // Node_
+        for (auto& tree : m_trees_)
+        {
+            if (tree != nullptr)
+            {
+                nodes.push_back(tree);
+            }
+            else
+            {
+                continue;
+            }
 
-    TLT_v2::Node_::Node_(const Pair<String, Vector<String>>& tree)
+            while (nodes.size() > 0)
+            {
+                Node_* node = nodes.back();
+
+                nodes.pop_back();
+
+                for (auto& leaf : node->leaves_)
+                {
+                    nodes.push_back(leaf);
+                }
+
+                delete node;
+            }
+        }
+    }
+
+
+    // TLT_v2::Node_
+
+    TLT_v2::Node_::Node_(const pair<string, vector<string>>& tree)
         :
         item_(tree.first)
     {
@@ -153,7 +182,7 @@ namespace fatpound::automata
             leaves_.push_back(new Node_(str));
         }
     }
-    TLT_v2::Node_::Node_(const String& str)
+    TLT_v2::Node_::Node_(const string& str)
         :
         item_(str)
     {

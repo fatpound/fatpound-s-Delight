@@ -1,36 +1,28 @@
 #pragma once
 
-#include <vector>
-#include <string>
+#include "CFG.hpp"
 
 namespace fatpound::automata
 {
-    /// <summary>
-    /// Total Language Tree parser and unique word generator
-    /// </summary>
     class TLT_v2 final
     {
-        template <typename T>
-        using Vector = std::vector<T>;
-
-        template <typename T1, typename T2>
-        using Pair = std::pair<T1, T2>;
-
-        using String = std::string;
-
     public:
-        TLT_v2(const Vector<Pair<String, Vector<String>>>& trees);
+        explicit TLT_v2(const CFG& cfgs);
+        explicit TLT_v2(const std::string& inputFilename);
 
-        TLT_v2() = delete;
-        TLT_v2(const TLT_v2& src) = delete;
+        explicit TLT_v2() = delete;
+        explicit TLT_v2(const TLT_v2& src) = delete;
+        explicit TLT_v2(TLT_v2&& src) = delete;
+
         TLT_v2& operator = (const TLT_v2& src) = delete;
-        TLT_v2(TLT_v2&& src) = delete;
         TLT_v2& operator = (TLT_v2&& src) = delete;
-        ~TLT_v2() noexcept;
+        ~TLT_v2() noexcept(false);
 
 
     public:
-        auto GetWords() const noexcept -> Vector<Pair<String, bool>>;
+        auto GetWords() const noexcept -> std::vector<std::pair<std::string, bool>>;
+
+        void PrintWords() const;
 
 
     protected:
@@ -39,26 +31,28 @@ namespace fatpound::automata
     private:
         struct Node_ final
         {
-            Vector<Node_*> leaves_;
+            Node_(const std::pair<std::string, std::vector<std::string>>& tree);
+            Node_(const std::string& str);
 
-            String item_;
+            std::vector<Node_*> leaves_;
 
-            Node_(const Pair<String, Vector<String>>& tree);
-            Node_(const String& str);
+            std::string item_;
         };
-        
-
-    private:
-        auto Generate_(String init_str = {}, std::size_t index = 0u, std::size_t recursed_count = 0u) const->Vector<Pair<String, bool>>;
-
-        bool IsTerminal_(const String& str) const;
 
 
     private:
-        Vector<Pair<String, bool>> results_;
+        auto GenerateResults_(std::string init_str = "", std::size_t index = 0u, std::size_t recursed = 0u) const -> std::vector<std::pair<std::string, bool>>;
 
-        Vector<Node_*> trees_;
+        bool IsTerminal_(const std::string& str) const;
 
-        static constexpr std::size_t recurse_limit_ = 1u;
+        void Clear_();
+
+
+    private:
+        std::vector<std::pair<std::string, bool>> m_results_;
+
+        std::vector<Node_*> m_trees_;
+
+        static constexpr auto s_recurse_limit_ = 1u;
     };
 }

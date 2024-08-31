@@ -1,36 +1,28 @@
 #pragma once
 
-#include <vector>
-#include <string>
+#include "CFG.hpp"
 
 namespace fatpound::automata
 {
-    /// <summary>
-    /// Total Language Tree parser and full word generator
-    /// </summary>
     class TLT final
     {
-        template <typename T>
-        using Vector = std::vector<T>;
-
-        template <typename T1, typename T2>
-        using Pair = std::pair<T1, T2>;
-
-        using String = std::string;
-
     public:
-        TLT(const Vector<Pair<String, Vector<String>>>& cfgs);
+        explicit TLT(const CFG& cfgs);
+        explicit TLT(const std::string& inputFilename);
 
-        TLT() = delete;
-        TLT(const TLT& src) = delete;
+        explicit TLT() = delete;
+        explicit TLT(const TLT& src) = delete;
+        explicit TLT(TLT&& src) = delete;
+
         TLT& operator = (const TLT& src) = delete;
-        TLT(TLT&& src) = delete;
         TLT& operator = (TLT&& src) = delete;
-        ~TLT() noexcept;
+        ~TLT() noexcept(false);
 
 
     public:
-        auto GetWords() const noexcept -> const Vector<String>&;
+        auto GetWords() const noexcept -> std::vector<std::string>;
+
+        void PrintWords() const;
 
 
     protected:
@@ -39,31 +31,34 @@ namespace fatpound::automata
     private:
         struct Node_ final
         {
-            Vector<Node_*> leaves_;
+            Node_(const std::string& item);
 
-            String item_;
+            std::vector<Node_*> leaves;
 
-            Node_(const String& item);
+            std::string item;
         };
 
 
     private:
-        static bool IsTerminal_(const String& word) noexcept;
+        static bool IsTerminal_(const std::string& word) noexcept;
 
 
     private:
         void CreateTree_(Node_* node);
         void CreateInnerTree_(Node_* node);
 
+        void Clear_();
+
 
     private:
-        const Vector<Pair<String, Vector<String>>>& cfgs_;
-        Vector<String> results_;
+        const std::vector<std::pair<std::string, std::vector<std::string>>>& m_cfgrammar_;
 
-        Vector<std::size_t> recurse_;
+        std::vector<std::string> m_results_;
 
-        Node_* tree_ = nullptr;
+        std::vector<std::size_t> m_recursers_;
 
-        static constexpr std::size_t recurse_limit_ = 1u;
+        Node_* m_tree_ = nullptr;
+
+        static constexpr auto s_recurse_limit_ = 1u;
     };
 }

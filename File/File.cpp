@@ -5,8 +5,6 @@
 #include <stdexcept>
 #include <ranges>
 
-namespace rn = std::ranges;
-
 namespace fatpound::file
 {
     auto GetNameAndExtension(const std::string& filename) -> std::pair<std::string, std::string>
@@ -23,12 +21,14 @@ namespace fatpound::file
 
             auto&& temp_revstr = std::string(filename.rbegin(), it);
 
-            rn::reverse(temp_revstr);
+            std::ranges::reverse(temp_revstr);
 
-            return {
-                std::string(filename.cbegin(), filename.cend() - dot_index),
-                std::string(temp_revstr)
-            };
+            std::pair<std::string, std::string> temp_pair;
+
+            temp_pair.first  = std::string(filename.cbegin(), filename.cend() - dot_index);
+            temp_pair.second = temp_revstr;
+
+            return temp_pair;
         }
         else
         {

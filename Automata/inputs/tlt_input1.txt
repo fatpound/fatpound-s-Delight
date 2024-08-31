@@ -1,0 +1,2 @@
+a b
+S-->aa|bX|aXX,   X-->ab|b

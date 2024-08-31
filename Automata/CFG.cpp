@@ -1,142 +1,103 @@
 #include "CFG.hpp"
 
-#include <fstream>
 #include <sstream>
 #include <iostream>
 #include <algorithm>
 
-namespace rn = std::ranges;
+using std::vector, std::string, std::pair;
 
 namespace fatpound::automata
 {
-    auto CFG::ParseFromFile(const String& filename) -> Vector<Pair<String, Vector<String>>>
+    CFG::CFG(const string& inputFilename)
     {
-        std::ifstream input_file(filename);
+        std::ifstream inputFile(inputFilename);
 
-        if ( ! input_file.is_open())
+        if (not inputFile.is_open())
         {
             throw std::runtime_error("Input file cannot be opened for [InputtingCFG]!");
         }
 
-        /////////////
-        Vector<char> alphabet;
+        vector<char> alphabet;
 
+        ReadFirstLine_(inputFile, alphabet);
+        ReadSecondLine_(inputFile, alphabet);
+    }
+
+    auto CFG::GetGrammar() const noexcept -> decltype(m_grammar_)
+    {
+        return m_grammar_;
+    }
+    
+    void CFG::ReadFirstLine_(std::ifstream& inputFile, vector<char>& alphabet)
+    {
         {
-            std::stringstream ss;
+            string str;
 
-            String str;
-            std::getline(input_file, str);
+            std::getline(inputFile, str);
 
-            ss << str;
-
-            char ch;
-
-            while (ss >> ch)
             {
-                alphabet.emplace_back(ch);
-            }
+                std::stringstream ss;
 
-            rn::sort(alphabet);
+                ss << str;
 
-            auto it = rn::unique(alphabet);
-            alphabet.erase(it.begin(), it.end());
-        }
+                char ch;
 
-        /////////////////////////////////////////
-        Vector<Pair<String, Vector<String>>> cfgs;
-
-        {
-            const String arrow = "-->";
-            String str;
-
-            while (std::getline(input_file, str, ','))
-            {
-                const auto it = rn::remove_if(str, [](const auto& ch) -> bool { return std::isspace(ch); });
-
-                str.erase(it.begin(), it.end());
-
-                const std::size_t index = str.find(arrow);
-
-                if (index != String::npos)
+                while (ss >> ch)
                 {
-                    String word(str.cbegin(), str.cbegin() + index);
-
-                    str.erase(0, index + arrow.length());
-
-                    Vector<String> leaves;
-
-                    std::istringstream iss(str);
-
-                    String tempstr;
-
-                    while (std::getline(iss, tempstr, '|'))
-                    {
-                        if (rn::find(leaves, tempstr) == leaves.cend())
-                        {
-                            for (const auto& ch : tempstr)
-                            {
-                                if (std::islower(ch) && rn::find(alphabet, ch) == alphabet.cend())
-                                {
-                                    throw std::runtime_error("The letter " + String{ ch } + " is not in the alphabet!");
-                                }
-                            }
-
-                            leaves.push_back(tempstr);
-                        }
-                    }
-
-                    cfgs.emplace_back(std::move(word), std::move(leaves));
+                    alphabet.push_back(ch);
                 }
             }
         }
 
-        return cfgs;
+        std::ranges::sort(alphabet);
+
+        auto it = std::ranges::unique(alphabet);
+
+        alphabet.erase(it.begin(), it.end());
     }
-
-    void CFG::Print(const Vector<String>& results)
+    void CFG::ReadSecondLine_(std::ifstream& inputFile, vector<char>& alphabet)
     {
-        Vector<String> finals;
-        Vector<String> repeaters;
+        string str;
 
-        for (const auto& str : results)
+        while (std::getline(inputFile, str, s_language_seperator_))
         {
-            if (rn::find(finals, str) == finals.cend())
             {
-                finals.push_back(str);
-            }
-            else if (rn::find(repeaters, str) == repeaters.cend())
-            {
-                repeaters.push_back(str);
-            }
-        }
+                const auto& it = std::ranges::remove_if(str, [](const auto& ch) noexcept -> bool { return std::isspace(ch) not_eq 0; });
 
-        if (finals.size() > 0u)
-        {
-            for (const auto& str : finals)
-            {
-                std::cout << str << '\n';
+                str.erase(it.begin(), it.end());
             }
-        }
 
-        if (repeaters.size() > 0u)
-        {
-            std::cout << "\nRepeaters :\n\n";
+            const auto& index = str.find(s_language_content_seperator_);
 
-            for (const auto& str : repeaters)
+            if (index not_eq string::npos)
             {
-                std::cout << str << '\n';
-            }
-        }
+                string word(str.cbegin(), str.cbegin() + index);
 
-        std::cout << '\n';
-    }
-    void CFG::Print(const Vector<Pair<String, bool>>& results)
-    {
-        for (const auto& item : results)
-        {
-            if (item.second == true)
-            {
-                std::cout << item.first << '\n';
+                str.erase(0, index + std::strlen(s_language_content_seperator_));
+
+                vector<string> leaves;
+
+                std::istringstream iss(str);
+
+                string tempstr;
+
+                while (std::getline(iss, tempstr, s_language_word_seperator_))
+                {
+                    if (std::ranges::find(leaves, tempstr) == leaves.cend())
+                    {
+                        for (const auto& ch : tempstr)
+                        {
+                            if (std::islower(ch) && std::ranges::find(alphabet, ch) == alphabet.cend())
+                            {
+                                throw std::runtime_error("The letter " + string{ ch } + " is not in the alphabet!");
+                            }
+                        }
+
+                        leaves.push_back(tempstr);
+                    }
+                }
+
+                m_grammar_.emplace_back(std::move(word), std::move(leaves));
             }
         }
     }

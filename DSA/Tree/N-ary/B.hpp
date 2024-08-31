@@ -3,10 +3,8 @@
 #include <iostream>
 #include <vector>
 #include <queue>
-#include <algorithm>
 #include <ranges>
-
-namespace rn = std::ranges;
+#include <algorithm>
 
 namespace fatpound::dsa::tree::n_ary
 {
@@ -22,44 +20,43 @@ namespace fatpound::dsa::tree::n_ary
         B& operator = (B&& src) = delete;
         ~B() noexcept
         {
-            DeleteTree_();
-
-            root_ = nullptr;
+            Clear_();
         }
 
 
     public:
         void Insert(const T& new_item)
         {
-            std::pair<T, Node_*>* new_pair = new std::pair<T, Node_*>(new_item, nullptr);
+            auto new_pair = new std::pair<T, Node_*>(new_item, nullptr);
 
-            if (root_ == nullptr)
+            if (m_root_ == nullptr)
             {
-                root_ = new Node_(new_pair);
-                depth_++;
+                m_root_ = new Node_(new_pair);
+
+                ++m_depth_;
 
                 return;
             }
 
-            Insert_(root_, new_pair, true);
+            Insert_(m_root_, new_pair, true);
         }
         void ListLevelorder() const
         {
-            if (root_ == nullptr)
+            if (m_root_ == nullptr)
             {
                 return;
             }
 
             std::queue<Node_*> Q;
-            Q.push(root_);
+
+            Q.push(m_root_);
 
             while (Q.size() > 0u)
             {
                 Node_* u = Q.front();
                 Q.pop();
 
-
-                if (u->lesser != nullptr)
+                if (u->lesser not_eq nullptr)
                 {
                     Q.push(u->lesser);
                 }
@@ -68,18 +65,18 @@ namespace fatpound::dsa::tree::n_ary
                 {
                     std::cout << u->items[i]->first << ' ';
 
-                    if (u->items[i]->second != nullptr)
+                    if (u->items[i]->second not_eq nullptr)
                     {
                         Q.push(u->items[i]->second);
                     }
                 }
 
-                std::cout << "\n";
+                std::cout << '\n';
             }
 
-            std::cout << "\n";
+            std::cout << '\n';
         }
-        
+
 
     protected:
 
@@ -104,7 +101,7 @@ namespace fatpound::dsa::tree::n_ary
                 :
                 parent(new_parent)
             {
-                if (new_item != nullptr)
+                if (new_item not_eq nullptr)
                 {
                     items.push_back(new_item);
                 }
@@ -131,7 +128,7 @@ namespace fatpound::dsa::tree::n_ary
 
                     for (std::size_t i = 0u; i < node->items.size(); ++i)
                     {
-                        if (pair->first > node->items[i]->first && node->items[i]->second != nullptr)
+                        if ((pair->first > node->items[i]->first) and (node->items[i]->second not_eq nullptr))
                         {
                             if (flag == false)
                             {
@@ -158,9 +155,9 @@ namespace fatpound::dsa::tree::n_ary
             }
             else
             {
-                if (node->items.size() != 0u && add_first_time)
+                if ((node->items.size() not_eq 0u) and add_first_time)
                 {
-                    if (pair->first < node->items[0u]->first && node->lesser != nullptr)
+                    if ((pair->first < node->items[0u]->first) and (node->lesser not_eq nullptr))
                     {
                         node = node->lesser;
                         goto label;
@@ -176,7 +173,7 @@ namespace fatpound::dsa::tree::n_ary
                         }
                     }
 
-                    if (node->items[index]->second != nullptr)
+                    if (node->items[index]->second not_eq nullptr)
                     {
                         node = node->items[index]->second;
                         goto label;
@@ -187,7 +184,7 @@ namespace fatpound::dsa::tree::n_ary
 
                 if (node->items.size() > 1u)
                 {
-                    rn::sort(node->items, [](const auto& p1, const auto& p2) -> bool { return p1->first < p2->first; });
+                    std::ranges::sort(node->items, [](const auto& p1, const auto& p2) -> bool { return p1->first < p2->first; });
                 }
             }
         }
@@ -202,7 +199,7 @@ namespace fatpound::dsa::tree::n_ary
                 temp_vec.push_back(node->items[i]);
             }
 
-            rn::sort(temp_vec, [](const auto& p1, const auto& p2) -> bool { return p1->first < p2->first; });
+            std::ranges::sort(temp_vec, [](const auto& p1, const auto& p2) -> bool { return p1->first < p2->first; });
 
             std::size_t center = (C * 2u + 1u) / 2u;
 
@@ -226,11 +223,12 @@ namespace fatpound::dsa::tree::n_ary
                 node->items.push_back(temp_vec_less[i]);
             }
 
-            if (node == root_)
+            if (node == m_root_)
             {
                 node->parent = new Node_(node);
-                root_ = node->parent;
-                depth_++;
+                m_root_ = node->parent;
+
+                ++m_depth_;
             }
 
             Insert_(node->parent, temp_vec[center], false);
@@ -246,29 +244,31 @@ namespace fatpound::dsa::tree::n_ary
             new_node->lesser = temp_vec[center]->second;
             temp_vec[center]->second = new_node;
         }
-        void DeleteTree_()
+
+        void Clear_()
         {
-            if (root_ == nullptr)
+            if (m_root_ == nullptr)
             {
                 return;
             }
 
             std::queue<Node_*> Q;
-            Q.push(root_);
+
+            Q.push(m_root_);
 
             while (Q.size() > 0u)
             {
                 Node_* u = Q.front();
                 Q.pop();
 
-                if (u->lesser != nullptr)
+                if (u->lesser not_eq nullptr)
                 {
                     Q.push(u->lesser);
                 }
 
                 for (std::size_t i = 0u; i < u->items.size(); ++i)
                 {
-                    if (u->items[i]->second != nullptr)
+                    if (u->items[i]->second not_eq nullptr)
                     {
                         Q.push(u->items[i]->second);
                     }
@@ -278,12 +278,14 @@ namespace fatpound::dsa::tree::n_ary
 
                 delete u;
             }
+
+            m_root_ = nullptr;
         }
 
 
     private:
-        Node_* root_ = nullptr;
+        Node_* m_root_ = nullptr;
 
-        std::size_t depth_ = 0;
+        std::size_t m_depth_ = 0u;
     };
 }

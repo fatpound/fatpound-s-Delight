@@ -4,74 +4,99 @@
 #include <deque>
 #include <algorithm>
 
-namespace rn = std::ranges;
+using std::vector, std::string, std::pair;
 
 namespace fatpound::automata
 {
     // TLT
 
-    TLT::TLT(const Vector<Pair<String, Vector<String>>>& cfgs)
+    TLT::TLT(const CFG& cfg)
         :
-        cfgs_(cfgs),
-        recurse_(cfgs_.size(), 0)
+        m_cfgrammar_(cfg.GetGrammar()),
+        m_recursers_(m_cfgrammar_.size(), 0)
     {
-        if (cfgs_.size() < 1)
+        if (m_cfgrammar_.size() < 1)
         {
             throw std::runtime_error("There is no input!");
         }
 
-        tree_ = new Node_(cfgs_[0].first);
+        m_tree_ = new Node_(m_cfgrammar_[0].first);
 
-        for (const auto& leaf_str : cfgs_[0].second)
+        for (const auto& leaf_str : m_cfgrammar_[0].second)
         {
-            tree_->leaves_.push_back(new Node_(leaf_str));
+            m_tree_->leaves.push_back(new Node_(leaf_str));
         }
 
-        CreateTree_(tree_);
+        CreateTree_(m_tree_);
     }
-    TLT::~TLT() noexcept
+    TLT::TLT(const string& inputFilename)
+        :
+        TLT(CFG{ inputFilename })
     {
-        std::deque<Node_*> nodes;
 
-        if (tree_ != nullptr)
+    }
+    TLT::~TLT() noexcept(false)
+    {
+        Clear_();
+    }
+
+    auto TLT::GetWords() const noexcept -> vector<string>
+    {
+        return m_results_;
+    }
+
+    void TLT::PrintWords() const
+    {
+        vector<string> finals;
+        vector<string> repeaters;
+
+        for (const auto& str : m_results_)
         {
-            nodes.push_back(tree_);
-        }
-
-        while (nodes.size() > 0u)
-        {
-            Node_* node = nodes.back();
-
-            nodes.pop_back();
-
-            for (auto& leaf : node->leaves_)
+            if (std::ranges::find(finals, str) == finals.cend())
             {
-                nodes.push_back(leaf);
+                finals.push_back(str);
             }
-
-            delete node;
+            else if (std::ranges::find(repeaters, str) == repeaters.cend())
+            {
+                repeaters.push_back(str);
+            }
         }
+
+        if (finals.size() > 0u)
+        {
+            for (const auto& str : finals)
+            {
+                std::cout << str << '\n';
+            }
+        }
+
+        if (repeaters.size() > 0u)
+        {
+            std::cout << "\nRepeaters :\n\n";
+
+            for (const auto& str : repeaters)
+            {
+                std::cout << str << '\n';
+            }
+        }
+
+        std::cout << '\n';
     }
 
-    auto TLT::GetWords() const noexcept -> const Vector<String>&
+    bool TLT::IsTerminal_(const std::string& word) noexcept
     {
-        return results_;
-    }
-
-    bool TLT::IsTerminal_(const String& word) noexcept
-    {
-        return rn::all_of(word, [](const auto& ch) -> bool { return std::islower(ch); });
+        return std::ranges::all_of(word, [](const auto& ch) noexcept -> bool { return std::islower(ch) not_eq 0; });
     }
 
     void TLT::CreateTree_(Node_* node)
     {
-        results_.reserve(node->leaves_.size());
+        m_results_.reserve(node->leaves.size());
 
-        for (auto& leaf : node->leaves_)
+        for (auto& leaf : node->leaves)
         {
-            if (TLT::IsTerminal_(leaf->item_))
+            if (IsTerminal_(leaf->item))
             {
-                results_.push_back(leaf->item_);
+                m_results_.push_back(leaf->item);
 
                 continue;
             }
@@ -81,73 +106,101 @@ namespace fatpound::automata
     }
     void TLT::CreateInnerTree_(Node_* node)
     {
-        for (std::size_t i = 0u; i < node->item_.size(); ++i)
+        for (std::size_t i = 0u; i < node->item.size(); ++i)
         {
-            const auto& ch = node->item_[i];
+            const auto& ch = node->item[i];
 
-            if (std::isupper(ch))
+            if (not std::isupper(ch))
             {
-                const auto& cfg_it = rn::find_if(cfgs_, [&](const auto& pair) { return pair.first[0] == ch; });
+                continue;
+            }
 
-                String leftstr(node->item_.cbegin(), node->item_.cbegin() + i);
-                String rightstr(node->item_.cbegin() + i + 1, node->item_.cend());
+            const auto& cfg_it = std::ranges::find_if(m_cfgrammar_, [&](const auto& pair) { return pair.first[0] == ch; });
 
-                const std::size_t index = cfg_it - cfgs_.cbegin();
+            string leftstr(node->item.cbegin(), node->item.cbegin() + i);
+            string rightstr(node->item.cbegin() + i + 1, node->item.cend());
 
-                node->leaves_.reserve(node->leaves_.size() + cfg_it->second.size());
+            const std::size_t index = cfg_it - m_cfgrammar_.cbegin();
 
-                for (const auto& cfgstr : cfg_it->second)
+            node->leaves.reserve(node->leaves.size() + cfg_it->second.size());
+
+            for (const auto& cfgstr : cfg_it->second)
+            {
+                // string str = cfgstr;
+
+                bool recursed = false;
+
+                if (cfgstr.contains(ch))
                 {
-                    // String str = cfgstr;
-
-                    bool recursed = false;
-
-                    if (cfgstr.contains(ch))
+                    if (m_recursers_[index] >= s_recurse_limit_)
                     {
-                        if (recurse_[index] >= recurse_limit_)
-                        {
-                            // const auto [first, last] = rn::remove_if(str, [](const auto& ch) { return std::isupper(ch); });
-                            // 
-                            // str.erase(first, last);
+                        // const auto [first, last] = rn::remove_if(str, [](const auto& ch) { return std::isupper(ch); });
+                        // 
+                        // str.erase(first, last);
 
-                            continue;
-                        }
-
-                        recursed = true;
-
-                        ++recurse_[index];
+                        continue;
                     }
 
-                    const String& newstr = leftstr + cfgstr + rightstr;
+                    recursed = true;
 
-                    Node_* newnode = new Node_(newstr);
+                    ++m_recursers_[index];
+                }
 
-                    node->leaves_.push_back(newnode);
+                const string& newstr = leftstr + cfgstr + rightstr;
 
-                    if (recursed || !IsTerminal_(newstr))
-                    {
-                        CreateInnerTree_(newnode);
-                    }
-                    else
-                    {
-                        results_.push_back(newstr);
-                    }
+                Node_* newnode = new Node_(newstr);
 
-                    if (recursed)
-                    {
-                        --recurse_[index];
-                    }
+                node->leaves.push_back(newnode);
+
+                if (recursed or (not IsTerminal_(newstr)))
+                {
+                    CreateInnerTree_(newnode);
+                }
+                else
+                {
+                    m_results_.push_back(newstr);
+                }
+
+                if (recursed)
+                {
+                    --m_recursers_[index];
                 }
             }
         }
     }
 
+    void TLT::Clear_()
+    {
+        if (m_tree_ == nullptr) [[unlikely]]
+        {
+            return;
+        }
 
-    // Node_
+        std::deque<Node_*> nodes;
 
-    TLT::Node_::Node_(const String& item)
+        nodes.push_back(m_tree_);
+
+        while (nodes.size() > 0u)
+        {
+            Node_* node = nodes.back();
+
+            nodes.pop_back();
+
+            for (auto& leaf : node->leaves)
+            {
+                nodes.push_back(leaf);
+            }
+
+            delete node;
+        }
+    }
+
+
+    // TLT::Node_
+
+    TLT::Node_::Node_(const std::string& item)
         :
-        item_(item)
+        item(item)
     {
 
     }

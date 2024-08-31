@@ -9,33 +9,33 @@ namespace fatpound
         class Color final
         {
         public:
-            constexpr Color(unsigned char r, unsigned char g, unsigned char b, unsigned char alpha = 0xFFu)
+            explicit constexpr Color(unsigned char r, unsigned char g, unsigned char b, unsigned char alpha = 0xFFui8)
             {
                 dword = (static_cast<std::uint32_t>(alpha) << 24)
                     | (static_cast<std::uint32_t>(r) << 16)
                     | (static_cast<std::uint32_t>(g) << 8)
                     | (static_cast<std::uint32_t>(b));
             }
-            constexpr Color(int r, int g, int b)
+            explicit constexpr Color(int r, int g, int b)
                 :
                 Color(static_cast<unsigned char>(r), static_cast<unsigned char>(g), static_cast<unsigned char>(b))
             {
 
             }
-            constexpr Color(std::uint32_t dw)
+            explicit constexpr Color(std::uint32_t dw)
                 :
                 dword(dw | 0xFF'00'00'00u)
             {
 
             }
-            constexpr Color(Color col, unsigned char alpha)
+            explicit constexpr Color(Color col, unsigned char alpha)
                 :
                 Color((static_cast<std::uint32_t>(alpha) << 24) | col.dword)
             {
 
             }
 
-            constexpr Color() = default;
+            explicit constexpr Color() = default;
             constexpr Color(const Color& src) noexcept
                 :
                 dword(src.dword)
@@ -43,6 +43,7 @@ namespace fatpound
 
             }
             constexpr Color(Color&& src) noexcept = default;
+
             constexpr Color& operator = (const Color& src) noexcept
             {
                 dword = src.dword;
@@ -54,19 +55,26 @@ namespace fatpound
 
 
         public:
-            void SetAlpha(unsigned char x)
+            bool operator == (const Color src) const noexcept
+            {
+                return dword == src.dword;
+            }
+
+
+        public:
+            void SetAlpha(unsigned char x) noexcept
             {
                 dword = (dword & 0x00'FF'FF'FFu) | (std::uint32_t(x) << 24);
             }
-            void SetR(unsigned char r)
+            void SetR(unsigned char r) noexcept
             {
                 dword = (dword & 0xFF'00'FF'FFu) | (std::uint32_t(r) << 16);
             }
-            void SetG(unsigned char g)
+            void SetG(unsigned char g) noexcept
             {
                 dword = (dword & 0xFF'FF'00'FFu) | (std::uint32_t(g) << 8);
             }
-            void SetB(unsigned char b)
+            void SetB(unsigned char b) noexcept
             {
                 dword = (dword & 0xFF'FF'FF'00u) | std::uint32_t(b);
             }
@@ -88,15 +96,6 @@ namespace fatpound
                 return dword & 0xFFu;
             }
 
-            bool operator == (const Color src) const
-            {
-                return dword == src.dword;
-            }
-            bool operator != (const Color src) const
-            {
-                return !(dword == src.dword);
-            }
-
 
         public:
             std::uint32_t dword = 0xFF'FF'FF'FFu;
@@ -111,11 +110,13 @@ namespace fatpound
 
     namespace colors
     {
-        constexpr auto MakeRGB(unsigned char r, unsigned char g, unsigned char b) -> ::fatpound::util::Color
+        constexpr auto MakeRGB(unsigned char r, unsigned char g, unsigned char b) -> util::Color
         {
-            return ((static_cast<std::uint32_t>(r) << 16) |
+            return util::Color{
+                (static_cast<std::uint32_t>(r) << 16) |
                 (static_cast<std::uint32_t>(g) << 8) |
-                static_cast<std::uint32_t>(b));
+                static_cast<std::uint32_t>(b)
+            };
         }
 
         constexpr auto Black     = MakeRGB(  0u,   0u,   0u);
@@ -130,5 +131,4 @@ namespace fatpound
         constexpr auto Cyan      = MakeRGB(  0u, 255u, 255u);
         constexpr auto Magenta   = MakeRGB(255u,   0u, 255u);
     }
-
 }

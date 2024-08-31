@@ -1,0 +1,2 @@
+a b c
+S-->bS|aN,   N-->bN|aF,   F-->bF|c
