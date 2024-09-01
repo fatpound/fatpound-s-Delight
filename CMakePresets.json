@@ -7,7 +7,15 @@
     },
     "configurePresets": [
         {
-            "name": "clang-base",
+            "name": "G++",
+            "hidden": true,
+            "generator": "Ninja",
+            "cacheVariables": {
+                "CMAKE_CXX_COMPILER": "g++"
+            }
+        },
+        {
+            "name": "Clang++",
             "hidden": true,
             "generator": "Ninja",
             "cacheVariables": {
@@ -15,7 +23,7 @@
             }
         },
         {
-            "name": "intel-base",
+            "name": "Intel oneAPI C++",
             "hidden": true,
             "generator": "Ninja",
             "cacheVariables": {
@@ -23,37 +31,55 @@
             }
         },
         {
-            "name": "clang-debug",
-            "inherits": "clang-base",
+            "name": "G++ (Debug)",
+            "inherits": "G++",
             "hidden": false,
-            "binaryDir": "${sourceDir}/build/clang-debug",
+            "binaryDir": "${sourceDir}/build/G++ (Debug)",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug"
             }
         },
         {
-            "name": "clang-release",
-            "inherits": "clang-base",
+            "name": "G++ (Release)",
+            "inherits": "G++",
             "hidden": false,
-            "binaryDir": "${sourceDir}/build/clang-release",
+            "binaryDir": "${sourceDir}/build/G++ (Release)",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release"
             }
         },
         {
-            "name": "intel-debug",
-            "inherits": "intel-base",
+            "name": "Clang++ (Debug)",
+            "inherits": "Clang++",
             "hidden": false,
-            "binaryDir": "${sourceDir}/build/intel-debug",
+            "binaryDir": "${sourceDir}/build/Clang++ (Debug)",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug"
             }
         },
         {
-            "name": "intel-release",
-            "inherits": "intel-base",
+            "name": "Clang++ (Release)",
+            "inherits": "Clang++",
             "hidden": false,
-            "binaryDir": "${sourceDir}/build/intel-release",
+            "binaryDir": "${sourceDir}/build/Clang++ (Release)",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        },
+        {
+            "name": "Intel oneAPI C++ (Debug)",
+            "inherits": "Intel oneAPI C++",
+            "hidden": false,
+            "binaryDir": "${sourceDir}/build/Intel oneAPI C++ (Debug)",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        },
+        {
+            "name": "Intel oneAPI C++ (Release)",
+            "inherits": "Intel oneAPI C++",
+            "hidden": false,
+            "binaryDir": "${sourceDir}/build/Intel oneAPI C++ (Release)",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release"
             }
@@ -61,23 +87,33 @@
     ],
     "buildPresets": [
         {
-            "name": "intel-debug",
-            "configurePreset": "intel-debug",
+            "name": "G++ (Debug)",
+            "configurePreset": "G++ (Debug)",
             "jobs": 4
         },
         {
-            "name": "intel-release",
-            "configurePreset": "intel-release",
+            "name": "G++ (Release)",
+            "configurePreset": "G++ (Release)",
             "jobs": 4
         },
         {
-            "name": "clang-debug",
-            "configurePreset": "clang-debug",
+            "name": "Intel oneAPI C++ (Debug)",
+            "configurePreset": "Intel oneAPI C++ (Debug)",
             "jobs": 4
         },
         {
-            "name": "clang-release",
-            "configurePreset": "clang-release",
+            "name": "Intel oneAPI C++ (Release)",
+            "configurePreset": "Intel oneAPI C++ (Release)",
+            "jobs": 4
+        },
+        {
+            "name": "Clang++ (Debug)",
+            "configurePreset": "Clang++ (Debug)",
+            "jobs": 4
+        },
+        {
+            "name": "Clang++ (Release)",
+            "configurePreset": "Clang++ (Release)",
             "jobs": 4
         }
     ]

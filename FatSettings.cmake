@@ -1,6 +1,23 @@
 add_library (FatSettings INTERFACE)
 
-if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "Intel")
+if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+    target_compile_options(FatSettings INTERFACE
+        ## Active warnings
+        -Wall
+        -Wextra
+        -Wpedantic
+
+
+        ## Inactive errors
+        -Wno-error=changes-meaning
+
+
+        ## Configuration-specific
+        $<$<CONFIG:Debug>:-O0 -Werror>
+        $<$<CONFIG:Release>:-O3>
+    )
+
+elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "Intel")
     target_compile_options (FatSettings INTERFACE
         ## Active warnings
         -Weverything
