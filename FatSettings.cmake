@@ -18,12 +18,8 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "Inte
         -Wno-unused-private-field
 
 
-        ## Errors
-        -Werror
-
-
-        ## Optimizations
-        $<$<CONFIG:Debug>:-O0>
+        ## Configuration-specific
+        $<$<CONFIG:Debug>:-O0 -Werror>
         $<$<CONFIG:Release>:-O3>
     )
 
@@ -39,22 +35,25 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
 
 
         ## Inactive warnings
-        /wd4820
-        /wd5045
-        /wd4514
+        /wd4061 # Not all enum identifiers of an Enum (class) are handled by a switch statement (When there is a default case)
+        /wd4062 # Not all enum identifiers of an Enum (class) are handled by a switch statement (When there is NOT a default case)
+        /wd4514 # Unreferenced inline function has been removed
+        /wd4820 # n bytes padding added after construct MyClass
+        /wd5045 # Compiler will insert Spectre mitigation for memory load if /Qspectre switch specified
+        
 
-        # for my library code
-        /wd4061 /wd4668 /wd5039 /wd4365 /wd4265 /wd5220 /wd4625 /wd4626 /wd5204
+        ## Configuration-specific
+        $<$<CONFIG:Debug>:
+            /Od
 
-        ## Errors
-        /Wx # Treat warnings as errors
-
-        ## Optimizations
-        $<$<CONFIG:Debug>:/Od>
+            /Wx # Treat warnings as errors
+        >
         $<$<CONFIG:Release>:
             /O2
-            /Qvec-report:2
-            /Qpar-report:2
+            /GL # Whole-program optimization
+
+            /Qvec-report:2 # Auto vectorizer reports
+            /Qpar-report:2 # Parallelizer reports
 
             /GF # String pooling
         >
