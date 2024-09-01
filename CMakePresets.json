@@ -11,8 +11,7 @@
             "hidden": true,
             "generator": "Ninja",
             "cacheVariables": {
-                "CMAKE_CXX_COMPILER": "clang++",
-                "CMAKE_PROJECT_INCLUDE_BEFORE": "${sourceDir}/CMakeSettings.cmake"
+                "CMAKE_CXX_COMPILER": "clang++"
             }
         },
         {
@@ -20,8 +19,7 @@
             "hidden": true,
             "generator": "Ninja",
             "cacheVariables": {
-                "CMAKE_CXX_COMPILER": "icpx",
-                "CMAKE_PROJECT_INCLUDE_BEFORE": "${sourceDir}/CMakeSettings.cmake"
+                "CMAKE_CXX_COMPILER": "icpx"
             }
         },
         {
@@ -30,8 +28,7 @@
             "hidden": false,
             "binaryDir": "${sourceDir}/build/clang-debug",
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug",
-                "CMAKE_PROJECT_INCLUDE_BEFORE": "${sourceDir}/CMakeSettings_Debug.cmake"
+                "CMAKE_BUILD_TYPE": "Debug"
             }
         },
         {
@@ -40,8 +37,7 @@
             "hidden": false,
             "binaryDir": "${sourceDir}/build/clang-release",
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release",
-                "CMAKE_PROJECT_INCLUDE_BEFORE": "${sourceDir}/CMakeSettings_Release.cmake"
+                "CMAKE_BUILD_TYPE": "Release"
             }
         },
         {
@@ -50,8 +46,7 @@
             "hidden": false,
             "binaryDir": "${sourceDir}/build/intel-debug",
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug",
-                "CMAKE_PROJECT_INCLUDE_BEFORE": "${sourceDir}/CMakeSettings_Debug.cmake"
+                "CMAKE_BUILD_TYPE": "Debug"
             }
         },
         {
@@ -60,8 +55,7 @@
             "hidden": false,
             "binaryDir": "${sourceDir}/build/intel-release",
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release",
-                "CMAKE_PROJECT_INCLUDE_BEFORE": "${sourceDir}/CMakeSettings_Release.cmake"
+                "CMAKE_BUILD_TYPE": "Release"
             }
         }
     ],
@@ -69,22 +63,22 @@
         {
             "name": "intel-debug",
             "configurePreset": "intel-debug",
-            "jobs": 8
+            "jobs": 4
         },
         {
             "name": "intel-release",
             "configurePreset": "intel-release",
-            "jobs": 8
+            "jobs": 4
         },
         {
             "name": "clang-debug",
             "configurePreset": "clang-debug",
-            "jobs": 8
+            "jobs": 4
         },
         {
             "name": "clang-release",
             "configurePreset": "clang-release",
-            "jobs": 8
+            "jobs": 4
         }
     ]
 }
