@@ -15,11 +15,11 @@ namespace fatpound::math
     template <typename T>
     concept Multiplicable = requires(T var1, T var2)
     {
-        { var1 * var2 } -> std::same_as<T>;
+        { var1 * var2 } noexcept -> std::same_as<T>;
     };
     
     template <Multiplicable T>
-    inline auto Square(const T& var)
+    inline auto Square(const T& var) noexcept
     {
         return var * var;
     }
