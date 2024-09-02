@@ -19,7 +19,8 @@
             "hidden": true,
             "generator": "Ninja",
             "cacheVariables": {
-                "CMAKE_CXX_COMPILER": "clang++"
+                "CMAKE_CXX_COMPILER": "clang++",
+                "CMAKE_CXX_CLANG_TIDY": "clang-tidy;-config-file=${sourceDir}/.clang-tidy"
             }
         },
         {
@@ -27,7 +28,8 @@
             "hidden": true,
             "generator": "Ninja",
             "cacheVariables": {
-                "CMAKE_CXX_COMPILER": "icpx"
+                "CMAKE_CXX_COMPILER": "icpx",
+                "CMAKE_CXX_CLANG_TIDY": "clang-tidy;-config-file=${sourceDir}/.clang-tidy"
             }
         },
         {
@@ -89,32 +91,32 @@
         {
             "name": "G++ (Debug)",
             "configurePreset": "G++ (Debug)",
-            "jobs": 4
+            "jobs": 8
         },
         {
             "name": "G++ (Release)",
             "configurePreset": "G++ (Release)",
-            "jobs": 4
+            "jobs": 8
         },
         {
             "name": "Intel oneAPI C++ (Debug)",
             "configurePreset": "Intel oneAPI C++ (Debug)",
-            "jobs": 4
+            "jobs": 8
         },
         {
             "name": "Intel oneAPI C++ (Release)",
             "configurePreset": "Intel oneAPI C++ (Release)",
-            "jobs": 4
+            "jobs": 8
         },
         {
             "name": "Clang++ (Debug)",
             "configurePreset": "Clang++ (Debug)",
-            "jobs": 4
+            "jobs": 8
         },
         {
             "name": "Clang++ (Release)",
             "configurePreset": "Clang++ (Release)",
-            "jobs": 4
+            "jobs": 8
         }
     ]
 }

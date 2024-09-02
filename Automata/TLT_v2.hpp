@@ -14,12 +14,13 @@ namespace fatpound::automata
         explicit TLT_v2(const TLT_v2& src) = delete;
         explicit TLT_v2(TLT_v2&& src) = delete;
 
-        TLT_v2& operator = (const TLT_v2& src) = delete;
-        TLT_v2& operator = (TLT_v2&& src) = delete;
+        auto operator = (const TLT_v2& src) -> TLT_v2& = delete;
+        auto operator = (TLT_v2&& src)      -> TLT_v2& = delete;
         ~TLT_v2() noexcept(false);
 
 
     public:
+        [[nodiscard]]
         auto GetWords() const noexcept -> std::vector<std::pair<std::string, bool>>;
 
         void PrintWords() const;
@@ -29,10 +30,10 @@ namespace fatpound::automata
 
 
     private:
-        struct Node_ final
+        struct alignas(64) Node_ final
         {
-            Node_(const std::pair<std::string, std::vector<std::string>>& tree);
-            Node_(const std::string& str);
+            explicit Node_(const std::pair<std::string, std::vector<std::string>>& tree);
+            explicit Node_(const std::string& str);
 
             std::vector<Node_*> leaves_;
 
@@ -41,9 +42,11 @@ namespace fatpound::automata
 
 
     private:
+        [[nodiscard]]
         auto GenerateResults_(std::string init_str = "", std::size_t index = 0u, std::size_t recursed = 0u) const -> std::vector<std::pair<std::string, bool>>;
 
-        bool IsTerminal_(const std::string& str) const;
+        [[nodiscard]]
+        auto IsTerminal_(const std::string& str) const -> bool;
 
         void Clear_();
 

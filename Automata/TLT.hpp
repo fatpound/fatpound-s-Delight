@@ -14,12 +14,13 @@ namespace fatpound::automata
         explicit TLT(const TLT& src) = delete;
         explicit TLT(TLT&& src) = delete;
 
-        TLT& operator = (const TLT& src) = delete;
-        TLT& operator = (TLT&& src) = delete;
+        auto operator = (const TLT& src) -> TLT& = delete;
+        auto operator = (TLT&& src)      -> TLT& = delete;
         ~TLT() noexcept(false);
 
 
     public:
+        [[nodiscard]]
         auto GetWords() const noexcept -> std::vector<std::string>;
 
         void PrintWords() const;
@@ -29,9 +30,9 @@ namespace fatpound::automata
 
 
     private:
-        struct Node_ final
+        struct alignas(64) Node_ final
         {
-            Node_(const std::string& item);
+            explicit Node_(const std::string& item);
 
             std::vector<Node_*> leaves;
 
@@ -40,7 +41,7 @@ namespace fatpound::automata
 
 
     private:
-        static bool IsTerminal_(const std::string& word) noexcept;
+        static auto IsTerminal_(const std::string& word) noexcept -> bool;
 
 
     private:

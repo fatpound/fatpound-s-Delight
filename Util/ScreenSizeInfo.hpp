@@ -2,7 +2,7 @@
 
 namespace fatpound::util
 {
-	struct ScreenSizeInfo final
+	struct alignas(8) ScreenSizeInfo final
 	{
 		unsigned int m_width;
 		unsigned int m_height;

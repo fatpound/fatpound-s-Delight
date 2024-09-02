@@ -13,10 +13,8 @@ namespace fatpound::dsa::linkedlist
     class Doubly
     {
     public:
-        Doubly() = default;
-        Doubly(const Doubly& src) = delete;
-        Doubly& operator = (const Doubly& src) = delete;
-
+        explicit Doubly() = default;
+        explicit Doubly(const Doubly& src) = delete;
         Doubly(Doubly&& src) noexcept
             :
             m_list_(std::exchange(src.m_list_, nullptr)),
@@ -25,7 +23,9 @@ namespace fatpound::dsa::linkedlist
         {
 
         }
-        Doubly& operator = (Doubly&& src) noexcept
+
+        auto operator = (const Doubly& src) -> Doubly& = delete;
+        auto operator = (Doubly&& src) noexcept -> Doubly&
         {
             if ((this not_eq std::addressof(src)) and (typeid(src) == typeid(*this)) and (src.m_list_ not_eq nullptr))
             {
@@ -46,14 +46,14 @@ namespace fatpound::dsa::linkedlist
 
 
     public:
-        virtual bool Contains(const T& item) const final
+        virtual auto Contains(const T& item) const -> bool final
         {
             return Find_(item) not_eq nullptr;
         }
 
         virtual void Add(const T& new_item)
         {
-            Node_* new_part = new Node_(new_item);
+            auto* const new_part = new Node_(new_item);
 
             ++m_item_count_;
 
@@ -71,7 +71,7 @@ namespace fatpound::dsa::linkedlist
         }
         virtual void AddOrdered(const T& new_item)
         {
-            Node_* new_part = new Node_(new_item);
+            auto* const new_part = new Node_(new_item);
 
             ++m_item_count_;
 
@@ -124,7 +124,7 @@ namespace fatpound::dsa::linkedlist
 
             Node_* temp = m_list_;
 
-            while (temp->next != nullptr)
+            while (temp->next not_eq nullptr)
             {
                 std::swap(temp->prev, temp->next);
                 temp = temp->prev;
@@ -149,7 +149,7 @@ namespace fatpound::dsa::linkedlist
 
                 temp = temp->next;
             }
-            while (temp != nullptr);
+            while (temp not_eq nullptr);
 
             std::cout << '\n';
         }
@@ -158,7 +158,7 @@ namespace fatpound::dsa::linkedlist
     protected:
         struct Node_ final
         {
-            Node_(T new_item)
+            explicit Node_(T new_item)
                 :
                 item{ new_item }
             {
@@ -173,7 +173,7 @@ namespace fatpound::dsa::linkedlist
 
 
     protected:
-        virtual Node_* Find_(const T& item) const final
+        virtual auto Find_(const T& item) const -> Node_* final
         {
             if (m_item_count_ == 0u)
             {
@@ -210,18 +210,18 @@ namespace fatpound::dsa::linkedlist
                 return;
             }
 
-            Node_* ex = m_list_;
-            Node_* temp;
+            Node_* exes = m_list_;
+            Node_* temp{};
 
             do
             {
-                temp = ex->next;
+                temp = exes->next;
 
-                delete ex;
+                delete exes;
 
-                ex = temp;
+                exes = temp;
             }
-            while (ex not_eq nullptr);
+            while (exes not_eq nullptr);
 
             m_list_ = nullptr;
             m_end_  = nullptr;

@@ -8,6 +8,8 @@ namespace fatpound::automata
 {
     class CFG final
     {
+        using GrammarType = std::vector<std::pair<std::string, std::vector<std::string>>>;
+
     public:
         // The input file should be in the following format:
         //
@@ -26,9 +28,14 @@ namespace fatpound::automata
         explicit CFG(const CFG& src) = delete;
         explicit CFG(CFG&& src) = delete;
 
-        CFG& operator = (const CFG& src) = delete;
-        CFG& operator = (CFG&& src) = delete;
+        auto operator = (const CFG& src) -> CFG& = delete;
+        auto operator = (CFG&& src)      -> CFG& = delete;
         ~CFG() noexcept = default;
+
+
+    public:
+        [[nodiscard]]
+        auto GetGrammar() const noexcept -> GrammarType;
 
 
     protected:
@@ -40,25 +47,10 @@ namespace fatpound::automata
 
 
     private:
-        std::vector<std::pair<std::string, std::vector<std::string>>> m_grammar_;
+        GrammarType m_grammar_;
 
         static constexpr auto s_language_seperator_         = ',';
         static constexpr auto s_language_word_seperator_    = '|';
         static constexpr auto s_language_content_seperator_ = "-->";
-
-
-        /*            */
-        //  fatpound* //
-        /*            */
-
-
-    public:
-        auto GetGrammar() const noexcept -> decltype(m_grammar_);
-
-
-    protected:
-
-
-    private:
     };
 }

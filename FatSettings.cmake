@@ -21,7 +21,6 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "
     target_compile_options (FatSettings INTERFACE
         ## Active warnings
         -Weverything
-        -Wmicrosoft
         
         
         ## Inactive warnings
@@ -29,6 +28,8 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "
         -Wno-c++98-compat-pedantic
         
         -Wno-c++20-compat
+
+        -Wno-padded
         
         -Wno-missing-prototypes
         -Wno-unused-function

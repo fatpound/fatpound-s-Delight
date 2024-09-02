@@ -13,8 +13,14 @@ namespace fatpound::math
     concept Number = std::integral<T> or std::floating_point<T>;
 
     template <typename T>
-    inline auto Square(const T& x)
+    concept Multiplicable = requires(T var1, T var2)
     {
-        return x * x;
+        { var1 * var2 } -> std::same_as<T>;
+    };
+    
+    template <Multiplicable T>
+    inline auto Square(const T& var)
+    {
+        return var * var;
     }
 }
