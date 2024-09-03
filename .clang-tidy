@@ -44,8 +44,8 @@ Checks: '*,
 '
 
 CheckOptions:
-  - key: misc-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic
-    value: 'true'
+  - key: misc-include-cleaner.IgnoreHeaders
+    value: '.*/FatPound\.hpp'
 
 WarningsAsErrors: false
 HeaderFilterRegex: '(.*\.hpp)'

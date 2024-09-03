@@ -28,8 +28,7 @@
             "hidden": true,
             "generator": "Ninja",
             "cacheVariables": {
-                "CMAKE_CXX_COMPILER": "icpx",
-                "CMAKE_CXX_CLANG_TIDY": "clang-tidy;-config-file=${sourceDir}/.clang-tidy"
+                "CMAKE_CXX_COMPILER": "icpx"
             }
         },
         {

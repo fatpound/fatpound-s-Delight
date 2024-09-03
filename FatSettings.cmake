@@ -8,13 +8,16 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
         -Wpedantic
 
 
-        ## Inactive errors
-        -Wno-error=changes-meaning
-
-
         ## Configuration-specific
-        $<$<CONFIG:Debug>:-O0 -Werror>
-        $<$<CONFIG:Release>:-O3>
+        $<$<CONFIG:Debug>:
+            -O0
+
+            -Werror
+            -Wno-error=changes-meaning
+        >
+        $<$<CONFIG:Release>:
+            -O3
+        >
     )
 
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "Intel")
@@ -59,7 +62,7 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
         /wd4514 # Unreferenced inline function has been removed
         /wd4820 # n bytes padding added after construct MyClass
         /wd5045 # Compiler will insert Spectre mitigation for memory load if /Qspectre switch specified
-        
+
 
         ## Configuration-specific
         $<$<CONFIG:Debug>:
@@ -71,8 +74,8 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
             /O2
             /GL # Whole-program optimization
 
-            /Qvec-report:2 # Auto vectorizer reports
-            /Qpar-report:2 # Parallelizer reports
+            /Qvec-report:2 # Auto vectorizer reporting (max)
+            /Qpar-report:2 # Parallelizer reporting (max)
 
             /GF # String pooling
         >
